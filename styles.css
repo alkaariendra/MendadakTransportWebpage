@@ -331,46 +331,20 @@ h3 {
 
 .fleet-preview {
   position: relative;
-  min-height: 220px;
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
+  aspect-ratio: 11 / 10;
 }
 
 .fleet-preview img {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 260px;
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  object-position: top center;
   background: #fff;
-}
-
-.fleet-badge {
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 14px;
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(16, 16, 16, 0.12);
-  backdrop-filter: blur(10px);
-}
-
-.fleet-badge strong {
-  font-size: 0.96rem;
-}
-
-.fleet-badge span {
-  color: var(--muted);
-  font-size: 0.84rem;
-  font-weight: 700;
 }
 
 .quick-list {
@@ -495,9 +469,9 @@ h3 {
 
 .vehicle-photo {
   width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: contain;
-  object-position: center;
+  aspect-ratio: 11 / 10;
+  object-fit: cover;
+  object-position: top center;
   border-radius: 6px;
   background: #fff;
 }
@@ -505,7 +479,7 @@ h3 {
 .vehicle-photo-placeholder {
   display: grid;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 11 / 10;
   place-items: center;
   border: 1px dashed var(--line);
   border-radius: 6px;
@@ -770,10 +744,6 @@ h3 {
 
   .hero-actions {
     display: grid;
-  }
-
-  .fleet-preview {
-    min-height: 180px;
   }
 
   .floating-whatsapp {
