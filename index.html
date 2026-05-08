@@ -8,6 +8,12 @@
       content="Mendadak Transport menyediakan layanan rental mobil, tour, jemput bandara, dan transport harian dengan armada nyaman dan respons cepat."
     />
     <title>Mendadak Transport | Tour & Transport Service</title>
+    <meta name="theme-color" content="#d71920" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mendadak Transport | Tour & Transport Service" />
+    <meta property="og:description" content="Rental mobil, tour, jemput bandara, dan transport harian dengan armada nyaman dan respons cepat." />
+    <meta property="og:image" content="assets/logo-mendadak.jpeg" />
+    <meta property="og:locale" content="id_ID" />
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,10 +27,6 @@
     <header class="site-header">
       <a class="brand" href="#beranda" aria-label="Mendadak Transport">
         <img class="brand-logo" src="assets/logo-mendadak.jpeg" alt="Mendadak Transport" />
-        <span class="brand-text">
-          <strong>Mendadak Transport</strong>
-          <span>Tour & Transport Service</span>
-        </span>
       </a>
 
       <nav class="nav-links" aria-label="Navigasi utama">
@@ -38,32 +40,41 @@
         <img src="assets/icon-whatsapp.svg" alt="" />
         <span>Konsultasi</span>
       </a>
+      <button class="hamburger" id="hamburger" aria-label="Buka menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </header>
+
+    <div class="mobile-nav" id="mobileNav" aria-hidden="true">
+      <nav>
+        <a href="#layanan" class="mobile-nav-link">Layanan</a>
+        <a href="#armada" class="mobile-nav-link">Armada</a>
+        <a href="#paket-wisata" class="mobile-nav-link">Paket Wisata</a>
+        <a href="#kontak" class="mobile-nav-link">Kontak</a>
+        <a class="mobile-wa-btn icon-action" data-whatsapp-link href="#kontak">
+          <img src="assets/icon-whatsapp.svg" alt="" />Chat WhatsApp
+        </a>
+      </nav>
+    </div>
 
     <main>
       <section class="hero" id="beranda">
-        <div class="hero-copy">
+        <div class="hero-copy animate-on-scroll">
           <p class="eyebrow">Rental mobil, tour, dan transport service</p>
           <h1>Perjalanan lebih tenang dengan armada yang siap saat dibutuhkan.</h1>
           <p>
-            Mendadak Transport membantu kebutuhan perjalanan harian, wisata,
-            jemput bandara, acara keluarga, hingga perjalanan kantor dengan
-            proses pemesanan yang cepat dan jelas.
+            Sewa mobil lepas kunci atau dengan driver profesional untuk wisata,
+            jemput bandara, acara keluarga, hingga kebutuhan korporat. Proses
+            cepat, harga transparan, dan armada terawat siap melayani 24 jam.
           </p>
 
           <div class="hero-actions">
             <a class="primary-button" data-whatsapp-link href="#kontak">Chat WhatsApp</a>
             <a class="secondary-button" href="#armada">Lihat Armada</a>
           </div>
-
-          <div class="trust-strip" aria-label="Keunggulan layanan">
-            <span>Harga transparan</span>
-            <span>Unit beragam</span>
-            <span>Driver berpengalaman</span>
-          </div>
         </div>
 
-        <aside class="hero-panel" aria-label="Ringkasan pemesanan">
+        <aside class="hero-panel animate-on-scroll" aria-label="Ringkasan pemesanan">
           <div class="panel-top">
             <span>Siap bantu</span>
             <strong>Tour & Transport</strong>
@@ -85,29 +96,41 @@
       </section>
 
       <section class="section" id="layanan">
-        <div class="section-heading">
+        <div class="section-heading animate-on-scroll">
           <p class="eyebrow">Layanan</p>
           <h2>Kebutuhan transport yang paling sering dipesan</h2>
         </div>
 
         <div class="service-grid">
-          <article class="service-card">
-            <span class="card-number">01</span>
+          <article class="service-card animate-on-scroll">
+            <div class="service-card-header">
+              <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+              <span class="card-number">01</span>
+            </div>
             <h3>Rental Mobil</h3>
             <p>Sewa kendaraan lepas kunci atau dengan driver untuk aktivitas harian.</p>
           </article>
-          <article class="service-card">
-            <span class="card-number">02</span>
-            <h3>Tour & Wisata</h3>
+          <article class="service-card animate-on-scroll">
+            <div class="service-card-header">
+              <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+              <span class="card-number">02</span>
+            </div>
+            <h3>Tour &amp; Wisata</h3>
             <p>Perjalanan wisata dengan rute fleksibel untuk keluarga, tamu, atau grup.</p>
           </article>
-          <article class="service-card">
-            <span class="card-number">03</span>
+          <article class="service-card animate-on-scroll">
+            <div class="service-card-header">
+              <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.88 19.79 19.79 0 01.12 1.2 2 2 0 012.1 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+              <span class="card-number">03</span>
+            </div>
             <h3>Airport Transfer</h3>
             <p>Jemput dan antar bandara dengan jadwal yang bisa disesuaikan.</p>
           </article>
-          <article class="service-card">
-            <span class="card-number">04</span>
+          <article class="service-card animate-on-scroll">
+            <div class="service-card-header">
+              <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+              <span class="card-number">04</span>
+            </div>
             <h3>Transport Kantor</h3>
             <p>Dukungan perjalanan kerja, kunjungan tamu, event, dan operasional.</p>
           </article>
@@ -115,29 +138,41 @@
       </section>
 
       <section class="process-section">
-        <div class="section-heading">
+        <div class="section-heading animate-on-scroll">
           <p class="eyebrow">Alur Pesan</p>
           <h2>Cukup kirim detail perjalanan</h2>
         </div>
         <div class="process-grid">
-          <div>
-            <strong>1</strong>
-            <span>Pilih unit atau sampaikan kebutuhan perjalanan.</span>
+          <div class="process-step animate-on-scroll">
+            <div class="process-step-top">
+              <div class="process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+              <strong>1</strong>
+            </div>
+            <h4>Sampaikan Kebutuhan</h4>
+            <span>Pilih unit atau sampaikan kebutuhan perjalanan Anda via WhatsApp.</span>
           </div>
-          <div>
-            <strong>2</strong>
-            <span>Kami cek jadwal, rute, durasi, dan estimasi harga.</span>
+          <div class="process-step animate-on-scroll">
+            <div class="process-step-top">
+              <div class="process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <strong>2</strong>
+            </div>
+            <h4>Cek &amp; Estimasi</h4>
+            <span>Kami cek jadwal, rute, durasi, dan estimasi harga untuk Anda.</span>
           </div>
-          <div>
-            <strong>3</strong>
-            <span>Konfirmasi pemesanan, lalu armada disiapkan.</span>
+          <div class="process-step animate-on-scroll">
+            <div class="process-step-top">
+              <div class="process-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <strong>3</strong>
+            </div>
+            <h4>Armada Siap</h4>
+            <span>Konfirmasi pemesanan, lalu armada disiapkan sesuai jadwal.</span>
           </div>
         </div>
       </section>
 
       <section class="fleet-section" id="armada">
-        <div class="section-heading">
-          <p class="eyebrow">Armada & Harga</p>
+        <div class="section-heading animate-on-scroll">
+          <p class="eyebrow">Armada &amp; Harga</p>
           <h2>Pricelist Mendadak Transport</h2>
           <p>
             Pilih unit yang paling sesuai. Harga dapat berubah mengikuti tanggal,
@@ -145,129 +180,257 @@
           </p>
         </div>
 
+        <div class="fleet-filter animate-on-scroll">
+          <button class="filter-btn active" data-filter="all">Semua</button>
+          <button class="filter-btn" data-filter="Motor">Motor</button>
+          <button class="filter-btn" data-filter="City Car">City Car</button>
+          <button class="filter-btn" data-filter="MPV">MPV</button>
+          <button class="filter-btn" data-filter="Premium MPV">Premium MPV</button>
+          <button class="filter-btn" data-filter="SUV">SUV</button>
+          <button class="filter-btn" data-filter="Luxury">Luxury</button>
+          <button class="filter-btn" data-filter="Minibus">Minibus</button>
+        </div>
+
         <div class="price-grid">
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/honda-jazz.jpeg" alt="Honda Jazz Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">City Car</span>
-            <h3>Honda Jazz</h3>
+          <article class="price-card animate-on-scroll" data-category="City Car">
+            <a href="honda-jazz.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/honda-jazz.jpeg" alt="Honda Jazz Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">City Car</span>
+              <h3>Honda Jazz</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp450.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp700.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Honda Jazz." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="honda-jazz.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Honda Jazz." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/toyota-agya.jpeg" alt="Toyota Agya Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">City Car</span>
-            <h3>Toyota Agya</h3>
+          <article class="price-card animate-on-scroll" data-category="City Car">
+            <a href="toyota-agya.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/toyota-agya.jpeg" alt="Toyota Agya Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">City Car</span>
+              <h3>Toyota Agya</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp350.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp650.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Toyota Agya." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="toyota-agya.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Toyota Agya." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/new-honda-brio.jpeg" alt="New Honda Brio Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">City Car</span>
-            <h3>New Honda Brio</h3>
+          <article class="price-card animate-on-scroll" data-category="City Car">
+            <a href="new-honda-brio.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/new-honda-brio.jpeg" alt="New Honda Brio Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">City Car</span>
+              <h3>New Honda Brio</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp350.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp650.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan New Honda Brio." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="new-honda-brio.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan New Honda Brio." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/all-new-avanza.jpeg" alt="All New Avanza Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">MPV</span>
-            <h3>All New Avanza</h3>
+          <article class="price-card animate-on-scroll" data-category="MPV">
+            <a href="all-new-avanza.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/all-new-avanza.jpeg" alt="All New Avanza Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">MPV</span>
+              <h3>All New Avanza</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp400.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp750.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan All New Avanza." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="all-new-avanza.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan All New Avanza." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/xpander.jpeg" alt="Xpander Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">MPV</span>
-            <h3>Xpander</h3>
+          <article class="price-card animate-on-scroll" data-category="MPV">
+            <a href="xpander.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/xpander.jpeg" alt="Xpander Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">MPV</span>
+              <h3>Xpander</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp400.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp750.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Xpander." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="xpander.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Xpander." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/all-new-xenia.jpeg" alt="All New Xenia Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">MPV</span>
-            <h3>All New Xenia</h3>
+          <article class="price-card animate-on-scroll" data-category="MPV">
+            <a href="all-new-xenia.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/all-new-xenia.jpeg" alt="All New Xenia Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">MPV</span>
+              <h3>All New Xenia</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp400.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp750.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan All New Xenia." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="all-new-xenia.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan All New Xenia." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/innova-reborn.jpeg" alt="Innova Reborn Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">Premium MPV</span>
-            <h3>Innova Reborn</h3>
-            <dl>
-              <div><dt>Lepas kunci</dt><dd>Rp500.000 / 24 jam</dd></div>
-              <div><dt>Driver + BBM</dt><dd>Rp850.000 / 12 jam</dd></div>
-            </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Innova Reborn." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
-          </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/fortuner.jpeg" alt="Fortuner Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">SUV</span>
-            <h3>Fortuner</h3>
+          <article class="price-card animate-on-scroll" data-category="SUV">
+            <a href="fortuner.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/fortuner.jpeg" alt="Fortuner Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">SUV</span>
+              <h3>Fortuner</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp1.000.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp1.600.000 / 24 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Fortuner." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="fortuner.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Fortuner." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/innova-zenix.jpeg" alt="Innova Zenix Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">Premium MPV</span>
-            <h3>Innova Zenix</h3>
+          <article class="price-card animate-on-scroll" data-category="Premium MPV">
+            <a href="innova-zenix.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/innova-zenix.jpeg" alt="Innova Zenix Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Premium MPV</span>
+              <h3>Innova Zenix</h3>
+            </a>
             <dl>
               <div><dt>Lepas kunci</dt><dd>Rp950.000 / 24 jam</dd></div>
               <div><dt>Driver + BBM</dt><dd>Rp1.650.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Innova Zenix." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="innova-zenix.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Innova Zenix." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/pajero-sport.jpeg" alt="Pajero Sport Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">SUV</span>
-            <h3>Pajero Sport</h3>
+          <article class="price-card animate-on-scroll" data-category="SUV">
+            <a href="pajero-sport.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/pajero-sport.jpeg" alt="Pajero Sport Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">SUV</span>
+              <h3>Pajero Sport</h3>
+            </a>
             <dl>
               <div><dt>Driver + BBM</dt><dd>Rp1.600.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Pajero Sport." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="pajero-sport.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Pajero Sport." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/alphard.jpeg" alt="Alphard Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">Luxury</span>
-            <h3>Alphard</h3>
+          <article class="price-card animate-on-scroll" data-category="Luxury">
+            <a href="alphard.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/alphard.jpeg" alt="Alphard Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Luxury</span>
+              <h3>Alphard</h3>
+            </a>
             <dl>
               <div><dt>Driver + BBM</dt><dd>Rp4.500.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Alphard." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="alphard.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Alphard." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
-          <article class="price-card">
-            <img class="vehicle-photo" src="assets/hiace-premio.jpeg" alt="All New Hiace Premio Mendadak Transport" loading="lazy" />
-            <span class="vehicle-type">Minibus</span>
-            <h3>All New Hiace Premio</h3>
+          <article class="price-card animate-on-scroll" data-category="Minibus">
+            <a href="hiace-premio.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/hiace-premio.jpeg" alt="All New Hiace Premio Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Minibus</span>
+              <h3>All New Hiace Premio</h3>
+            </a>
             <dl>
               <div><dt>Driver + BBM</dt><dd>Rp1.650.000 / 12 jam</dd></div>
             </dl>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan All New Hiace Premio." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan unit ini</a>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="hiace-premio.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan All New Hiace Premio." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
+          </article>
+          <article class="price-card animate-on-scroll" data-category="Minibus">
+            <a href="hiace-commuter.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/hiace-commuter.jpeg" alt="Hiace Commuter Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Minibus</span>
+              <h3>Hiace Commuter</h3>
+            </a>
+            <dl>
+              <div><dt>Driver + BBM</dt><dd>Rp1.100.000 / 12 jam</dd></div>
+            </dl>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="hiace-commuter.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Hiace Commuter." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
+          </article>
+          <article class="price-card animate-on-scroll" data-category="Motor">
+            <a href="vespa-matic.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/vespa-matic.jpeg" alt="Vespa Matic Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Motor</span>
+              <h3>Vespa Matic</h3>
+            </a>
+            <dl>
+              <div><dt>Lepas kunci</dt><dd>Rp300.000 / 24 jam</dd></div>
+            </dl>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="vespa-matic.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Vespa Matic." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
+          </article>
+          <article class="price-card animate-on-scroll" data-category="Motor">
+            <a href="yamaha-xmax.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/yamaha-xmax.jpeg" alt="Yamaha XMAX Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Motor</span>
+              <h3>Yamaha XMAX</h3>
+            </a>
+            <dl>
+              <div><dt>Lepas kunci</dt><dd>Rp400.000 / 24 jam</dd></div>
+            </dl>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="yamaha-xmax.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Yamaha XMAX." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
+          </article>
+          <article class="price-card animate-on-scroll" data-category="Premium MPV">
+            <a href="innova-reborn.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/innova-reborn.jpeg" alt="Innova Reborn Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Premium MPV</span>
+              <h3>Innova Reborn</h3>
+            </a>
+            <dl>
+              <div><dt>Lepas kunci</dt><dd>Rp550.000 / 24 jam</dd></div>
+              <div><dt>Driver + BBM</dt><dd>Rp900.000 / 12 jam</dd></div>
+            </dl>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="innova-reborn.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Innova Reborn." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
+          </article>
+          <article class="price-card animate-on-scroll" data-category="Premium MPV">
+            <a href="zenix-g-hev.html" class="vehicle-link">
+              <img class="vehicle-photo" src="assets/zenix-g-hev.jpeg" alt="Zenix G HEV Mendadak Transport" loading="lazy" />
+              <span class="vehicle-type">Premium MPV</span>
+              <h3>Zenix G HEV</h3>
+            </a>
+            <dl>
+              <div><dt>Lepas kunci</dt><dd>Rp700.000 / 24 jam</dd></div>
+              <div><dt>Driver + BBM</dt><dd>Rp1.200.000 / 12 jam</dd></div>
+            </dl>
+            <div class="card-actions">
+              <a class="text-button icon-action" href="zenix-g-hev.html">Lihat Detail</a>
+              <a class="text-button icon-action whatsapp-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin cek ketersediaan Zenix G HEV." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" /> Pesan</a>
+            </div>
           </article>
         </div>
       </section>
 
       <section class="package-section" id="paket-wisata">
-        <div class="section-heading">
+        <div class="section-heading animate-on-scroll">
           <p class="eyebrow">Paket Wisata</p>
           <h2>Pilihan paket perjalanan yang bisa disesuaikan</h2>
           <p>
@@ -279,28 +442,84 @@
 
         <div class="package-grid">
           <article class="package-card">
-            <span>Paket Harian</span>
-            <h3>City Tour / Wisata 1 Hari</h3>
-            <p>Perjalanan singkat untuk beberapa destinasi dalam satu hari.</p>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket wisata harian." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Tanya paket</a>
+            <span>Paket 1 Hari</span>
+            <h3>Tour Harian Eksekutif</h3>
+            <ul class="package-features">
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Private Tour Tanpa Gabung</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Bebas Pilih Destinasi Utama</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Termasuk Mobil Nyaman & BBM</li>
+            </ul>
+            <div class="package-price">
+              <small>Mulai dari</small>
+              <strong>Rp350.000<span>/Pax</span></strong>
+            </div>
+            <a class="primary-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket wisata harian." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan Sekarang</a>
           </article>
           <article class="package-card">
             <span>2H1M</span>
             <h3>Paket Wisata 2 Hari 1 Malam</h3>
-            <p>Trip ringkas untuk liburan akhir pekan, keluarga, atau tamu.</p>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket wisata 2 hari 1 malam." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Tanya paket</a>
+            <ul class="package-features">
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Jelajah Destinasi Terbaik</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Termasuk Hotel Nyaman</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Penjemputan Bandara</li>
+            </ul>
+            <div class="package-price">
+              <small>Mulai dari</small>
+              <strong>Rp850.000<span>/Pax</span></strong>
+            </div>
+            <a class="primary-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket wisata 2 hari 1 malam." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan Sekarang</a>
           </article>
           <article class="package-card">
             <span>3H2M</span>
-            <h3>Paket Wisata 3 Hari 2 Malam</h3>
-            <p>Rute lebih lengkap dengan waktu perjalanan yang tetap santai.</p>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket wisata 3 hari 2 malam." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Tanya paket</a>
+            <h3>Tour Eksklusif 3 Hari 2 Malam</h3>
+            <ul class="package-features">
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Mandalika & Gili Trawangan</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Menginap 2 Malam (Bintang)</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Makan & Dokumentasi</li>
+            </ul>
+            <div class="package-price">
+              <small>Mulai dari</small>
+              <strong>Rp1.037.000<span>/Pax</span></strong>
+            </div>
+            <a class="primary-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket wisata 3 hari 2 malam." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Pesan Sekarang</a>
           </article>
           <article class="package-card">
             <span>Custom</span>
-            <h3>Honeymoon / Family Trip</h3>
-            <p>Paket fleksibel untuk pasangan, keluarga, rombongan, atau corporate trip.</p>
-            <a class="text-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket honeymoon atau family trip." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Tanya paket</a>
+            <h3>Honeymoon / Corporate Trip</h3>
+            <ul class="package-features">
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Itinerary Sangat Fleksibel</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Transportasi Kelas Premium</li>
+              <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Layanan Asisten/Guide Lokal</li>
+            </ul>
+            <div class="package-price">
+              <small>Hubungi untuk</small>
+              <strong>Penawaran<span> Terbaik</span></strong>
+            </div>
+            <a class="primary-button icon-action" data-whatsapp-message="Halo Mendadak Transport, saya ingin bertanya paket honeymoon atau corporate trip." href="#kontak"><img src="assets/icon-whatsapp.svg" alt="" />Konsultasi</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="testimonial-section animate-on-scroll">
+        <div class="section-heading">
+          <p class="eyebrow">Testimoni</p>
+          <h2>Dipercaya ribuan pelanggan</h2>
+        </div>
+        <div class="testimonial-grid">
+          <article class="testimonial-card">
+            <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p>"Driver tepat waktu, mobil sangat bersih dan nyaman. Perjalanan ke bandara jadi jauh lebih tenang."</p>
+            <div class="reviewer"><div class="reviewer-avatar">AS</div><div><strong>Andi Setiawan</strong><span>Jakarta</span></div></div>
+          </article>
+          <article class="testimonial-card">
+            <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p>"Paket wisata keluarga 2 hari 1 malam sangat memuaskan. Rute disesuaikan keinginan kami."</p>
+            <div class="reviewer"><div class="reviewer-avatar">RL</div><div><strong>Rina Lestari</strong><span>Bandung</span></div></div>
+          </article>
+          <article class="testimonial-card">
+            <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p>"Harga transparan, tidak ada biaya tersembunyi. Armada lengkap dari city car hingga Alphard."</p>
+            <div class="reviewer"><div class="reviewer-avatar">DP</div><div><strong>Dian Pratama</strong><span>Surabaya</span></div></div>
           </article>
         </div>
       </section>
@@ -332,6 +551,11 @@
               <img src="assets/icon-instagram.svg" alt="" />
               @mendadaktransport
             </a>
+
+            <div class="hours-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Siap melayani 24 jam
+            </div>
           </div>
         </div>
       </section>
@@ -342,8 +566,16 @@
     </a>
 
     <footer class="site-footer">
-      <span>&copy; <span id="year"></span> Mendadak Transport</span>
-      <span>Tour & Transport Service</span>
+      <div class="footer-brand">
+        <span>&copy; <span id="year"></span> Mendadak Transport</span>
+        <span class="footer-sub">Tour &amp; Transport Service</span>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="#layanan">Layanan</a>
+        <a href="#armada">Armada</a>
+        <a href="#paket-wisata">Paket Wisata</a>
+        <a href="#kontak">Kontak</a>
+      </nav>
     </footer>
 
     <script src="script.js"></script>
