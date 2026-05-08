@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" role="img" aria-labelledby="title desc">
+  <title id="title">Mendadak Transport</title>
+  <desc id="desc">Logo sementara Mendadak Transport</desc>
+  <rect width="520" height="160" rx="18" fill="#ffffff"/>
+  <g transform="translate(28 32)">
+    <text x="0" y="43" fill="#111111" font-family="Arial Black, Impact, sans-serif" font-size="44" font-style="italic" font-weight="900">MENDADAK</text>
+    <text x="0" y="87" fill="#d71920" font-family="Arial Black, Impact, sans-serif" font-size="48" font-style="italic" font-weight="900">TRANSPORT</text>
+    <text x="4" y="113" fill="#111111" font-family="Arial, sans-serif" font-size="17" letter-spacing="2">TOUR &amp; TRANSPORT SERVICE</text>
+  </g>
+  <g transform="translate(332 39)" fill="none" stroke="#d71920" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 62 C42 26 117 20 154 61"/>
+    <path d="M7 75 H163"/>
+    <path d="M42 34 H103 L133 62"/>
+    <path d="M37 78 C37 94 60 94 60 78"/>
+    <path d="M118 78 C118 94 141 94 141 78"/>
+    <path d="M124 46 L154 51"/>
+  </g>
+</svg>
