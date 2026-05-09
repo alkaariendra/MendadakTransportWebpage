@@ -1,0 +1,21 @@
+{
+  "name": "web-nopal-bedel",
+  "version": "1.0.0",
+  "description": "Static landing page for Mendadak Transport.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alkaariendra/MendadakTransportWebpage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alkaariendra/MendadakTransportWebpage/issues"
+  },
+  "homepage": "https://github.com/alkaariendra/MendadakTransportWebpage#readme"
+}

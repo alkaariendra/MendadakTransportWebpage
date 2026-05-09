@@ -1,4 +1,16 @@
 server.log
 server.err.log
+*.log
 .DS_Store
 Thumbs.db
+
+.vercel
+backups/
+.env
+.env.local
+.env.*.local
+baileys-order-bot/.env
+baileys-order-bot/auth/
+baileys-order-bot/qr.png
+baileys-order-bot/server-qr.png
+baileys-order-bot/node_modules/
