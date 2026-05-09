@@ -1369,6 +1369,58 @@ h3 {
   margin: 0;
 }
 
+.thank-you-section {
+  min-height: calc(100vh - 180px);
+  display: grid;
+  place-items: center;
+  padding: 160px 24px 96px;
+  background:
+    linear-gradient(180deg, rgba(215, 25, 32, 0.08), rgba(255, 255, 255, 0)),
+    var(--surface);
+}
+
+.thank-you-content {
+  width: min(100%, 720px);
+  text-align: center;
+}
+
+.thank-you-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(36, 184, 93, 0.12);
+  color: #118642;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.thank-you-content h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.thank-you-content p {
+  max-width: 580px;
+  margin: 20px auto 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.thank-you-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
 .detail-cta {
   margin-top: 16px;
   display: inline-flex;

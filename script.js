@@ -2,6 +2,7 @@
 const whatsappPrimary   = "6289697301342";
 const whatsappSecondary = "62881038004520";
 const defaultMessage    = "Halo Mendadak Transport, saya ingin bertanya ketersediaan transport.";
+const thankYouUrl       = "/terima-kasih.html";
 
 const createWhatsAppUrl = (number, message = defaultMessage) =>
   `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
@@ -150,6 +151,12 @@ const setAssistantStatus = (message, type = "") => {
   assistantStatus.dataset.type = type;
 };
 
+const goToThankYouPage = () => {
+  window.setTimeout(() => {
+    window.location.assign(thankYouUrl);
+  }, 900);
+};
+
 const isAssistantLeadReady = (content) => {
   const text = cleanAssistantText(content);
   const hasSummary = /ringkasan\s+pesanan/i.test(text);
@@ -234,17 +241,10 @@ const submitAssistantLead = async ({ automatic = false } = {}) => {
 
     if (response.ok && data.ok) {
       assistantState.leadSent = true;
-      setAssistantStatus(data.message || "Pesanan sudah dikirim ke admin.", "success");
+      setAssistantStatus(`${data.message || "Pesanan sudah dikirim ke admin."} Mengalihkan...`, "success");
       assistantWa.textContent = "Terkirim ke Admin";
       assistantWa.disabled = true;
-      if (!automatic) {
-        assistantState.messages = [getAssistantWelcomeMessage()];
-        assistantState.leadSent = false;
-        assistantWa.textContent = "Kirim Manual ke Admin";
-        assistantInput.value = "";
-        assistantInput.style.height = "auto";
-        renderAssistantMessages();
-      }
+      goToThankYouPage();
       return;
     }
 
