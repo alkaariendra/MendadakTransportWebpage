@@ -43,6 +43,13 @@ Aturan jawaban:
 - Jika layanan belum jelas, tanya pelanggan butuh mobil, motor, paket tour, antar jemput bandara,
   atau transport acara/kantor.
 - Untuk rental mobil/motor, jika belum ada pilihan lepas kunci/driver, tanyakan pilihan itu.
+- Jika pelanggan meminta lepas kunci untuk armada yang di katalog hanya tersedia driver + BBM
+  (contoh: Hiace, Pajero Sport, Alphard), jangan buat ringkasan pesanan dulu. Jelaskan singkat
+  bahwa lepas kunci tidak tersedia untuk unit itu, sebutkan opsi dan harga yang tersedia, lalu
+  tanyakan apakah pelanggan setuju memakai opsi tersebut atau ingin pilihan unit lain.
+- Jika pelanggan meminta driver untuk armada/motor yang di katalog hanya tersedia lepas kunci,
+  jangan buat ringkasan pesanan dulu. Jelaskan opsi yang tersedia sesuai katalog dan tawarkan
+  admin untuk mencarikan alternatif bila perlu.
 - Untuk rental mobil/motor, jika pelanggan memilih pengantaran tetapi belum memberi alamat,
   tanyakan alamat/titik antarnya. Jika pelanggan memilih pengambilan, jangan minta alamat.
 - Untuk paket tour, jangan memaksa detail itinerary panjang; cukup paket/tanggal/jumlah peserta
@@ -80,22 +87,22 @@ function normalizeMessages(input) {
 }
 
 const SERVICE_ITEMS = [
-  { keys: ["honda jazz", "jazz"], name: "Honda Jazz", prices: "lepas kunci Rp450.000 / 24 jam; driver + BBM Rp700.000 / 12 jam" },
-  { keys: ["toyota agya", "agya"], name: "Toyota Agya", prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam" },
-  { keys: ["new honda brio", "honda brio", "brio"], name: "New Honda Brio", prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam" },
-  { keys: ["all new avanza", "avanza"], name: "All New Avanza", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam" },
-  { keys: ["xpander"], name: "Xpander", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam" },
-  { keys: ["all new xenia", "xenia"], name: "All New Xenia", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam" },
-  { keys: ["fortuner"], name: "Fortuner", prices: "lepas kunci Rp1.000.000 / 24 jam; driver + BBM Rp1.600.000 / 24 jam" },
-  { keys: ["innova zenix", "zenix"], name: "Innova Zenix", prices: "lepas kunci Rp950.000 / 24 jam; driver + BBM Rp1.650.000 / 12 jam" },
-  { keys: ["innova reborn", "reborn"], name: "Innova Reborn", prices: "lepas kunci Rp550.000 / 24 jam; driver + BBM Rp900.000 / 12 jam" },
-  { keys: ["zenix g hev", "hev"], name: "Zenix G HEV", prices: "lepas kunci Rp700.000 / 24 jam; driver + BBM Rp1.200.000 / 12 jam" },
-  { keys: ["hiace premio", "premio"], name: "All New Hiace Premio", prices: "driver + BBM Rp1.650.000 / 12 jam" },
-  { keys: ["hiace commuter", "commuter", "hiace"], name: "Hiace Commuter", prices: "driver + BBM Rp1.100.000 / 12 jam" },
-  { keys: ["pajero sport", "pajero"], name: "Pajero Sport", prices: "driver + BBM Rp1.600.000 / 12 jam" },
-  { keys: ["alphard"], name: "Alphard", prices: "driver + BBM Rp4.500.000 / 12 jam" },
-  { keys: ["vespa matic", "vespa"], name: "Vespa Matic", prices: "lepas kunci Rp300.000 / 24 jam" },
-  { keys: ["yamaha xmax", "xmax"], name: "Yamaha XMAX", prices: "lepas kunci Rp400.000 / 24 jam" },
+  { keys: ["honda jazz", "jazz"], name: "Honda Jazz", prices: "lepas kunci Rp450.000 / 24 jam; driver + BBM Rp700.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["toyota agya", "agya"], name: "Toyota Agya", prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["new honda brio", "honda brio", "brio"], name: "New Honda Brio", prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["all new avanza", "avanza"], name: "All New Avanza", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["xpander"], name: "Xpander", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["all new xenia", "xenia"], name: "All New Xenia", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["fortuner"], name: "Fortuner", prices: "lepas kunci Rp1.000.000 / 24 jam; driver + BBM Rp1.600.000 / 24 jam", modes: ["self", "driver"] },
+  { keys: ["innova zenix", "zenix"], name: "Innova Zenix", prices: "lepas kunci Rp950.000 / 24 jam; driver + BBM Rp1.650.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["innova reborn", "reborn"], name: "Innova Reborn", prices: "lepas kunci Rp550.000 / 24 jam; driver + BBM Rp900.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["zenix g hev", "hev"], name: "Zenix G HEV", prices: "lepas kunci Rp700.000 / 24 jam; driver + BBM Rp1.200.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["hiace premio", "premio"], name: "All New Hiace Premio", prices: "driver + BBM Rp1.650.000 / 12 jam", modes: ["driver"] },
+  { keys: ["hiace commuter", "commuter", "hiace"], name: "Hiace Commuter", prices: "driver + BBM Rp1.100.000 / 12 jam", modes: ["driver"] },
+  { keys: ["pajero sport", "pajero"], name: "Pajero Sport", prices: "driver + BBM Rp1.600.000 / 12 jam", modes: ["driver"] },
+  { keys: ["alphard"], name: "Alphard", prices: "driver + BBM Rp4.500.000 / 12 jam", modes: ["driver"] },
+  { keys: ["vespa matic", "vespa"], name: "Vespa Matic", prices: "lepas kunci Rp300.000 / 24 jam", modes: ["self"] },
+  { keys: ["yamaha xmax", "xmax"], name: "Yamaha XMAX", prices: "lepas kunci Rp400.000 / 24 jam", modes: ["self"] },
   { keys: ["paket a", "tour a"], name: "Tour 3 Hari 2 Malam Paket A", prices: "mulai Rp1.037.000 / person" },
   { keys: ["paket b", "tour b"], name: "Tour 3 Hari 2 Malam Paket B", prices: "mulai Rp962.000 / person" },
   { keys: ["paket c", "tour c"], name: "Tour 3 Hari 2 Malam Paket C", prices: "mulai Rp1.080.000 / person" },
@@ -134,9 +141,47 @@ function findDuration(text) {
 }
 
 function findRentalType(text) {
-  if (/lepas\s*kunci/i.test(text)) return "Lepas kunci";
-  if (/driver|sopir/i.test(text)) return "Dengan driver";
+  const selfDriveMatches = [...text.matchAll(/lepas\s*kunci/gim)].map((match) => match.index || 0);
+  const driverMatches = [...text.matchAll(/\b(driver|sopir|supir)\b/gim)].map((match) => match.index || 0);
+  const selfDriveIndex = selfDriveMatches.at(-1) ?? -1;
+  const driverIndex = driverMatches.at(-1) ?? -1;
+
+  if (selfDriveIndex < 0 && driverIndex < 0) return "";
+  if (selfDriveIndex > driverIndex) return "Lepas kunci";
+  if (driverIndex > selfDriveIndex) return "Dengan driver";
   return "";
+}
+
+function getRentalModeKey(rentalType) {
+  if (rentalType === "Lepas kunci") return "self";
+  if (rentalType === "Dengan driver") return "driver";
+  return "";
+}
+
+function getPriceOption(prices, mode) {
+  const pattern = mode === "self"
+    ? /lepas\s+kunci[^;]*/i
+    : /driver\s*\+\s*BBM[^;]*/i;
+  return prices.match(pattern)?.[0] || prices;
+}
+
+function getAvailableOptions(service) {
+  const modes = Array.isArray(service.modes) ? service.modes : [];
+  return modes
+    .map((mode) => getPriceOption(service.prices, mode))
+    .filter(Boolean)
+    .join("; ");
+}
+
+function buildUnavailableRentalReply(service, rentalType) {
+  const requested = rentalType === "Lepas kunci" ? "lepas kunci" : "dengan driver";
+  const options = getAvailableOptions(service);
+
+  return [
+    `Untuk ${service.name}, ${requested} tidak tersedia di katalog website.`,
+    `Opsi yang tersedia: ${options}.`,
+    "Kalau cocok dengan opsi itu, balas konfirmasi pilihan sewanya, atau sebutkan unit lain yang ingin dicek."
+  ].join("\n");
 }
 
 function inferNameAndLocation(text, phone) {
@@ -172,9 +217,10 @@ function buildFastLeadReply(messages) {
   const isRental = /mobil|motor|pajero|brio|avanza|xpander|xenia|jazz|agya|fortuner|innova|zenix|hiace|alphard|vespa|xmax/i.test(service.name);
   if (isRental && (!dateText || !duration || !rentalType)) return "";
 
-  const unavailableNote = rentalType === "Lepas kunci" && !/lepas kunci/i.test(service.prices)
-    ? "Catatan: di katalog website, layanan untuk unit ini tercatat driver + BBM. Permintaan lepas kunci tetap dicatat untuk dikonfirmasi admin."
-    : "";
+  const rentalMode = getRentalModeKey(rentalType);
+  if (isRental && rentalMode && Array.isArray(service.modes) && !service.modes.includes(rentalMode)) {
+    return buildUnavailableRentalReply(service, rentalType);
+  }
 
   return [
     "Ringkasan pesanan:",
@@ -186,7 +232,6 @@ function buildFastLeadReply(messages) {
     location ? `- Lokasi/titik: ${location}` : "",
     dateText ? `- Tanggal mulai: ${dateText}` : "",
     duration ? `- Durasi: ${duration}` : "",
-    unavailableNote ? `- ${unavailableNote}` : "",
     "",
     "Website akan mengirim notifikasi ke admin otomatis."
   ].filter(Boolean).join("\n");
