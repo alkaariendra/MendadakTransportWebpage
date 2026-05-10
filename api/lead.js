@@ -119,7 +119,10 @@ async function sendTelegramLead(text) {
 }
 
 async function sendWebhookLead(body, messages, leadText) {
-  if (!process.env.LEAD_WEBHOOK_URL) {
+  const webhookUrl = String(process.env.LEAD_WEBHOOK_URL || "").trim();
+  const webhookSecret = String(process.env.LEAD_WEBHOOK_SECRET || "").trim();
+
+  if (!webhookUrl) {
     return {
       ok: false,
       skipped: true,
@@ -127,11 +130,11 @@ async function sendWebhookLead(body, messages, leadText) {
     };
   }
 
-  const response = await fetch(process.env.LEAD_WEBHOOK_URL, {
+  const response = await fetch(webhookUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-lead-secret": process.env.LEAD_WEBHOOK_SECRET || ""
+      "x-lead-secret": webhookSecret
     },
     body: JSON.stringify({
       source: "mendadaktransport.com",
@@ -152,6 +155,17 @@ async function sendWebhookLead(body, messages, leadText) {
   }
 
   return { ok: true };
+}
+
+function normalizeChannelResult(result) {
+  if (result.status === "fulfilled") {
+    return result.value || { ok: false, reason: "Respons kosong." };
+  }
+
+  return {
+    ok: false,
+    reason: result.reason?.message || String(result.reason || "Channel notification failed.")
+  };
 }
 
 export default async function handler(req, res) {
@@ -176,21 +190,35 @@ export default async function handler(req, res) {
     const leadText = buildLeadText(messages, body.pageUrl);
     const fallbackUrl = createWhatsAppUrl(ADMIN_WHATSAPP_NUMBER, leadText);
 
-    const telegramResult = await sendTelegramLead(leadText);
-    if (telegramResult.ok) {
-      return sendJson(res, 200, {
-        ok: true,
-        channel: "telegram",
-        message: "Pesanan sudah dikirim ke admin."
-      });
-    }
+    const [telegramResult, webhookResult] = (
+      await Promise.allSettled([
+        sendTelegramLead(leadText),
+        sendWebhookLead(body, messages, leadText)
+      ])
+    ).map(normalizeChannelResult);
 
-    const webhookResult = await sendWebhookLead(body, messages, leadText);
-    if (webhookResult.ok) {
+    if (telegramResult.ok || webhookResult.ok) {
+      const channels = [
+        telegramResult.ok ? "telegram" : "",
+        webhookResult.ok ? "whatsapp" : ""
+      ].filter(Boolean);
+
+      if (!telegramResult.ok) {
+        console.error("Telegram notification failed:", telegramResult.reason);
+      }
+
+      if (!webhookResult.ok) {
+        console.error("WhatsApp notification failed:", webhookResult.reason);
+      }
+
       return sendJson(res, 200, {
         ok: true,
-        channel: "webhook",
-        message: "Pesanan sudah dikirim ke admin."
+        channel: channels.join("+"),
+        telegramSent: Boolean(telegramResult.ok),
+        whatsappSent: Boolean(webhookResult.ok),
+        message: webhookResult.ok
+          ? "Pesanan sudah dikirim ke WhatsApp admin."
+          : "Pesanan sudah dikirim ke admin."
       });
     }
 
