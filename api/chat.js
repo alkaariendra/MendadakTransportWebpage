@@ -79,6 +79,119 @@ function normalizeMessages(input) {
     .filter((message) => message.content.trim().length > 0);
 }
 
+const SERVICE_ITEMS = [
+  { keys: ["honda jazz", "jazz"], name: "Honda Jazz", prices: "lepas kunci Rp450.000 / 24 jam; driver + BBM Rp700.000 / 12 jam" },
+  { keys: ["toyota agya", "agya"], name: "Toyota Agya", prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam" },
+  { keys: ["new honda brio", "honda brio", "brio"], name: "New Honda Brio", prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam" },
+  { keys: ["all new avanza", "avanza"], name: "All New Avanza", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam" },
+  { keys: ["xpander"], name: "Xpander", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam" },
+  { keys: ["all new xenia", "xenia"], name: "All New Xenia", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam" },
+  { keys: ["fortuner"], name: "Fortuner", prices: "lepas kunci Rp1.000.000 / 24 jam; driver + BBM Rp1.600.000 / 24 jam" },
+  { keys: ["innova zenix", "zenix"], name: "Innova Zenix", prices: "lepas kunci Rp950.000 / 24 jam; driver + BBM Rp1.650.000 / 12 jam" },
+  { keys: ["innova reborn", "reborn"], name: "Innova Reborn", prices: "lepas kunci Rp550.000 / 24 jam; driver + BBM Rp900.000 / 12 jam" },
+  { keys: ["zenix g hev", "hev"], name: "Zenix G HEV", prices: "lepas kunci Rp700.000 / 24 jam; driver + BBM Rp1.200.000 / 12 jam" },
+  { keys: ["hiace premio", "premio"], name: "All New Hiace Premio", prices: "driver + BBM Rp1.650.000 / 12 jam" },
+  { keys: ["hiace commuter", "commuter", "hiace"], name: "Hiace Commuter", prices: "driver + BBM Rp1.100.000 / 12 jam" },
+  { keys: ["pajero sport", "pajero"], name: "Pajero Sport", prices: "driver + BBM Rp1.600.000 / 12 jam" },
+  { keys: ["alphard"], name: "Alphard", prices: "driver + BBM Rp4.500.000 / 12 jam" },
+  { keys: ["vespa matic", "vespa"], name: "Vespa Matic", prices: "lepas kunci Rp300.000 / 24 jam" },
+  { keys: ["yamaha xmax", "xmax"], name: "Yamaha XMAX", prices: "lepas kunci Rp400.000 / 24 jam" },
+  { keys: ["paket a", "tour a"], name: "Tour 3 Hari 2 Malam Paket A", prices: "mulai Rp1.037.000 / person" },
+  { keys: ["paket b", "tour b"], name: "Tour 3 Hari 2 Malam Paket B", prices: "mulai Rp962.000 / person" },
+  { keys: ["paket c", "tour c"], name: "Tour 3 Hari 2 Malam Paket C", prices: "mulai Rp1.080.000 / person" },
+  { keys: ["paket d", "tour d"], name: "Tour 3 Hari 2 Malam Paket D", prices: "mulai Rp952.000 / person" },
+  { keys: ["paket e", "tour e"], name: "Tour 3 Hari 2 Malam Paket E", prices: "mulai Rp950.000 / person" },
+  { keys: ["tour", "paket wisata"], name: "Paket Tour Lombok", prices: "mulai Rp950.000 / person, tergantung paket" },
+  { keys: ["bandara", "airport"], name: "Antar jemput Bandara Lombok", prices: "harga mengikuti rute, jadwal, dan armada" }
+];
+
+function cleanLine(text) {
+  return String(text || "").replace(/\s+/g, " ").trim();
+}
+
+function findService(text) {
+  const lower = text.toLowerCase();
+  return SERVICE_ITEMS.find((item) => item.keys.some((key) => lower.includes(key)));
+}
+
+function findPhone(text) {
+  const match = text.match(/(?:\+?62|0)?[\d][\d\s-]{7,15}\d/);
+  return match ? match[0].replace(/[^\d+]/g, "") : "";
+}
+
+function findDateText(text) {
+  const lower = text.toLowerCase();
+  const explicitDate = lower.match(/\b\d{1,2}\s+(?:januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember|jan|feb|mar|apr|jun|jul|agu|agt|sep|okt|nov|des)\b/i);
+  if (lower.includes("besok") && explicitDate) return `Besok / ${explicitDate[0]} (admin konfirmasi tanggal final)`;
+  if (lower.includes("besok")) return "Besok";
+  return explicitDate ? explicitDate[0] : "";
+}
+
+function findDuration(text) {
+  if (/\b(sehari|1\s*hari|24\s*jam)\b/i.test(text)) return "1 hari / 24 jam";
+  const match = text.match(/\b\d+\s*(?:hari|jam)\b/i);
+  return match ? match[0] : "";
+}
+
+function findRentalType(text) {
+  if (/lepas\s*kunci/i.test(text)) return "Lepas kunci";
+  if (/driver|sopir/i.test(text)) return "Dengan driver";
+  return "";
+}
+
+function inferNameAndLocation(text, phone) {
+  const lines = text
+    .split(/\n+/)
+    .map(cleanLine)
+    .filter(Boolean)
+    .filter((line) => !phone || !line.includes(phone));
+
+  const serviceWords = /(mau|pesan|pesen|booking|sewa|rental|mobil|motor|tour|paket|bandara|driver|lepas kunci|besok|hari|jam|tanggal|pajero|brio|avanza|xpander|xenia|jazz|agya|fortuner|innova|zenix|hiace|alphard|vespa|xmax)/i;
+  const simpleLines = lines.filter((line) => !serviceWords.test(line) && !/\d{4,}/.test(line));
+  return {
+    name: simpleLines[0] || "",
+    location: simpleLines[1] || ""
+  };
+}
+
+function buildFastLeadReply(messages) {
+  const userText = messages
+    .filter((message) => message.role === "user")
+    .slice(-4)
+    .map((message) => message.content)
+    .join("\n");
+  const service = findService(userText);
+  const phone = findPhone(userText);
+  const { name, location } = inferNameAndLocation(userText, phone);
+  const dateText = findDateText(userText);
+  const duration = findDuration(userText);
+  const rentalType = findRentalType(userText);
+
+  if (!service || !phone || !name) return "";
+
+  const isRental = /mobil|motor|pajero|brio|avanza|xpander|xenia|jazz|agya|fortuner|innova|zenix|hiace|alphard|vespa|xmax/i.test(service.name);
+  if (isRental && (!dateText || !duration || !rentalType)) return "";
+
+  const unavailableNote = rentalType === "Lepas kunci" && !/lepas kunci/i.test(service.prices)
+    ? "Catatan: di katalog website, layanan untuk unit ini tercatat driver + BBM. Permintaan lepas kunci tetap dicatat untuk dikonfirmasi admin."
+    : "";
+
+  return [
+    "Ringkasan pesanan:",
+    `- Nama: ${name}`,
+    `- WhatsApp: ${phone}`,
+    `- Layanan: ${service.name}`,
+    `- Harga katalog: ${service.prices}`,
+    rentalType ? `- Tipe sewa: ${rentalType}` : "",
+    location ? `- Lokasi/titik: ${location}` : "",
+    dateText ? `- Tanggal mulai: ${dateText}` : "",
+    duration ? `- Durasi: ${duration}` : "",
+    unavailableNote ? `- ${unavailableNote}` : "",
+    "",
+    "Website akan mengirim notifikasi ke admin otomatis."
+  ].filter(Boolean).join("\n");
+}
+
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -108,6 +221,11 @@ export default async function handler(req, res) {
       return sendJson(res, 400, { error: "Pesan kosong." });
     }
 
+    const fastReply = buildFastLeadReply(messages);
+    if (fastReply) {
+      return sendJson(res, 200, { reply: fastReply, source: "fast-path" });
+    }
+
     const response = await fetch(DEEPSEEK_API_URL, {
       method: "POST",
       headers: {
@@ -121,10 +239,8 @@ export default async function handler(req, res) {
           ...(pageContext ? [{ role: "system", content: pageContext }] : []),
           ...messages
         ],
-        thinking: { type: "enabled" },
-        reasoning_effort: "high",
-        temperature: 0.25,
-        max_tokens: 650,
+        temperature: 0.2,
+        max_tokens: 360,
         stream: false
       })
     });
