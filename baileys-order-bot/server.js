@@ -54,6 +54,13 @@ function formatMessage(payload) {
   ].join("\n").slice(0, 6000);
 }
 
+function getTargetJids() {
+  return [GROUP_JID, ADMIN_JID]
+    .map((jid) => String(jid || "").trim())
+    .filter(Boolean)
+    .filter((jid, index, all) => all.indexOf(jid) === index);
+}
+
 async function startWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState("./auth");
   const { version } = await fetchLatestBaileysVersion();
@@ -109,7 +116,8 @@ app.get("/health", (req, res) => {
   res.json({
     ok: connectionStatus === "connected",
     status: connectionStatus,
-    target: GROUP_JID || ADMIN_JID || null,
+    target: getTargetJids()[0] || null,
+    targets: getTargetJids(),
     latestQrAt,
     qrUrl: latestQrAt ? "/qr" : null
   });
@@ -154,13 +162,27 @@ app.post("/send-lead", requireSecret, async (req, res) => {
     return res.status(503).json({ error: "WhatsApp bot belum terkoneksi." });
   }
 
-  const targetJid = GROUP_JID || ADMIN_JID;
-  if (!targetJid) {
+  const targetJids = getTargetJids();
+  if (!targetJids.length) {
     return res.status(500).json({ error: "WHATSAPP_GROUP_JID atau WHATSAPP_ADMIN_JID belum diset." });
   }
 
-  await sock.sendMessage(targetJid, { text: formatMessage(req.body) });
-  return res.json({ ok: true });
+  const text = formatMessage(req.body);
+  const errors = [];
+
+  for (const targetJid of targetJids) {
+    try {
+      await sock.sendMessage(targetJid, { text });
+      return res.json({ ok: true, target: targetJid });
+    } catch (error) {
+      errors.push({ target: targetJid, error: error?.message || String(error) });
+    }
+  }
+
+  return res.status(502).json({
+    error: "WhatsApp gagal mengirim ke semua target.",
+    details: errors
+  });
 });
 
 app.get("/groups", requireSecret, async (req, res) => {
