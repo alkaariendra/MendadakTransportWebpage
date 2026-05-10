@@ -50,7 +50,7 @@ function pickSummary(messages) {
     message.role === "assistant"
     && !/^halo, saya asisten/i.test(message.content)
     && !/pesanan sudah dikirim/i.test(message.content)
-    && /(ringkasan|catatan|nama|hp|nomor|wa|brio|lepas kunci|durasi|jam|pengantaran|pengambilan|alamat|ambil|paket)/i.test(message.content)
+    && /(ringkasan|catatan|nama|hp|nomor|wa|whatsapp|armada|mobil|motor|tour|paket|bandara|driver|lepas kunci|durasi|tanggal|jam|jemput|antar|pengantaran|pengambilan|alamat|lokasi|peserta|rute|tujuan)/i.test(message.content)
   ));
 
   if (assistantSummary) {
@@ -75,14 +75,12 @@ function buildLeadText(messages, pageUrl) {
     `Waktu: ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Makassar" })} WITA`,
     pageUrl ? `Sumber: ${pageUrl}` : "",
     "",
-    "Paket:",
-    "Mobil: New Honda Brio lepas kunci",
-    "Harga: Rp350.000 / 24 jam",
-    "Mulai: Besok jam 09:00",
-    "Durasi: 24 jam",
-    "",
     "Ringkasan:",
-    summary
+    summary,
+    "",
+    "Catatan katalog:",
+    "Lead bisa berasal dari rental mobil, rental motor, paket tour, antar jemput bandara, atau transport acara/kantor.",
+    "Harga dan ketersediaan final dikonfirmasi admin."
   ].filter(Boolean).join("\n");
 }
 

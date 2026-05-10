@@ -20,7 +20,7 @@ document.querySelectorAll("[data-whatsapp-message]").forEach((l) =>
 );
 
 // AI booking assistant
-const ASSISTANT_WELCOME_MESSAGE = "Halo, saya asisten Mendadak Transport. Paket chat website saat ini: New Honda Brio lepas kunci Rp350.000 / 24 jam, mulai besok jam 09:00. Saya cukup catat nama, nomor HP, dan pilihan pengantaran atau pengambilan. Jika datanya lengkap, notifikasi akan terkirim otomatis ke admin.";
+const ASSISTANT_WELCOME_MESSAGE = "Halo, saya asisten Mendadak Transport. Saya bisa bantu rental mobil, rental motor, paket tour Lombok, antar jemput bandara, dan transport acara/kantor. Ceritakan kebutuhan perjalanan Anda, nanti saya bantu cocokkan dengan katalog dan kirim ringkasan ke admin jika datanya cukup.";
 
 const getAssistantWelcomeMessage = () => ({
   role: "assistant",
@@ -35,10 +35,10 @@ const assistantState = {
 };
 
 const assistantQuickReplies = [
-  "Saya pilih pengantaran",
-  "Saya pilih pengambilan",
-  "Saya mau booking Brio",
-  "Kirim nama dan HP"
+  "Mobil lepas kunci",
+  "Mobil dengan driver",
+  "Rental motor",
+  "Paket tour Lombok"
 ];
 
 const assistantShell = document.createElement("div");
@@ -116,7 +116,7 @@ const getCompactAssistantSummary = () => {
 };
 
 const updateAssistantWhatsApp = () => {
-  const message = `Halo admin Mendadak Transport, saya ingin meneruskan pesanan dari AI assistant.\n\nPaket:\nNew Honda Brio lepas kunci\nHarga: Rp350.000 / 24 jam\nMulai: Besok jam 09:00\nDurasi: 24 jam\n\nRingkasan:\n${getCompactAssistantSummary()}`;
+  const message = `Halo admin Mendadak Transport, saya ingin meneruskan lead dari AI assistant website.\n\nRingkasan:\n${getCompactAssistantSummary()}`;
   assistantWa.dataset.fallbackUrl = createWhatsAppUrl(whatsappPrimary, message);
 };
 
@@ -161,10 +161,10 @@ const isAssistantLeadReady = (content) => {
   const text = cleanAssistantText(content);
   const hasSummary = /ringkasan\s+pesanan/i.test(text);
   const hasContact = /(whats\s*app|wa|hp|nomor)/i.test(text);
-  const hasRentalDetail = /(armada|mobil|brio|lepas\s+kunci|pengantaran|pengambilan|alamat|jemput|lokasi)/i.test(text);
+  const hasServiceDetail = /(layanan|armada|mobil|motor|tour|paket|bandara|driver|lepas\s+kunci|pengantaran|pengambilan|alamat|jemput|antar|lokasi|tanggal|durasi|peserta|rute|tujuan)/i.test(text);
   const asksToSend = /kirim\s+pesanan\s+ke\s+admin|meneruskan\s+ringkasan|notifikasi\s+ke\s+admin/i.test(text);
 
-  return hasSummary && hasContact && (hasRentalDetail || asksToSend);
+  return hasSummary && hasContact && (hasServiceDetail || asksToSend);
 };
 
 assistantQuickEl.innerHTML = assistantQuickReplies
@@ -191,7 +191,11 @@ const askAssistant = async (content) => {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: assistantState.messages })
+      body: JSON.stringify({
+        messages: assistantState.messages,
+        pageUrl: window.location.href,
+        pageTitle: document.title
+      })
     });
     const data = await response.json().catch(() => ({}));
 
