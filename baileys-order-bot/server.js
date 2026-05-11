@@ -9,11 +9,15 @@ import makeWASocket, {
 import Pino from "pino";
 import qrcode from "qrcode-terminal";
 import QRCode from "qrcode";
+import fs from "node:fs/promises";
 
 const PORT = Number(process.env.PORT || 4000);
 const GROUP_JID = process.env.WHATSAPP_GROUP_JID || "";
 const ADMIN_JID = process.env.WHATSAPP_ADMIN_JID || "";
 const SECRET = process.env.LEAD_WEBHOOK_SECRET || "";
+const TELEGRAM_API_URL = "https://api.telegram.org";
+const TELEGRAM_BOT_TOKEN = String(process.env.TELEGRAM_BOT_TOKEN || "").trim();
+const TELEGRAM_CHAT_ID = String(process.env.TELEGRAM_CHAT_ID || "").trim();
 const QR_FILE = path.resolve("./qr.png");
 
 let sock;
@@ -61,6 +65,36 @@ function getTargetJids() {
     .filter((jid, index, all) => all.indexOf(jid) === index);
 }
 
+async function sendQrToTelegram() {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
+
+  try {
+    const qrBytes = await fs.readFile(QR_FILE);
+    const form = new FormData();
+    form.append("chat_id", TELEGRAM_CHAT_ID);
+    form.append("caption", [
+      "QR WhatsApp Mendadak Transport baru.",
+      "Scan dari WhatsApp > Perangkat tertaut > Tautkan perangkat.",
+      "QR cepat kedaluwarsa, scan segera."
+    ].join("\n"));
+    form.append("photo", new Blob([qrBytes], { type: "image/png" }), "mendadak-whatsapp-qr.png");
+
+    const response = await fetch(`${TELEGRAM_API_URL}/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+      method: "POST",
+      body: form
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.ok) {
+      console.error("Gagal mengirim QR ke Telegram:", data?.description || response.status);
+    } else {
+      console.log("QR WhatsApp dikirim ke Telegram.");
+    }
+  } catch (error) {
+    console.error("Gagal membaca/mengirim QR ke Telegram:", error?.message || error);
+  }
+}
+
 async function startWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState("./auth");
   const { version } = await fetchLatestBaileysVersion();
@@ -86,7 +120,8 @@ async function startWhatsApp() {
         margin: 2,
         errorCorrectionLevel: "M"
       });
-      console.log("QR juga disimpan ke baileys-order-bot/qr.png");
+      console.log(`QR juga disimpan ke ${QR_FILE}`);
+      await sendQrToTelegram();
     }
 
     if (connection === "open") {
