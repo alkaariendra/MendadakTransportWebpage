@@ -2,6 +2,7 @@ import { REQUIRED_LEAD_FIELDS, SERVICE_CATALOG_TEXT } from "./catalog.js";
 
 const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 const MODEL = process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+const AI_TIMEOUT_MS = Number(process.env.AI_TIMEOUT_MS || 6500);
 
 const SYSTEM_PROMPT = `
 Anda adalah AI booking assistant untuk Mendadak Transport.
@@ -76,6 +77,15 @@ function sendJson(res, statusCode, payload) {
   res.end(JSON.stringify(payload));
 }
 
+function logChat(startMs, source, details = {}) {
+  const durationMs = Date.now() - startMs;
+  console.log("AI_CHAT", JSON.stringify({
+    source,
+    durationMs,
+    ...details
+  }));
+}
+
 function normalizeMessages(input) {
   if (!Array.isArray(input)) return [];
 
@@ -127,6 +137,14 @@ function findService(text) {
 function findPhone(text) {
   const match = text.match(/(?:\+?62|0)?[\d][\d\s-]{7,15}\d/);
   return match ? match[0].replace(/[^\d+]/g, "") : "";
+}
+
+function findName(text) {
+  const match = text.match(/\b(?:nama|atas\s+nama|saya)\s*[:=-]?\s*([a-zA-ZÀ-ÿ.' ]{2,40})/i);
+  if (!match) return "";
+  return cleanLine(match[1])
+    .replace(/\b(?:wa|hp|nomor|no|lokasi|alamat|antar|jemput|mau|pesan|pesen|booking|sewa)\b.*$/i, "")
+    .trim();
 }
 
 function findDateText(text) {
@@ -200,13 +218,30 @@ function inferNameAndLocation(text, phone) {
 
   const serviceWords = /(mau|pesan|pesen|booking|sewa|rental|mobil|motor|tour|paket|bandara|driver|lepas kunci|besok|hari|jam|tanggal|pajero|brio|avanza|xpander|xenia|jazz|agya|fortuner|innova|zenix|hiace|alphard|vespa|xmax)/i;
   const simpleLines = lines.filter((line) => !serviceWords.test(line) && !/\d{4,}/.test(line));
+  const locationMatch = text.match(/\b(?:antar\s+ke|kirim\s+ke|jemput\s+di|lokasi|alamat|titik)\s*[:=-]?\s*([a-zA-ZÀ-ÿ0-9.' ,/-]{3,70})/i);
+  const location = locationMatch
+    ? cleanLine(locationMatch[1]).replace(/\b(?:besok|hari|tanggal|durasi|sehari|24\s*jam|lepas\s*kunci|driver|sopir|supir)\b.*$/i, "").trim()
+    : "";
+
   return {
-    name: simpleLines[0] || "",
-    location: simpleLines[1] || ""
+    name: findName(text) || simpleLines[0] || "",
+    location: location || simpleLines[1] || ""
   };
 }
 
-function buildFastLeadReply(messages) {
+function isRentalService(service) {
+  return Array.isArray(service?.modes) && service.modes.length > 0;
+}
+
+function buildPriceReply(service, userText) {
+  if (!service || !/\b(harga|tarif|biaya|berapa|price|rate)\b/i.test(userText)) return "";
+  return [
+    `${service.name}: ${service.prices}.`,
+    "Ketersediaan jadwal/unit tetap dikonfirmasi admin."
+  ].join("\n");
+}
+
+function buildLocalGuidanceReply(messages) {
   const userText = messages
     .filter((message) => message.role === "user")
     .slice(-4)
@@ -220,16 +255,63 @@ function buildFastLeadReply(messages) {
   const rentalType = findRentalType(userText);
   const asksPriceNegotiation = hasPriceNegotiation(userText);
 
-  if (!service || !phone || !name) return "";
+  if (asksPriceNegotiation) {
+    return [
+      "AI hanya memakai harga katalog dan tidak melakukan nego harga.",
+      service ? `${service.name}: ${service.prices}.` : "Untuk nego atau harga khusus, silakan lanjut langsung dengan admin."
+    ].join("\n");
+  }
 
-  const isRental = /mobil|motor|pajero|brio|avanza|xpander|xenia|jazz|agya|fortuner|innova|zenix|hiace|alphard|vespa|xmax/i.test(service.name);
-  if (isRental && (!dateText || !duration || !rentalType)) return "";
+  const priceReply = buildPriceReply(service, userText);
+  if (priceReply && !phone) return priceReply;
 
+  if (!service) {
+    return "Boleh. Anda butuh rental mobil, rental motor, paket tour Lombok, antar jemput bandara, atau transport acara/kantor?";
+  }
+
+  const isRental = isRentalService(service);
   const rentalMode = getRentalModeKey(rentalType);
+
   if (isRental && rentalMode && Array.isArray(service.modes) && !service.modes.includes(rentalMode)) {
     return buildUnavailableRentalReply(service, rentalType);
   }
 
+  if (!phone || !name || (isRental && (!dateText || !duration || !rentalType))) {
+    const missing = [];
+    if (!name) missing.push("nama");
+    if (!phone) missing.push("nomor HP/WhatsApp");
+    if (isRental && !rentalType) missing.push("pilihan lepas kunci atau driver");
+    if (isRental && !dateText) missing.push("tanggal mulai");
+    if (isRental && !duration) missing.push("durasi sewa");
+
+    return [
+      `${service.name} tersedia di katalog: ${service.prices}.`,
+      `Agar admin bisa cek, mohon kirim ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ", dan detail lainnya" : ""}.`
+    ].join("\n");
+  }
+
+  return buildFastLeadReplyFromParts({
+    service,
+    phone,
+    name,
+    location,
+    dateText,
+    duration,
+    rentalType,
+    asksPriceNegotiation
+  });
+}
+
+function buildFastLeadReplyFromParts({
+  service,
+  phone,
+  name,
+  location,
+  dateText,
+  duration,
+  rentalType,
+  asksPriceNegotiation
+}) {
   return [
     "Ringkasan pesanan:",
     `- Nama: ${name}`,
@@ -247,6 +329,7 @@ function buildFastLeadReply(messages) {
 }
 
 export default async function handler(req, res) {
+  const startMs = Date.now();
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -272,16 +355,21 @@ export default async function handler(req, res) {
     ].filter(Boolean).join("\n");
 
     if (!messages.length) {
+      logChat(startMs, "bad-request", { reason: "empty_messages" });
       return sendJson(res, 400, { error: "Pesan kosong." });
     }
 
-    const fastReply = buildFastLeadReply(messages);
-    if (fastReply) {
-      return sendJson(res, 200, { reply: fastReply, source: "fast-path" });
+    const localReply = buildLocalGuidanceReply(messages);
+    if (localReply) {
+      logChat(startMs, "local", { messages: messages.length });
+      return sendJson(res, 200, { reply: localReply, source: "local" });
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
     const response = await fetch(DEEPSEEK_API_URL, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`
@@ -298,10 +386,12 @@ export default async function handler(req, res) {
         stream: false
       })
     });
+    clearTimeout(timeout);
 
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
+      logChat(startMs, "deepseek-error", { status: response.status });
       return sendJson(res, response.status, {
         error: data?.error?.message || "AI assistant sedang tidak tersedia."
       });
@@ -309,13 +399,25 @@ export default async function handler(req, res) {
 
     const reply = data?.choices?.[0]?.message?.content?.trim();
     if (!reply) {
+      logChat(startMs, "empty-reply");
       return sendJson(res, 502, {
-        error: "AI sedang butuh waktu lebih lama. Silakan coba ulang atau lanjut WhatsApp agar admin bantu langsung."
+        error: buildLocalGuidanceReply(messages) || "AI sedang butuh waktu lebih lama. Silakan lanjut WhatsApp agar admin bantu langsung."
       });
     }
 
+    logChat(startMs, "deepseek", { messages: messages.length });
     return sendJson(res, 200, { reply });
   } catch (error) {
+    if (error?.name === "AbortError") {
+      const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+      const messages = normalizeMessages(body.messages);
+      logChat(startMs, "timeout", { timeoutMs: AI_TIMEOUT_MS });
+      return sendJson(res, 200, {
+        reply: buildLocalGuidanceReply(messages) || "AI sedang agak lambat. Boleh kirim nama, nomor HP, layanan, tanggal, dan durasi agar admin bisa bantu cepat.",
+        source: "timeout-fallback"
+      });
+    }
+    logChat(startMs, "error", { message: error?.message || "unknown" });
     return sendJson(res, 500, {
       error: "Terjadi kendala saat menghubungi AI assistant."
     });
