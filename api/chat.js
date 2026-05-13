@@ -122,6 +122,7 @@ const SERVICE_ITEMS = [
   { keys: ["paket d", "tour d"], name: "Tour 3 Hari 2 Malam Paket D", prices: "mulai Rp952.000 / person" },
   { keys: ["paket e", "tour e"], name: "Tour 3 Hari 2 Malam Paket E", prices: "mulai Rp950.000 / person" },
   { keys: ["tour", "paket wisata"], name: "Paket Tour Lombok", prices: "mulai Rp950.000 / person, tergantung paket" },
+  { keys: ["sewa mobil", "rental mobil", "mobil keluarga", "mobil murah"], name: "Rental Mobil Lombok", prices: "rekomendasi hemat: New Honda Brio/Toyota Agya Rp350.000 / 24 jam lepas kunci; keluarga 5 orang: Avanza/Xpander/Xenia Rp400.000 / 24 jam lepas kunci", modes: ["self", "driver"] },
   { keys: ["bandara", "airport"], name: "Antar jemput Bandara Lombok", prices: "harga mengikuti rute, jadwal, dan armada" }
 ];
 
@@ -174,7 +175,7 @@ function findRentalType(text) {
 }
 
 function hasPriceNegotiation(text) {
-  return /\b(nego|negosiasi|diskon|disc|discount|kurang|potongan|harga\s+khusus|bisa\s+turun|turunin|murah(?:in)?|kemahalan)\b/i.test(text);
+  return /\b(nego|negosiasi|diskon|disc|discount|kurang|potongan|harga\s+khusus|bisa\s+turun|turunin|murahin|kemahalan)\b/i.test(text);
 }
 
 function getRentalModeKey(rentalType) {
@@ -207,6 +208,55 @@ function buildUnavailableRentalReply(service, rentalType) {
     `Opsi yang tersedia: ${options}.`,
     "Kalau cocok dengan opsi itu, balas konfirmasi pilihan sewanya, atau sebutkan unit lain yang ingin dicek."
   ].join("\n");
+}
+
+function findPassengerCount(text) {
+  const match = text.match(/\b(\d{1,2})\s*(?:orang|org|pax|peserta|penumpang)\b/i);
+  return match ? Number(match[1]) : 0;
+}
+
+function findGenericCarRecommendation(text, rentalType = "") {
+  const lower = text.toLowerCase();
+  const passengers = findPassengerCount(text);
+  const wantsCheap = /\b(murah|hemat|budget|ekonomis)\b/i.test(text);
+
+  if (!/\b(sewa|rental|pesan|pesen|booking|butuh|cari|mau)\b.*\bmobil\b|\bmobil\b.*\b(sewa|rental|pesan|pesen|booking|butuh|cari|mau)\b/i.test(lower)) {
+    return null;
+  }
+
+  if (passengers >= 7) {
+    return {
+      name: "Hiace Commuter",
+      prices: "driver + BBM Rp1.100.000 / 12 jam",
+      modes: ["driver"],
+      reason: "untuk rombongan 7 orang ke atas"
+    };
+  }
+
+  if (passengers >= 5 || /\bkeluarga\b/i.test(text)) {
+    return {
+      name: wantsCheap ? "All New Avanza / Xpander / All New Xenia" : "All New Avanza / Xpander / All New Xenia",
+      prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam",
+      modes: ["self", "driver"],
+      reason: "cocok untuk keluarga sekitar 5 orang"
+    };
+  }
+
+  if (wantsCheap || passengers <= 4) {
+    return {
+      name: "New Honda Brio / Toyota Agya",
+      prices: "lepas kunci Rp350.000 / 24 jam; driver + BBM Rp650.000 / 12 jam",
+      modes: ["self", "driver"],
+      reason: "opsi paling hemat di katalog"
+    };
+  }
+
+  return {
+    name: "Rental Mobil Lombok",
+    prices: "city car mulai Rp350.000 / 24 jam lepas kunci; MPV keluarga mulai Rp400.000 / 24 jam lepas kunci",
+    modes: ["self", "driver"],
+    reason: "pilihan unit disesuaikan jumlah penumpang dan kebutuhan"
+  };
 }
 
 function inferNameAndLocation(text, phone) {
@@ -247,13 +297,15 @@ function buildLocalGuidanceReply(messages) {
     .slice(-4)
     .map((message) => message.content)
     .join("\n");
-  const service = findService(userText);
+  const catalogService = findService(userText);
   const phone = findPhone(userText);
   const { name, location } = inferNameAndLocation(userText, phone);
   const dateText = findDateText(userText);
   const duration = findDuration(userText);
   const rentalType = findRentalType(userText);
   const asksPriceNegotiation = hasPriceNegotiation(userText);
+  const genericCar = findGenericCarRecommendation(userText, rentalType);
+  const service = genericCar || catalogService;
 
   if (asksPriceNegotiation) {
     return [
@@ -286,8 +338,9 @@ function buildLocalGuidanceReply(messages) {
 
     return [
       `${service.name} tersedia di katalog: ${service.prices}.`,
+      service.reason ? `Rekomendasi ini ${service.reason}.` : "",
       `Agar admin bisa cek, mohon kirim ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ", dan detail lainnya" : ""}.`
-    ].join("\n");
+    ].filter(Boolean).join("\n");
   }
 
   return buildFastLeadReplyFromParts({
