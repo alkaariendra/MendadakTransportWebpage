@@ -710,10 +710,9 @@ h3 {
 }
 
 .package-photo-poster {
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center top;
-  background: #f7f3ec;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: #fff;
 }
 
 .package-body {
@@ -1536,10 +1535,9 @@ h3 {
 }
 
 .tour-media-card .tour-poster-image {
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center top;
-  background: #f7f3ec;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: #fff;
 }
 
 .tour-price-panel {
@@ -1849,7 +1847,7 @@ h3 {
   }
 
   .package-photo-poster {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 4 / 5;
   }
 
   .package-body {
@@ -2213,4 +2211,12 @@ h3 {
     width: 32px;
     height: 32px;
   }
+}
+
+.package-card .package-photo.package-photo-poster,
+.tour-media-card img.tour-poster-image {
+  aspect-ratio: 4 / 5 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #fff !important;
 }
