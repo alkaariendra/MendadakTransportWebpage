@@ -27,7 +27,7 @@ Katalog armada dan harga dari website:
 - Yamaha XMAX: lepas kunci Rp400.000 / 24 jam.
 
 3. Paket tour Lombok
-- Tour 3 Hari 2 Malam Paket A: mulai Rp1.037.000 / person.
+- Paket A 2 Hari 1 Malam: harga menyesuaikan jumlah peserta. Private trip singkat untuk pantai, gili, sunset, kuliner lokal, dan destinasi populer sesuai jam kedatangan.
 - Tour 3 Hari 2 Malam Paket B: mulai Rp962.000 / person.
 - Tour 3 Hari 2 Malam Paket C: mulai Rp1.080.000 / person.
 - Tour 3 Hari 2 Malam Paket D: mulai Rp952.000 / person.

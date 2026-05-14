@@ -116,7 +116,7 @@ const SERVICE_ITEMS = [
   { keys: ["alphard"], name: "Alphard", prices: "driver + BBM Rp4.500.000 / 12 jam", modes: ["driver"] },
   { keys: ["vespa matic", "vespa"], name: "Vespa Matic", prices: "lepas kunci Rp300.000 / 24 jam", modes: ["self"] },
   { keys: ["yamaha xmax", "xmax"], name: "Yamaha XMAX", prices: "lepas kunci Rp400.000 / 24 jam", modes: ["self"] },
-  { keys: ["paket a", "tour a"], name: "Tour 3 Hari 2 Malam Paket A", prices: "mulai Rp1.037.000 / person" },
+  { keys: ["paket a", "tour a", "2 hari 1 malam"], name: "Paket A 2 Hari 1 Malam", prices: "harga menyesuaikan jumlah peserta; private trip singkat untuk pantai, gili, sunset, kuliner lokal, dan destinasi populer" },
   { keys: ["paket b", "tour b"], name: "Tour 3 Hari 2 Malam Paket B", prices: "mulai Rp962.000 / person" },
   { keys: ["paket c", "tour c"], name: "Tour 3 Hari 2 Malam Paket C", prices: "mulai Rp1.080.000 / person" },
   { keys: ["paket d", "tour d"], name: "Tour 3 Hari 2 Malam Paket D", prices: "mulai Rp952.000 / person" },
