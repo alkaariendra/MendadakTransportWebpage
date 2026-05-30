@@ -121,7 +121,7 @@ const SERVICE_ITEMS = [
   { keys: ["vespa matic", "vespa"], name: "Vespa Matic", prices: "lepas kunci Rp300.000 / 24 jam", modes: ["self"] },
   { keys: ["yamaha xmax", "xmax"], name: "Yamaha XMAX", prices: "lepas kunci Rp400.000 / 24 jam", modes: ["self"] },
   { keys: ["innova"], name: "Innova Zenix / Innova Reborn", prices: "Innova Reborn lepas kunci Rp550.000 / 24 jam; driver + BBM Rp900.000 / 12 jam. Innova Zenix lepas kunci Rp950.000 / 24 jam; driver + BBM Rp1.650.000 / 12 jam", modes: ["self", "driver"] },
-  { keys: ["paket a", "tour a", "2 hari 1 malam", "2h1m", "2 hari"], name: "Paket A 2 Hari 1 Malam", prices: "harga menyesuaikan jumlah peserta; private trip singkat untuk pantai, gili, sunset, kuliner lokal, dan destinasi populer" },
+  { keys: ["paket a", "tour a", "2 hari 1 malam", "2h1m"], name: "Paket A 2 Hari 1 Malam", prices: "harga menyesuaikan jumlah peserta; private trip singkat untuk pantai, gili, sunset, kuliner lokal, dan destinasi populer" },
   { keys: ["paket b", "tour b", "3 hari 2 malam paket b"], name: "Tour 3 Hari 2 Malam Paket B", prices: "mulai Rp962.000 / person" },
   { keys: ["paket c", "tour c", "3 hari 2 malam paket c"], name: "Tour 3 Hari 2 Malam Paket C", prices: "mulai Rp1.080.000 / person" },
   { keys: ["paket d", "tour d", "3 hari 2 malam paket d"], name: "Tour 3 Hari 2 Malam Paket D", prices: "mulai Rp952.000 / person" },
@@ -166,7 +166,7 @@ function findName(text) {
   const match = text.match(/\b(?:nama|atas\s+nama|saya)\s*[:=-]?\s*([a-zA-ZÀ-ÿ.' ]{2,40})/i);
   if (!match) return "";
   return cleanLine(match[1])
-    .replace(/\b(?:wa|hp|nomor|no|lokasi|alamat|antar|jemput|mau|pesan|pesen|booking|sewa)\b.*$/i, "")
+    .replace(/\b(?:wa|hp|nomor|no|lokasi|alamat|antar|jemput|mau|pesan|pesen|booking|sewa|rental|butuh|cari)\b.*$/i, "")
     .trim();
 }
 
@@ -196,9 +196,29 @@ function findRentalType(text) {
   return "";
 }
 
+function cleanRoutePoint(text) {
+  return cleanLine(text)
+    .replace(/(?:\+?62|0)?[\d][\d\s-]{7,15}\d.*$/i, "")
+    .replace(/\b(?:ke\s+bandara|dari\s+bandara|besok|hari|tanggal|jam|pukul|durasi|sewa|rental|mobil|motor|tour|paket)\b.*$/i, "")
+    .trim();
+}
+
 function findAirportDirection(text) {
-  if (/\b(dari|jemput\s+di|pickup\s+di)\s+bandara\b/i.test(text)) return "Dari Bandara Lombok";
-  if (/\b(ke|antar\s+ke|menuju)\s+bandara\b/i.test(text)) return "Ke Bandara Lombok";
+  const fromAirport = /\b(?:dari|jemput\s+di|pickup\s+di)\s+bandara\b/i.test(text);
+  const toAirport = /\b(?:ke|antar\s+ke|menuju)\s+bandara\b/i.test(text);
+  const destination = text.match(/\b(?:ke|menuju|tujuan)\s+(?!bandara\b)([a-zA-Z0-9.' ]{3,50})/i)?.[1];
+  const origin = text.match(/\b(?:dari|jemput\s+di|pickup\s+di)\s+(?!bandara\b)([a-zA-Z0-9.' ]{3,50})/i)?.[1];
+
+  if (fromAirport) {
+    const point = cleanRoutePoint(destination);
+    return point ? `Dari Bandara Lombok ke ${point}` : "Dari Bandara Lombok";
+  }
+
+  if (toAirport) {
+    const point = cleanRoutePoint(origin);
+    return point ? `Dari ${point} ke Bandara Lombok` : "Ke Bandara Lombok";
+  }
+
   return "";
 }
 
@@ -342,7 +362,9 @@ function buildLocalGuidanceReply(messages) {
   const asksPriceNegotiation = hasPriceNegotiation(userText);
   const genericCar = findGenericCarRecommendation(userText, rentalType);
   const service = catalogService || genericCar;
-  const finalLocation = location || (service?.name === "Antar jemput Bandara Lombok" ? findAirportDirection(userText) : "");
+  const finalLocation = service?.name === "Antar jemput Bandara Lombok"
+    ? (findAirportDirection(userText) || location)
+    : location;
   const fallbackLeadService = service || (
     hasLeadSignal({ service, phone, name, userText })
       ? { name: "Lead dari chat website", prices: "Belum disebutkan" }
@@ -356,9 +378,6 @@ function buildLocalGuidanceReply(messages) {
     ].join("\n");
   }
 
-  const priceReply = buildPriceReply(service, userText);
-  if (priceReply && !phone) return priceReply;
-
   if (!fallbackLeadService) {
     return "Boleh. Anda butuh rental mobil, rental motor, paket tour Lombok, antar jemput bandara, atau transport acara/kantor?";
   }
@@ -369,6 +388,9 @@ function buildLocalGuidanceReply(messages) {
   if (isRental && rentalMode && Array.isArray(fallbackLeadService.modes) && !fallbackLeadService.modes.includes(rentalMode)) {
     return buildUnavailableRentalReply(fallbackLeadService, rentalType);
   }
+
+  const priceReply = buildPriceReply(service, userText);
+  if (priceReply && !phone) return priceReply;
 
   if (hasLeadSignal({ service: fallbackLeadService, phone, name, userText })) {
     return buildFastLeadReplyFromParts({
