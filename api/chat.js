@@ -323,7 +323,7 @@ function buildLocalGuidanceReply(messages) {
   const rentalType = findRentalType(userText);
   const asksPriceNegotiation = hasPriceNegotiation(userText);
   const genericCar = findGenericCarRecommendation(userText, rentalType);
-  const service = genericCar || catalogService;
+  const service = catalogService || genericCar;
   const finalLocation = location || (service?.name === "Antar jemput Bandara Lombok" ? findAirportDirection(userText) : "");
   const fallbackLeadService = service || (
     hasLeadSignal({ service, phone, name, userText })
