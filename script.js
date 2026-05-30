@@ -44,10 +44,16 @@ const assistantQuickReplies = [
 const assistantShell = document.createElement("div");
 assistantShell.className = "ai-assistant";
 assistantShell.innerHTML = `
-  <button class="ai-assistant-toggle" type="button" aria-label="Buka AI assistant" aria-expanded="false">
-    <span>AI</span>
-    <strong>Tanya AI</strong>
-  </button>
+  <div class="ai-assistant-actions" aria-label="Aksi cepat">
+    <a class="ai-assistant-whatsapp-cta" href="#kontak" aria-label="Chat WhatsApp Mendadak Transport">
+      <img src="assets/icon-whatsapp.svg" alt="" />
+      <strong>WhatsApp</strong>
+    </a>
+    <button class="ai-assistant-toggle" type="button" aria-label="Buka AI assistant" aria-expanded="false">
+      <span>AI</span>
+      <strong>Tanya AI</strong>
+    </button>
+  </div>
   <section class="ai-assistant-panel" aria-label="AI assistant Mendadak Transport">
     <div class="ai-assistant-header">
       <div>
@@ -68,6 +74,7 @@ assistantShell.innerHTML = `
 `;
 document.body.appendChild(assistantShell);
 
+const assistantWhatsappCta = assistantShell.querySelector(".ai-assistant-whatsapp-cta");
 const assistantToggle = assistantShell.querySelector(".ai-assistant-toggle");
 const assistantPanel = assistantShell.querySelector(".ai-assistant-panel");
 const assistantClose = assistantShell.querySelector(".ai-assistant-close");
@@ -78,6 +85,8 @@ const assistantInput = assistantForm.querySelector("textarea");
 const assistantSubmit = assistantForm.querySelector("button");
 const assistantWa = assistantShell.querySelector(".ai-assistant-wa");
 const assistantStatus = assistantShell.querySelector(".ai-assistant-status");
+
+applyWhatsAppLink(assistantWhatsappCta, whatsappPrimary);
 
 const cleanAssistantText = (text) => String(text || "")
   .replace(/\*\*(.*?)\*\*/g, "$1")
