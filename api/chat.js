@@ -110,24 +110,26 @@ const SERVICE_ITEMS = [
   { keys: ["all new avanza", "avanza"], name: "All New Avanza", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam", modes: ["self", "driver"] },
   { keys: ["xpander"], name: "Xpander", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam", modes: ["self", "driver"] },
   { keys: ["all new xenia", "xenia"], name: "All New Xenia", prices: "lepas kunci Rp400.000 / 24 jam; driver + BBM Rp750.000 / 12 jam", modes: ["self", "driver"] },
-  { keys: ["fortuner"], name: "Fortuner", prices: "lepas kunci Rp1.000.000 / 24 jam; driver + BBM Rp1.600.000 / 24 jam", modes: ["self", "driver"] },
+  { keys: ["fortuner", "toyota fortuner"], name: "Fortuner", prices: "lepas kunci Rp1.000.000 / 24 jam; driver + BBM Rp1.600.000 / 24 jam", modes: ["self", "driver"] },
   { keys: ["innova zenix", "zenix"], name: "Innova Zenix", prices: "lepas kunci Rp950.000 / 24 jam; driver + BBM Rp1.650.000 / 12 jam", modes: ["self", "driver"] },
   { keys: ["innova reborn", "reborn"], name: "Innova Reborn", prices: "lepas kunci Rp550.000 / 24 jam; driver + BBM Rp900.000 / 12 jam", modes: ["self", "driver"] },
   { keys: ["zenix g hev", "hev"], name: "Zenix G HEV", prices: "lepas kunci Rp700.000 / 24 jam; driver + BBM Rp1.200.000 / 12 jam", modes: ["self", "driver"] },
   { keys: ["hiace premio", "premio"], name: "All New Hiace Premio", prices: "driver + BBM Rp1.650.000 / 12 jam", modes: ["driver"] },
   { keys: ["hiace commuter", "commuter", "hiace"], name: "Hiace Commuter", prices: "driver + BBM Rp1.100.000 / 12 jam", modes: ["driver"] },
   { keys: ["pajero sport", "pajero"], name: "Pajero Sport", prices: "driver + BBM Rp1.600.000 / 12 jam", modes: ["driver"] },
-  { keys: ["alphard"], name: "Alphard", prices: "driver + BBM Rp4.500.000 / 12 jam", modes: ["driver"] },
+  { keys: ["alphard", "toyota alphard"], name: "Alphard", prices: "driver + BBM Rp4.500.000 / 12 jam", modes: ["driver"] },
   { keys: ["vespa matic", "vespa"], name: "Vespa Matic", prices: "lepas kunci Rp300.000 / 24 jam", modes: ["self"] },
   { keys: ["yamaha xmax", "xmax"], name: "Yamaha XMAX", prices: "lepas kunci Rp400.000 / 24 jam", modes: ["self"] },
-  { keys: ["paket a", "tour a", "2 hari 1 malam"], name: "Paket A 2 Hari 1 Malam", prices: "harga menyesuaikan jumlah peserta; private trip singkat untuk pantai, gili, sunset, kuliner lokal, dan destinasi populer" },
-  { keys: ["paket b", "tour b"], name: "Tour 3 Hari 2 Malam Paket B", prices: "mulai Rp962.000 / person" },
-  { keys: ["paket c", "tour c"], name: "Tour 3 Hari 2 Malam Paket C", prices: "mulai Rp1.080.000 / person" },
-  { keys: ["paket d", "tour d"], name: "Tour 3 Hari 2 Malam Paket D", prices: "mulai Rp952.000 / person" },
-  { keys: ["paket e", "tour e"], name: "Tour 3 Hari 2 Malam Paket E", prices: "mulai Rp950.000 / person" },
-  { keys: ["tour", "paket wisata"], name: "Paket Tour Lombok", prices: "mulai Rp950.000 / person, tergantung paket" },
+  { keys: ["innova"], name: "Innova Zenix / Innova Reborn", prices: "Innova Reborn lepas kunci Rp550.000 / 24 jam; driver + BBM Rp900.000 / 12 jam. Innova Zenix lepas kunci Rp950.000 / 24 jam; driver + BBM Rp1.650.000 / 12 jam", modes: ["self", "driver"] },
+  { keys: ["paket a", "tour a", "2 hari 1 malam", "2h1m", "2 hari"], name: "Paket A 2 Hari 1 Malam", prices: "harga menyesuaikan jumlah peserta; private trip singkat untuk pantai, gili, sunset, kuliner lokal, dan destinasi populer" },
+  { keys: ["paket b", "tour b", "3 hari 2 malam paket b"], name: "Tour 3 Hari 2 Malam Paket B", prices: "mulai Rp962.000 / person" },
+  { keys: ["paket c", "tour c", "3 hari 2 malam paket c"], name: "Tour 3 Hari 2 Malam Paket C", prices: "mulai Rp1.080.000 / person" },
+  { keys: ["paket d", "tour d", "3 hari 2 malam paket d"], name: "Tour 3 Hari 2 Malam Paket D", prices: "mulai Rp952.000 / person" },
+  { keys: ["paket e", "tour e", "3 hari 2 malam paket e"], name: "Tour 3 Hari 2 Malam Paket E", prices: "mulai Rp950.000 / person" },
+  { keys: ["3 hari 2 malam", "3h2m"], name: "Paket Tour 3 Hari 2 Malam", prices: "Paket B mulai Rp962.000 / person; Paket C mulai Rp1.080.000 / person; Paket D mulai Rp952.000 / person; Paket E mulai Rp950.000 / person" },
+  { keys: ["tour", "paket wisata", "wisata lombok", "trip lombok", "liburan lombok", "honeymoon lombok"], name: "Paket Tour Lombok", prices: "mulai Rp950.000 / person, tergantung paket" },
   { keys: ["sewa mobil", "rental mobil", "mobil keluarga", "mobil murah"], name: "Rental Mobil Lombok", prices: "rekomendasi hemat: New Honda Brio/Toyota Agya Rp350.000 / 24 jam lepas kunci; keluarga 5 orang: Avanza/Xpander/Xenia Rp400.000 / 24 jam lepas kunci", modes: ["self", "driver"] },
-  { keys: ["bandara", "airport"], name: "Antar jemput Bandara Lombok", prices: "harga mengikuti rute, jadwal, dan armada" }
+  { keys: ["antar jemput bandara", "jemput bandara", "antar bandara", "ke bandara", "dari bandara", "bandara", "airport"], name: "Antar jemput Bandara Lombok", prices: "harga mengikuti rute, jadwal, dan armada" }
 ];
 
 function cleanLine(text) {
@@ -136,7 +138,23 @@ function cleanLine(text) {
 
 function findService(text) {
   const lower = text.toLowerCase();
-  return SERVICE_ITEMS.find((item) => item.keys.some((key) => lower.includes(key)));
+  const matches = SERVICE_ITEMS
+    .map((item, index) => {
+      const matchedKeys = item.keys.filter((key) => lower.includes(key));
+      if (!matchedKeys.length) return null;
+
+      const bestKey = matchedKeys.sort((a, b) => b.length - a.length)[0];
+      const specificity = bestKey.split(/\s+/).length * 12 + bestKey.length;
+      const genericPenalty = /^(sewa mobil|rental mobil|mobil keluarga|mobil murah|tour|paket wisata|wisata lombok|trip lombok|liburan lombok|bandara|airport)$/.test(bestKey) ? 18 : 0;
+      return {
+        item,
+        score: specificity - genericPenalty - index / 100
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score);
+
+  return matches[0]?.item || null;
 }
 
 function findPhone(text) {
