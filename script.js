@@ -160,11 +160,11 @@ const goToThankYouPage = () => {
 const isAssistantLeadReady = (content) => {
   const text = cleanAssistantText(content);
   const hasSummary = /ringkasan\s+pesanan/i.test(text);
-  const hasContact = /(whats\s*app|wa|hp|nomor)/i.test(text);
+  const hasIdentity = /(whats\s*app|wa|hp|nomor|nama|pesan pelanggan)/i.test(text);
   const hasServiceDetail = /(layanan|armada|mobil|motor|tour|paket|bandara|driver|lepas\s+kunci|pengantaran|pengambilan|alamat|jemput|antar|lokasi|tanggal|durasi|peserta|rute|tujuan)/i.test(text);
   const asksToSend = /kirim\s+pesanan\s+ke\s+admin|meneruskan\s+ringkasan|notifikasi\s+ke\s+admin/i.test(text);
 
-  return hasSummary && hasContact && (hasServiceDetail || asksToSend);
+  return hasSummary && hasIdentity && (hasServiceDetail || asksToSend);
 };
 
 assistantQuickEl.innerHTML = assistantQuickReplies
@@ -228,7 +228,7 @@ const submitAssistantLead = async ({ automatic = false } = {}) => {
 
   setAssistantBusy(true);
   setAssistantStatus(
-    automatic ? "Data lengkap. Mengirim otomatis ke admin..." : "Mengirim pesanan ke admin...",
+    automatic ? "Mengirim informasi ke admin..." : "Mengirim pesanan ke admin...",
     "loading"
   );
 

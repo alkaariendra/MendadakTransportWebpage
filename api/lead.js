@@ -36,13 +36,25 @@ function normalizeMessages(input) {
 
 function cleanSummary(text) {
   return cleanText(text)
+    .replace(/^ringkasan pesanan:\s*/i, "")
     .replace(/klik tombol kirim pesanan ke admin.*$/i, "")
     .replace(/website akan mengirim notifikasi ke admin otomatis.*$/i, "")
     .replace(/ketersediaan dan harga final.*$/i, "")
     .replace(/perlu dikonfirmasi admin.*$/i, "")
+    .replace(/agar admin bisa cek,?\s*mohon kirim.*$/i, "")
     .replace(/\s+\./g, ".")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+function pickUserText(messages) {
+  return messages
+    .filter((message) => message.role === "user")
+    .slice(-5)
+    .map((message) => cleanSummary(message.content))
+    .filter(Boolean)
+    .join("\n")
+    .slice(0, 900);
 }
 
 function pickSummary(messages) {
@@ -57,24 +69,23 @@ function pickSummary(messages) {
     return cleanSummary(assistantSummary.content).slice(0, 900);
   }
 
-  const userSummary = messages
-    .filter((message) => message.role === "user")
-    .slice(-5)
-    .map((message) => cleanSummary(message.content))
-    .filter(Boolean)
-    .join("\n");
+  const userSummary = pickUserText(messages);
 
   return (userSummary || "Pesanan baru dari AI assistant.").slice(0, 900);
 }
 
 function buildLeadText(messages, pageUrl) {
   const summary = pickSummary(messages);
+  const userText = pickUserText(messages);
 
   return [
     "ORDER BARU WEBSITE",
     `Waktu: ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Makassar" })} WITA`,
     pageUrl ? `Sumber: ${pageUrl}` : "",
     "",
+    userText ? "Pesan pelanggan:" : "",
+    userText || "",
+    userText ? "" : "",
     "Ringkasan:",
     summary,
     "",

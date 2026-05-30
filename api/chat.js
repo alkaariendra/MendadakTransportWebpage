@@ -39,8 +39,12 @@ Aturan jawaban:
   sebelum meminta data lead.
 - Jangan bertele-tele. Jika field minimal untuk layanan yang diminta sudah cukup, jangan
   minta detail tambahan yang bisa disusul admin.
-- Jika belum ada nama, tanyakan nama.
-- Jika belum ada nomor HP, tanyakan nomor HP.
+- Jika pelanggan sudah menulis nama, nomor HP, tujuan, layanan, atau kebutuhan apa pun,
+  jangan tahan lead hanya karena belum lengkap. Buat ringkasan parsial berisi data yang ada.
+- Jika hanya ada sebagian data, tulis field yang belum ada sebagai "Belum disebutkan" dan biarkan
+  admin melanjutkan konfirmasi.
+- Jika belum ada nama atau nomor HP, boleh tanyakan singkat, tetapi tetap buat ringkasan parsial
+  bila pelanggan sudah menyebut layanan/kebutuhan.
 - Jika layanan belum jelas, tanya pelanggan butuh mobil, motor, paket tour, antar jemput bandara,
   atau transport acara/kantor.
 - Untuk rental mobil/motor, jika belum ada pilihan lepas kunci/driver, tanyakan pilihan itu.
@@ -56,7 +60,7 @@ Aturan jawaban:
 - Untuk paket tour, jangan memaksa detail itinerary panjang; cukup paket/tanggal/jumlah peserta
   jika memungkinkan, lalu admin lanjutkan.
 - Untuk antar jemput bandara, cukup arah jemput/antar, tanggal, jam, dan nomor HP.
-- Setelah nama, nomor HP, layanan, dan detail minimal cukup, langsung buat ringkasan pesanan.
+- Setelah ada kebutuhan apa pun yang bisa diteruskan ke admin, langsung buat ringkasan pesanan.
 - Jangan pernah menulis bahwa admin sudah dikabari, admin akan menghubungi, atau pesanan
   sudah terkirim sebelum sistem website berhasil mengirim notifikasi.
 - Jangan menulis "kami akan kirimkan", "kami teruskan", atau "saya kirim ke admin".
@@ -174,6 +178,12 @@ function findRentalType(text) {
   return "";
 }
 
+function findAirportDirection(text) {
+  if (/\b(dari|jemput\s+di|pickup\s+di)\s+bandara\b/i.test(text)) return "Dari Bandara Lombok";
+  if (/\b(ke|antar\s+ke|menuju)\s+bandara\b/i.test(text)) return "Ke Bandara Lombok";
+  return "";
+}
+
 function hasPriceNegotiation(text) {
   return /\b(nego|negosiasi|diskon|disc|discount|kurang|potongan|harga\s+khusus|bisa\s+turun|turunin|murahin|kemahalan)\b/i.test(text);
 }
@@ -283,6 +293,14 @@ function isRentalService(service) {
   return Array.isArray(service?.modes) && service.modes.length > 0;
 }
 
+function hasLeadSignal({ service, phone, name, userText }) {
+  return Boolean(
+    phone
+    || name
+    || (service && /\b(mau|pesan|pesen|booking|sewa|rental|butuh|antar|jemput|ke\s+bandara)\b/i.test(userText))
+  );
+}
+
 function buildPriceReply(service, userText) {
   if (!service || !/\b(harga|tarif|biaya|berapa|price|rate)\b/i.test(userText)) return "";
   return [
@@ -306,6 +324,12 @@ function buildLocalGuidanceReply(messages) {
   const asksPriceNegotiation = hasPriceNegotiation(userText);
   const genericCar = findGenericCarRecommendation(userText, rentalType);
   const service = genericCar || catalogService;
+  const finalLocation = location || (service?.name === "Antar jemput Bandara Lombok" ? findAirportDirection(userText) : "");
+  const fallbackLeadService = service || (
+    hasLeadSignal({ service, phone, name, userText })
+      ? { name: "Lead dari chat website", prices: "Belum disebutkan" }
+      : null
+  );
 
   if (asksPriceNegotiation) {
     return [
@@ -317,15 +341,29 @@ function buildLocalGuidanceReply(messages) {
   const priceReply = buildPriceReply(service, userText);
   if (priceReply && !phone) return priceReply;
 
-  if (!service) {
+  if (!fallbackLeadService) {
     return "Boleh. Anda butuh rental mobil, rental motor, paket tour Lombok, antar jemput bandara, atau transport acara/kantor?";
   }
 
-  const isRental = isRentalService(service);
+  const isRental = isRentalService(fallbackLeadService);
   const rentalMode = getRentalModeKey(rentalType);
 
-  if (isRental && rentalMode && Array.isArray(service.modes) && !service.modes.includes(rentalMode)) {
-    return buildUnavailableRentalReply(service, rentalType);
+  if (isRental && rentalMode && Array.isArray(fallbackLeadService.modes) && !fallbackLeadService.modes.includes(rentalMode)) {
+    return buildUnavailableRentalReply(fallbackLeadService, rentalType);
+  }
+
+  if (hasLeadSignal({ service: fallbackLeadService, phone, name, userText })) {
+    return buildFastLeadReplyFromParts({
+      service: fallbackLeadService,
+      phone,
+      name,
+      location: finalLocation,
+      dateText,
+      duration,
+      rentalType,
+      asksPriceNegotiation,
+      userText
+    });
   }
 
   if (!phone || !name || (isRental && (!dateText || !duration || !rentalType))) {
@@ -337,21 +375,22 @@ function buildLocalGuidanceReply(messages) {
     if (isRental && !duration) missing.push("durasi sewa");
 
     return [
-      `${service.name} tersedia di katalog: ${service.prices}.`,
-      service.reason ? `Rekomendasi ini ${service.reason}.` : "",
+      `${fallbackLeadService.name} tersedia di katalog: ${fallbackLeadService.prices}.`,
+      fallbackLeadService.reason ? `Rekomendasi ini ${fallbackLeadService.reason}.` : "",
       `Agar admin bisa cek, mohon kirim ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ", dan detail lainnya" : ""}.`
     ].filter(Boolean).join("\n");
   }
 
   return buildFastLeadReplyFromParts({
-    service,
+    service: fallbackLeadService,
     phone,
     name,
-    location,
+    location: finalLocation,
     dateText,
     duration,
     rentalType,
-    asksPriceNegotiation
+    asksPriceNegotiation,
+    userText
   });
 }
 
@@ -363,18 +402,20 @@ function buildFastLeadReplyFromParts({
   dateText,
   duration,
   rentalType,
-  asksPriceNegotiation
+  asksPriceNegotiation,
+  userText
 }) {
   return [
     "Ringkasan pesanan:",
-    `- Nama: ${name}`,
-    `- WhatsApp: ${phone}`,
-    `- Layanan: ${service.name}`,
-    `- Harga katalog: ${service.prices}`,
-    rentalType ? `- Tipe sewa: ${rentalType}` : "",
-    location ? `- Lokasi/titik: ${location}` : "",
-    dateText ? `- Tanggal mulai: ${dateText}` : "",
-    duration ? `- Durasi: ${duration}` : "",
+    `- Pesan pelanggan: ${cleanLine(userText).slice(0, 220) || "Belum disebutkan"}`,
+    `- Nama: ${name || "Belum disebutkan"}`,
+    `- WhatsApp: ${phone || "Belum disebutkan"}`,
+    `- Layanan: ${service.name || "Belum disebutkan"}`,
+    `- Harga katalog: ${service.prices || "Belum disebutkan / admin konfirmasi final"}`,
+    `- Tipe sewa: ${rentalType || "Belum disebutkan"}`,
+    `- Lokasi/titik: ${location || "Belum disebutkan"}`,
+    `- Tanggal/jam: ${dateText || "Belum disebutkan"}`,
+    `- Durasi: ${duration || "Belum disebutkan"}`,
     asksPriceNegotiation ? "- Catatan harga: permintaan nego/diskon dibahas langsung dengan admin. AI hanya memakai harga katalog." : "",
     "",
     "Website akan mengirim notifikasi ke admin otomatis."
