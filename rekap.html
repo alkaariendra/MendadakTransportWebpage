@@ -1724,7 +1724,7 @@
     function syncContractCashflowToLedger(showToastNotice = false) {
       if (!masterKontrak || masterKontrak.length === 0) return;
 
-      const currentDateStr = '2026-08-10'; // Cutoff date
+      const currentDateStr = new Date().toISOString().slice(0, 10); // Dynamic cutoff date (e.g. 2026-08-10)
 
       // Filter out any future date contract transactions if present
       cashTransactions = cashTransactions.filter(c => {
