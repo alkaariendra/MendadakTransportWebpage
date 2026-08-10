@@ -14,7 +14,7 @@
     :root {
       --bg-primary: #090d16;
       --bg-secondary: #111827;
-      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-card: rgba(17, 24, 39, 0.9);
       --border-color: rgba(255, 255, 255, 0.08);
       --border-active: rgba(215, 25, 32, 0.5);
       --text-primary: #f9fafb;
@@ -41,9 +41,9 @@
       --color-mulai-border: rgba(156, 163, 175, 0.35);
 
       --radius-sm: 6px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -53,9 +53,10 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(215, 25, 32, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+        radial-gradient(circle at 10% 15%, rgba(215, 25, 32, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
     }
 
     /* Lock Screen */
@@ -67,120 +68,141 @@
     .lock-box {
       background: var(--bg-secondary); border: 1px solid var(--border-color);
       border-radius: var(--radius-lg); padding: 2.5rem 2rem; width: 100%;
-      max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      max-width: 380px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
     }
-    .logo-img { height: 48px; width: auto; object-fit: contain; margin-bottom: 0.75rem; background:#fff; padding: 4px 8px; border-radius: 8px; }
+    .logo-img { height: 44px; width: auto; object-fit: contain; margin-bottom: 0.75rem; background:#fff; padding: 4px 8px; border-radius: 8px; }
     .pin-input {
-      width: 100%; padding: 0.85rem 1rem; background: var(--bg-primary);
+      width: 100%; padding: 0.8rem 1rem; background: var(--bg-primary);
       border: 1px solid var(--border-color); color: #fff; font-size: 1.25rem;
       border-radius: var(--radius-sm); text-align: center; letter-spacing: 4px;
-      margin: 1.5rem 0 1rem; outline: none; font-weight: 700;
+      margin: 1.25rem 0 1rem; outline: none; font-weight: 700;
     }
     .pin-input:focus { border-color: var(--accent-red); }
 
     /* Topbar */
     .topbar {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0.85rem 2rem; background: rgba(11, 15, 25, 0.85);
+      padding: 0.65rem 1.5rem; background: rgba(11, 15, 25, 0.9);
       backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color);
       position: sticky; top: 0; z-index: 100;
     }
-    .brand-group { display: flex; align-items: center; gap: 12px; }
-    .top-logo { height: 38px; width: auto; object-fit: contain; background: #fff; padding: 2px 8px; border-radius: 6px; }
-    .brand-title { font-size: 1.15rem; font-weight: 700; color: #fff; }
+    .brand-group { display: flex; align-items: center; gap: 10px; }
+    .top-logo { height: 34px; width: auto; object-fit: contain; background: #fff; padding: 2px 6px; border-radius: 6px; }
+    .brand-title { font-size: 1.05rem; font-weight: 700; color: #fff; line-height: 1.2; }
     .brand-title span { color: var(--accent-red); }
-    .brand-sub { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .brand-sub { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .live-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; background: rgba(16, 185, 129, 0.1);
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; background: rgba(16, 185, 129, 0.1);
       border: 1px solid rgba(16, 185, 129, 0.3); color: var(--color-lunas);
-      font-size: 0.8rem; font-weight: 600; border-radius: 9999px;
+      font-size: 0.72rem; font-weight: 600; border-radius: 9999px;
     }
-    .live-dot { width: 8px; height: 8px; background: var(--color-lunas); border-radius: 50%; box-shadow: 0 0 8px var(--color-lunas); }
+    .live-dot { width: 7px; height: 7px; background: var(--color-lunas); border-radius: 50%; box-shadow: 0 0 6px var(--color-lunas); }
 
     /* Navigation & Year Selector */
     .nav-tabs {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0 2rem; background: rgba(17, 24, 39, 0.5); border-bottom: 1px solid var(--border-color);
+      padding: 0 1.5rem; background: rgba(17, 24, 39, 0.6); border-bottom: 1px solid var(--border-color);
       flex-wrap: wrap; gap: 0.5rem;
     }
-    .tab-group { display: flex; gap: 0.5rem; overflow-x: auto; }
+    .tab-group { display: flex; gap: 0.25rem; }
     .tab-btn {
-      padding: 0.9rem 1.25rem; background: transparent; border: none;
-      color: var(--text-secondary); font-size: 0.9rem; font-weight: 600;
-      cursor: pointer; display: flex; align-items: center; gap: 8px;
-      border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
+      padding: 0.75rem 1rem; background: transparent; border: none;
+      color: var(--text-secondary); font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      border-bottom: 2px solid transparent; transition: all 0.2s ease;
     }
     .tab-btn:hover { color: #fff; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--accent-red); }
 
     .year-switch {
-      display: flex; gap: 4px; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);
+      display: flex; gap: 3px; background: rgba(0,0,0,0.4); padding: 3px; border-radius: 6px; border: 1px solid var(--border-color);
     }
     .year-btn {
-      padding: 5px 14px; background: transparent; border: none; color: var(--text-secondary);
-      font-size: 0.85rem; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
+      padding: 4px 12px; background: transparent; border: none; color: var(--text-secondary);
+      font-size: 0.78rem; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;
     }
     .year-btn.active { background: var(--accent-red); color: #fff; }
 
-    /* Container */
-    .container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 1.75rem; flex: 1; }
+    /* Main Container (Full screen width utilization) */
+    .container { width: 100%; max-width: 100%; padding: 1rem 1.25rem; flex: 1; }
 
-    /* KPI Summary Cards */
+    /* KPI Summary Cards (5 Compact Cards) */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem; margin-bottom: 1.75rem;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem; margin-bottom: 1rem;
+    }
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
     }
     .stat-card {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex;
-      flex-direction: column; gap: 0.35rem; position: relative; overflow: hidden;
+      border-radius: var(--radius-md); padding: 0.85rem 1rem; display: flex;
+      flex-direction: column; gap: 0.2rem; position: relative; overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3.5px; height: 100%; }
+    .stat-card.total::before { background: var(--accent-red); }
     .stat-card.paid::before { background: var(--color-lunas); }
     .stat-card.pending::before { background: var(--color-belum); }
-    .stat-card.fee::before { background: var(--color-dp); }
-    .stat-card.total::before { background: var(--accent-red); }
-    .stat-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
-    .stat-value { font-size: 1.65rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-    .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
+    .stat-card.feemonth::before { background: var(--color-dp); }
+    .stat-card.feeyear::before { background: #3b82f6; }
+    .stat-label { font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; }
+    .stat-value { font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .stat-sub { font-size: 0.68rem; color: var(--text-muted); }
 
     /* Action & Legend Bar */
     .table-top-actions {
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;
     }
     .legend-bar {
-      display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
-      background: rgba(17, 24, 39, 0.7); padding: 0.65rem 1.15rem;
-      border: 1px solid var(--border-color); border-radius: var(--radius-md);
+      display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+      background: rgba(17, 24, 39, 0.7); padding: 0.4rem 0.85rem;
+      border: 1px solid var(--border-color); border-radius: var(--radius-sm);
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); }
-    .legend-box { width: 10px; height: 10px; border-radius: 2px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--text-secondary); }
+    .legend-box { width: 9px; height: 9px; border-radius: 2px; }
 
-    /* Matrix Table (Jan - Des) */
+    /* Matrix Table 100% Fit (Fixed layout, no horizontal scroll) */
     .matrix-wrapper {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); overflow-x: auto; box-shadow: 0 6px 18px rgba(0,0,0,0.3); margin-bottom: 1.75rem;
+      border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin-bottom: 1.25rem;
+      width: 100%;
     }
-    .matrix-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.8rem; }
+    .matrix-table {
+      width: 100%; border-collapse: collapse; text-align: center;
+      table-layout: fixed; font-size: 0.72rem;
+    }
     .matrix-table th {
-      background: rgba(0, 0, 0, 0.5); padding: 0.75rem 0.5rem; color: var(--text-secondary);
-      font-weight: 700; font-size: 0.75rem; border: 1px solid var(--border-color); text-transform: uppercase;
+      background: rgba(0, 0, 0, 0.6); padding: 0.55rem 0.15rem; color: var(--text-secondary);
+      font-weight: 700; font-size: 0.68rem; border: 1px solid var(--border-color); text-transform: uppercase;
+      letter-spacing: 0.2px;
     }
     .matrix-table td {
-      padding: 0.65rem 0.4rem; border: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap;
+      padding: 0.45rem 0.15rem; border: 1px solid var(--border-color); vertical-align: middle;
+      overflow: hidden; text-overflow: ellipsis;
     }
-    .matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+    /* Fixed Column Widths (Sum = 100%) */
+    .col-no { width: 2.5%; }
+    .col-unit { width: 14%; text-align: left !important; padding-left: 0.5rem !important; }
+    .col-plat { width: 7.5%; }
+    .col-month { width: 4.3%; } /* 12 months = 51.6% */
+    .col-total { width: 7.8%; font-weight: 800; }
+    .col-feebln { width: 5.8%; }
+    .col-feethn { width: 6%; }
+    .col-aksi { width: 4.8%; }
 
     /* Month Cell Statuses */
     .cell-status {
-      display: inline-block; width: 100%; padding: 4px 6px; border-radius: 4px;
-      font-weight: 700; font-size: 0.72rem; cursor: pointer; transition: all 0.15s ease;
+      display: block; width: 100%; padding: 3px 1px; border-radius: 3px;
+      font-weight: 700; font-size: 0.67rem; cursor: pointer; transition: all 0.15s ease;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .cell-status:hover { transform: scale(1.05); }
+    .cell-status:hover { transform: scale(1.04); }
     .cell-lunas { background: var(--color-lunas-bg); color: var(--color-lunas); border: 1px solid var(--color-lunas-border); }
     .cell-belum { background: var(--color-belum-bg); color: var(--color-belum); border: 1px solid var(--color-belum-border); }
     .cell-dp { background: var(--color-dp-bg); color: var(--color-dp); border: 1px solid var(--color-dp-border); }
@@ -188,24 +210,24 @@
 
     .plate-tag {
       display: inline-block; background: #000; color: #fff; font-weight: 700;
-      font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #333; margin-top: 2px;
+      font-size: 0.68rem; padding: 2px 4px; border-radius: 3px; border: 1px solid #333;
     }
 
     /* Buttons */
     .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 0.55rem 1.1rem; border-radius: var(--radius-sm); font-size: 0.85rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 0.45rem 0.9rem; border-radius: var(--radius-sm); font-size: 0.78rem;
       font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s ease;
     }
     .btn-primary { background: var(--accent-red); color: #fff; }
-    .btn-primary:hover { background: var(--accent-red-hover); transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--accent-red-hover); }
     .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-color); }
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
     .btn-edit { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
     .btn-edit:hover { background: rgba(59, 130, 246, 0.35); color: #fff; }
     .btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
     .btn-danger:hover { background: rgba(239, 68, 68, 0.35); color: #fff; }
-    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.72rem; }
+    .btn-icon { padding: 3px 5px; font-size: 0.68rem; border-radius: 3px; }
 
     /* Edit Modal */
     #edit-modal {
@@ -214,41 +236,41 @@
     }
     .edit-modal-box {
       background: var(--bg-secondary); border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 780px;
+      border-radius: var(--radius-lg); padding: 1.75rem; width: 100%; max-width: 760px;
       max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.8);
     }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .modal-title { font-size: 1.25rem; font-weight: 700; color: #fff; }
-    .close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 1.15rem; font-weight: 700; color: #fff; }
+    .close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.4rem; cursor: pointer; }
 
     /* Form Grid */
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
     .form-input, .form-select {
       background: var(--bg-primary); border: 1px solid var(--border-color);
-      color: #fff; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm);
-      font-size: 0.85rem; outline: none; font-family: inherit;
+      color: #fff; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm);
+      font-size: 0.8rem; outline: none; font-family: inherit;
     }
     .form-input:focus, .form-select:focus { border-color: var(--border-active); }
 
     /* Months Status Grid inside Edit Modal */
     .months-edit-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem;
-      background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 0.5rem;
+      background: rgba(0,0,0,0.3); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.25rem;
     }
-    .month-edit-item { display: flex; flex-direction: column; gap: 0.25rem; text-align: center; }
-    .month-edit-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); }
+    .month-edit-item { display: flex; flex-direction: column; gap: 0.2rem; text-align: center; }
+    .month-edit-label { font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); }
 
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
     .toast-box {
-      position: fixed; bottom: 2rem; right: 2rem; background: #1f2937;
-      border-left: 4px solid var(--color-lunas); color: #fff; padding: 1rem 1.5rem;
+      position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1f2937;
+      border-left: 4px solid var(--color-lunas); color: #fff; padding: 0.85rem 1.25rem;
       border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 99999;
-      display: none; animation: slideIn 0.3s ease;
+      display: none; animation: slideIn 0.3s ease; font-size: 0.82rem;
     }
     @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   </style>
@@ -260,12 +282,12 @@
     <div class="lock-box">
       <img src="assets/logo-mendadak-transport.png" alt="Mendadak Transport Logo" class="logo-img">
       <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Master Rekap Kontrak Mobil &amp; Motor</p>
+      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Master Rekap Kontrak Unit</p>
       <form id="pin-form" onsubmit="handlePinSubmit(event)">
         <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="6" autofocus required>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Buka Master Rekap</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;">Buka Master Rekap</button>
       </form>
-      <p id="pin-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 0.75rem; display: none;">PIN salah, silakan coba lagi.</p>
+      <p id="pin-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 0.65rem; display: none;">PIN salah, silakan coba lagi.</p>
     </div>
   </div>
 
@@ -279,8 +301,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Editable Workspace</span></div>
-      <button class="btn btn-primary btn-sm" onclick="openNewContractModal()">➕ Tambah Unit Baru</button>
+      <div class="live-badge"><div class="live-dot"></div><span>Editable Fit Screen</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openNewContractModal()">➕ Tambah Unit</button>
       <button class="btn btn-secondary btn-sm" onclick="exportExcelCsv()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
     </div>
@@ -301,37 +323,42 @@
   <!-- Main Container -->
   <main class="container">
 
-    <!-- KPI Summary Row -->
+    <!-- KPI Summary Row (5 Cards) -->
     <section class="stats-grid">
       <div class="stat-card total">
-        <span class="stat-label">Total Omset Sewa (1 Tahun)</span>
+        <span class="stat-label">Total Omset Sewa (1 Thn)</span>
         <div class="stat-value" id="kpi-total">Rp 320.400.000</div>
-        <span class="stat-sub" id="kpi-unit-count">6 Unit Kontrak Terdaftar</span>
+        <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar</span>
       </div>
       <div class="stat-card paid">
-        <span class="stat-label">Total Sudah Terbayar (Lunas)</span>
+        <span class="stat-label">Sudah Terbayar (Lunas)</span>
         <div class="stat-value" id="kpi-paid" style="color: var(--color-lunas);">Rp 171.200.000</div>
-        <span class="stat-sub">Pembayaran telah diterima</span>
+        <span class="stat-sub">Pembayaran diterima</span>
       </div>
       <div class="stat-card pending">
-        <span class="stat-label">Total Piutang / Belum Bayar</span>
+        <span class="stat-label">Piutang / Belum Bayar</span>
         <div class="stat-value" id="kpi-pending" style="color: var(--color-belum);">Rp 149.200.000</div>
         <span class="stat-sub">Sisa tagihan berjalan</span>
       </div>
-      <div class="stat-card fee">
-        <span class="stat-label">Total Fee Bulanan Pemilik</span>
-        <div class="stat-value" id="kpi-fee" style="color: var(--color-dp);">Rp 5.550.000 / bln</div>
-        <span class="stat-sub">Brio, Avanza, Vario, Fazzio</span>
+      <div class="stat-card feemonth">
+        <span class="stat-label">Total Fee / Bulan</span>
+        <div class="stat-value" id="kpi-feemonth" style="color: var(--color-dp);">Rp 5.550.000</div>
+        <span class="stat-sub">Fee pemilik per bulan</span>
+      </div>
+      <div class="stat-card feeyear">
+        <span class="stat-label">Total Fee / Tahun</span>
+        <div class="stat-value" id="kpi-feeyear" style="color: #60a5fa;">Rp 46.600.000</div>
+        <span class="stat-sub">Total fee pemilik 1 tahun</span>
       </div>
     </section>
 
     <!-- Top Action Bar & Legend -->
     <div class="table-top-actions">
       <div class="legend-bar">
-        <span style="font-weight: 700; font-size: 0.75rem; color:#fff;">KETERANGAN:</span>
-        <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span>🟢 SUDAH BAYAR</span></div>
+        <span style="font-weight: 700; font-size: 0.72rem; color:#fff;">KETERANGAN:</span>
+        <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span>🟢 LUNAS</span></div>
         <div class="legend-item"><div class="legend-box" style="background: var(--color-belum);"></div><span>🔴 BELUM BAYAR</span></div>
-        <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span>🟠 BAYAR SETENGAH (DP)</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span>🟠 DP / 1/2</span></div>
         <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span>⚪ MULAI KONTRAK</span></div>
       </div>
       <div style="display: flex; gap: 0.5rem;">
@@ -339,30 +366,31 @@
       </div>
     </div>
 
-    <!-- TAB 1: MATRIX TABEL KONTRAK (JAN - DES) DENGAN TOMBOL EDIT -->
+    <!-- TAB 1: MATRIX TABEL KONTRAK (FIT 100% TANPA SCROLL HORIZONTAL) -->
     <section id="tab-matrix" class="section active">
       <div class="matrix-wrapper">
         <table class="matrix-table">
           <thead>
             <tr>
-              <th style="width: 35px;">No.</th>
-              <th style="text-align: left; min-width: 180px;">Nama Unit &amp; Pengontrak</th>
-              <th style="min-width: 95px;">PLAT</th>
-              <th>Jan</th>
-              <th>Feb</th>
-              <th>Mar</th>
-              <th>Apr</th>
-              <th>Mei</th>
-              <th>Jun</th>
-              <th>Jul</th>
-              <th>Ags</th>
-              <th>Sep</th>
-              <th>Okt</th>
-              <th>Nov</th>
-              <th>Des</th>
-              <th style="min-width: 105px;">FEE/BULAN</th>
-              <th style="min-width: 105px;">TOTAL</th>
-              <th style="min-width: 100px;">AKSI</th>
+              <th class="col-no">No.</th>
+              <th class="col-unit">Nama Unit &amp; Pengontrak</th>
+              <th class="col-plat">PLAT</th>
+              <th class="col-month">Jan</th>
+              <th class="col-month">Feb</th>
+              <th class="col-month">Mar</th>
+              <th class="col-month">Apr</th>
+              <th class="col-month">Mei</th>
+              <th class="col-month">Jun</th>
+              <th class="col-month">Jul</th>
+              <th class="col-month">Ags</th>
+              <th class="col-month">Sep</th>
+              <th class="col-month">Okt</th>
+              <th class="col-month">Nov</th>
+              <th class="col-month">Des</th>
+              <th class="col-total">TOTAL</th>
+              <th class="col-feebln">FEE/BLN</th>
+              <th class="col-feethn">FEE/THN</th>
+              <th class="col-aksi">AKSI</th>
             </tr>
           </thead>
           <tbody id="matrix-tbody">
@@ -374,16 +402,16 @@
 
     <!-- TAB 2: ANALISIS GRAFIK & FEE -->
     <section id="tab-analytics" class="section">
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
-          <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">📊 Grafik Pemasukan per Bulan (<span id="chart-year-label">2026</span>)</h3>
-          <div style="height: 300px; position: relative;">
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.75rem;">📊 Grafik Pemasukan per Bulan (<span id="chart-year-label">2026</span>)</h3>
+          <div style="height: 280px; position: relative;">
             <canvas id="monthlyChart"></canvas>
           </div>
         </div>
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
-          <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">🚘 Kontribusi Omset per Unit</h3>
-          <div style="height: 300px; position: relative;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.75rem;">🚘 Kontribusi Omset per Unit</h3>
+          <div style="height: 280px; position: relative;">
             <canvas id="unitShareChart"></canvas>
           </div>
         </div>
@@ -421,6 +449,10 @@
             <input type="text" id="edit-fee" class="form-input" placeholder="Rp. 1.850.000 / NO FEE" required>
           </div>
           <div class="form-group">
+            <label class="form-label">Total Fee / Tahun (Opsional)</label>
+            <input type="text" id="edit-fee-year" class="form-input" placeholder="Otomatis dihitung / Rp. 8.000.000">
+          </div>
+          <div class="form-group">
             <label class="form-label">Tarif Bulanan Default (Rp)</label>
             <input type="number" id="edit-rate-default" class="form-input" placeholder="5500000" oninput="applyDefaultRateToAll(this.value)">
           </div>
@@ -433,12 +465,12 @@
           </div>
         </div>
 
-        <h4 style="font-size: 0.9rem; color: #fff; margin-bottom: 0.65rem;">📅 Status &amp; Nominal Pembayaran Tiap Bulan (Januari - Desember):</h4>
+        <h4 style="font-size: 0.85rem; color: #fff; margin-bottom: 0.5rem;">📅 Status &amp; Nominal Pembayaran Tiap Bulan (Januari - Desember):</h4>
         <div class="months-edit-grid" id="months-edit-container">
           <!-- Dynamic 12 months editors -->
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
           <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
           <button type="submit" class="btn btn-primary">💾 Simpan Perubahan</button>
         </div>
@@ -457,7 +489,7 @@
     const defaultMaster = {
       2026: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
           months: [
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
@@ -466,7 +498,7 @@
           ]
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE',
+          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', fee_year: 'Rp. 0',
           months: [
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
@@ -475,7 +507,7 @@
           ]
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000',
+          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
           months: [
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
@@ -484,7 +516,7 @@
           ]
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
           months: [
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
@@ -493,29 +525,29 @@
           ]
         },
         {
-          no: 5, renter: 'Rachmad Satriowibowo', model: 'Vario 155', plate: 'DR 5229 CV', fee: 'Rp. 2.000.000',
+          no: 5, renter: 'Rachmad Satriowibowo', model: 'Vario 155', plate: 'DR 5229 CV', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         },
         {
-          no: 6, renter: 'Rachmad Satriowibowo', model: 'Fazzio', plate: 'DR 3416 EP', fee: 'Rp. 500.000',
+          no: 6, renter: 'Rachmad Satriowibowo', model: 'Fazzio', plate: 'DR 3416 EP', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         }
       ],
       2027: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
           months: Array(12).fill(0).map(() => ({ amt: 5500000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE',
+          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', fee_year: 'Rp. 0',
           months: Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000',
+          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 6000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
           months: Array(12).fill(0).map(() => ({ amt: 6200000, st: 'BELUM_BAYAR' }))
         }
       ]
@@ -536,7 +568,7 @@
       }
 
       // Load stored custom edits if any
-      const saved = localStorage.getItem('mt_master_rekap');
+      const saved = localStorage.getItem('mt_master_rekap_v2');
       if (saved) {
         try { masterData = JSON.parse(saved); } catch(e) {}
       }
@@ -561,7 +593,8 @@
       let totalGross = 0;
       let totalPaid = 0;
       let totalPending = 0;
-      let totalFee = 0;
+      let totalFeeMonth = 0;
+      let totalFeeYear = 0;
 
       tbody.innerHTML = list.map((item, rowIdx) => {
         let rowSum = 0;
@@ -572,15 +605,15 @@
           if (m.st === 'SUDAH_BAYAR') rowPaid += m.amt;
 
           let cls = 'cell-belum';
-          let txt = 'Rp ' + (m.amt / 1000000).toFixed(1) + 'jt';
+          let txt = (m.amt / 1000000).toFixed(1) + 'jt';
 
           if (m.st === 'SUDAH_BAYAR') cls = 'cell-lunas';
           else if (m.st === 'BAYAR_SETENGAH') cls = 'cell-dp';
           else if (m.st === 'MULAI_KONTRAK') cls = 'cell-mulai';
 
           return `
-            <td>
-              <span class="cell-status ${cls}" title="Klik cepat ubah status / klik tombol Edit untuk ubah nominal" onclick="toggleMonthStatus(${rowIdx}, ${mIdx})">
+            <td class="col-month">
+              <span class="cell-status ${cls}" title="Klik cepat ubah status (${monthsList[mIdx]})" onclick="toggleMonthStatus(${rowIdx}, ${mIdx})">
                 ${txt}
               </span>
             </td>
@@ -591,22 +624,37 @@
         totalPaid += rowPaid;
         totalPending += (rowSum - rowPaid);
 
-        const feeNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
-        totalFee += feeNum;
+        // Parse fee monthly & yearly
+        const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
+        totalFeeMonth += feeMonthNum;
+
+        let feeYearNum = 0;
+        if (item.fee_year) {
+          feeYearNum = parseInt(String(item.fee_year).replace(/[^0-9]/g, '')) || 0;
+        } else {
+          feeYearNum = feeMonthNum * 12;
+        }
+        totalFeeYear += feeYearNum;
+
+        const feeYearDisplay = item.fee_year ? item.fee_year : (feeYearNum > 0 ? `Rp. ${feeYearNum.toLocaleString('id-ID')}` : 'Rp. 0');
 
         return `
           <tr>
-            <td><strong>${item.no || (rowIdx + 1)}</strong></td>
-            <td style="text-align: left;">
-              <strong>${item.renter}</strong> / <span style="color:var(--text-secondary);">${item.model}</span>
+            <td class="col-no"><strong>${item.no || (rowIdx + 1)}</strong></td>
+            <td class="col-unit">
+              <div style="font-weight:700; color:#fff; font-size:0.76rem; line-height:1.2;">${item.renter}</div>
+              <div style="color:var(--text-secondary); font-size:0.68rem;">${item.model}</div>
             </td>
-            <td><div class="plate-tag">${item.plate}</div></td>
+            <td class="col-plat"><div class="plate-tag">${item.plate}</div></td>
             ${monthsHtml}
-            <td style="color: var(--color-dp); font-weight:700;">${item.fee}</td>
-            <td style="font-weight:800; color:#fff;">Rp ${rowSum.toLocaleString('id-ID')}</td>
-            <td>
-              <button class="btn btn-edit btn-sm" onclick="openEditModal(${rowIdx})">✏️ Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteContract(${rowIdx})">🗑️</button>
+            <td class="col-total" style="color:#fff;">Rp ${(rowSum / 1000000).toFixed(1)}jt</td>
+            <td class="col-feebln" style="color:var(--color-dp); font-weight:700;">${item.fee}</td>
+            <td class="col-feethn" style="color:#60a5fa; font-weight:700;">${feeYearDisplay}</td>
+            <td class="col-aksi">
+              <div style="display:flex; justify-content:center; gap:2px;">
+                <button class="btn btn-edit btn-icon" title="Edit" onclick="openEditModal(${rowIdx})">✏️</button>
+                <button class="btn btn-danger btn-icon" title="Hapus" onclick="deleteContract(${rowIdx})">🗑️</button>
+              </div>
             </td>
           </tr>
         `;
@@ -616,8 +664,9 @@
       document.getElementById('kpi-total').textContent = `Rp ${totalGross.toLocaleString('id-ID')}`;
       document.getElementById('kpi-paid').textContent = `Rp ${totalPaid.toLocaleString('id-ID')}`;
       document.getElementById('kpi-pending').textContent = `Rp ${totalPending.toLocaleString('id-ID')}`;
-      document.getElementById('kpi-fee').textContent = `Rp ${totalFee.toLocaleString('id-ID')} / bln`;
-      document.getElementById('kpi-unit-count').textContent = `${list.length} Unit Kontrak Terdaftar (${activeYear})`;
+      document.getElementById('kpi-feemonth').textContent = `Rp ${totalFeeMonth.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-feeyear').textContent = `Rp ${totalFeeYear.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-unit-count').textContent = `${list.length} Unit Terdaftar (${activeYear})`;
     }
 
     function toggleMonthStatus(rowIdx, mIdx) {
@@ -630,7 +679,7 @@
       else m.st = 'SUDAH_BAYAR';
 
       saveAll();
-      showToast(`✅ Status ${monthsList[mIdx]} untuk ${item.renter} diubah!`);
+      showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah!`);
     }
 
     // ── EDIT MODAL LOGIC ──
@@ -644,6 +693,7 @@
       document.getElementById('edit-model').value = item.model;
       document.getElementById('edit-plate').value = item.plate;
       document.getElementById('edit-fee').value = item.fee;
+      document.getElementById('edit-fee-year').value = item.fee_year || '';
       document.getElementById('edit-rate-default').value = item.months[0]?.amt || 5000000;
       document.getElementById('edit-year-select').value = activeYear;
 
@@ -658,6 +708,7 @@
       document.getElementById('edit-model').value = '';
       document.getElementById('edit-plate').value = '';
       document.getElementById('edit-fee').value = 'NO FEE';
+      document.getElementById('edit-fee-year').value = 'Rp. 0';
       document.getElementById('edit-rate-default').value = 5000000;
       document.getElementById('edit-year-select').value = activeYear;
 
@@ -671,13 +722,13 @@
       container.innerHTML = monthsArray.map((m, idx) => `
         <div class="month-edit-item">
           <span class="month-edit-label">${monthsList[idx]}</span>
-          <select id="m-st-${idx}" class="form-select" style="padding: 4px; font-size:0.75rem;">
+          <select id="m-st-${idx}" class="form-select" style="padding: 3px; font-size:0.72rem;">
             <option value="SUDAH_BAYAR" ${m.st === 'SUDAH_BAYAR' ? 'selected' : ''}>🟢 LUNAS</option>
             <option value="BELUM_BAYAR" ${m.st === 'BELUM_BAYAR' ? 'selected' : ''}>🔴 BELUM</option>
             <option value="BAYAR_SETENGAH" ${m.st === 'BAYAR_SETENGAH' ? 'selected' : ''}>🟠 DP / 1/2</option>
             <option value="MULAI_KONTRAK" ${m.st === 'MULAI_KONTRAK' ? 'selected' : ''}>⚪ MULAI</option>
           </select>
-          <input type="number" id="m-amt-${idx}" class="form-input" style="padding: 4px; font-size:0.75rem;" value="${m.amt}">
+          <input type="number" id="m-amt-${idx}" class="form-input" style="padding: 3px; font-size:0.72rem;" value="${m.amt}">
         </div>
       `).join('');
     }
@@ -697,6 +748,7 @@
       const model = document.getElementById('edit-model').value;
       const plate = document.getElementById('edit-plate').value;
       const fee = document.getElementById('edit-fee').value;
+      const feeYear = document.getElementById('edit-fee-year').value;
       const yr = Number(document.getElementById('edit-year-select').value);
 
       const months = [];
@@ -707,18 +759,16 @@
       }
 
       if (rowIdx >= 0) {
-        // Update existing
         masterData[activeYear][rowIdx] = {
           ...masterData[activeYear][rowIdx],
-          renter, model, plate, fee, months
+          renter, model, plate, fee, fee_year: feeYear, months
         };
         showToast(`✅ Data kontrak ${renter} berhasil diperbarui!`);
       } else {
-        // Add new
         const newNo = (masterData[yr].length + 1);
         masterData[yr].push({
           no: newNo,
-          renter, model, plate, fee, months
+          renter, model, plate, fee, fee_year: feeYear, months
         });
         setYear(yr);
         showToast(`✅ Unit baru ${renter} (${model}) berhasil ditambahkan!`);
@@ -750,7 +800,7 @@
     }
 
     function saveAll() {
-      localStorage.setItem('mt_master_rekap', JSON.stringify(masterData));
+      localStorage.setItem('mt_master_rekap_v2', JSON.stringify(masterData));
       renderMatrix();
       updateCharts();
     }
@@ -766,8 +816,8 @@
           maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#9ca3af' } } },
           scales: {
-            x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
           }
         }
       });
@@ -779,7 +829,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 10 } } }
+          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 8, font: { size: 10 } } } }
         }
       });
     }
@@ -833,12 +883,15 @@
       let rows = [];
 
       rows.push([`REKAP KONTRAK MOBIL ${activeYear}`]);
-      rows.push(['No.', 'Nama Unit & Pengontrak', 'PLAT', ...fullMonths, 'FEE/BULAN', 'TOTAL']);
+      rows.push(['No.', 'Nama Unit & Pengontrak', 'PLAT', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']);
 
       list.forEach(item => {
         const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
         const totalNum = item.months.reduce((a, b) => a + b.amt, 0);
-        rows.push([item.no, `${item.renter} / ${item.model}`, item.plate, ...mCols, item.fee, `Rp ${totalNum.toLocaleString('id-ID')}`]);
+        const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
+        const feeYearStr = item.fee_year || (feeMonthNum > 0 ? `Rp. ${(feeMonthNum * 12).toLocaleString('id-ID')}` : 'Rp. 0');
+        
+        rows.push([item.no, `${item.renter} / ${item.model}`, item.plate, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
       });
 
       const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.map(x => `"${x || ''}"`).join(',')).join('\n');
