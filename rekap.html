@@ -372,6 +372,7 @@
     <div class="header-actions">
       <div class="live-badge"><div class="live-dot"></div><span>Autosave Aktif</span></div>
       <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
+      <button class="btn btn-secondary btn-sm" onclick="downloadFullBackupJSON()" title="Download Cadangan Data Lengkap (JSON)">💾 Backup Data</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
     </div>
@@ -2254,8 +2255,31 @@
       }
     }
 
+    function downloadFullBackupJSON() {
+      const fullData = {
+        timestamp: new Date().toISOString(),
+        kontrak: masterKontrak,
+        daily: dailyRentals,
+        cash: cashTransactions,
+        armada: masterArmada
+      };
+      const blob = new Blob([JSON.stringify(fullData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `MENDADAK_TRANSPORT_BACKUP_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('💾 Cadangan data berhasil di-download!');
+    }
+
     function resetToExcelDefault() {
-      if (confirm('Reset seluruh data kontrak ke format awal file Excel REKAP KONTRAK.xlsx?')) {
+      const confirm1 = confirm('⚠️ PERINGATAN: Apakah Anda YAKIN ingin mengembalikan seluruh data ke format awal Excel? Semua data baru yang di-edit akan tertimpa.');
+      if (!confirm1) return;
+      const confirm2 = confirm('Ketik Konfirmasi: Yakin reset data ke default Excel?');
+      if (confirm2) {
         masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
         saveAll();
         showToast('🔄 Data berhasil di-reset ke default Excel!');
