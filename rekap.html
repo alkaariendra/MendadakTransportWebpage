@@ -476,6 +476,7 @@
           <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span>⚪ MULAI KONTRAK</span></div>
         </div>
         <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="openTelegramModal()" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4);" title="Pengaturan Bot Telegram untuk Pengiriman Tagihan Invoice Otomatis">📱 Bot Telegram Invoice</button>
           <button class="btn btn-secondary btn-sm" onclick="resetToExcelDefault()">🔄 Reset Default Excel</button>
         </div>
       </div>
@@ -1168,6 +1169,38 @@
           </div>
 
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Telegram Bot Settings & Trigger -->
+  <div id="telegram-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📱 Telegram Invoice Bot Notification</h3>
+        <button class="modal-close" onclick="closeTelegramModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bot Token Telegram (dari @BotFather)</label>
+        <input type="text" id="tg-bot-token" class="form-input" placeholder="Contoh: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Chat ID Telegram Anda (atau ID Group Admin)</label>
+        <input type="text" id="tg-chat-id" class="form-input" placeholder="Contoh: 987654321">
+        <small style="color:var(--text-secondary); display:block; margin-top:4px;">Dapatkan Chat ID gratis melalui bot <code>@userinfobot</code> di Telegram.</small>
+      </div>
+
+      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.85rem; border-radius: 6px; margin: 1rem 0; font-size: 0.8rem; color: #93c5fd;">
+        💡 <b>Otomatisasi Tagihan Invoice:</b><br>
+        Sistem akan mengecek tanggal mulai kontrak tiap armada. Pada tanggal jatuh tempo tiap bulannya, bot akan otomatis membuat rangkuman invoice dan mengirimkannya langsung ke Telegram Anda.
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button class="btn btn-secondary" onclick="closeTelegramModal()">Tutup</button>
+        <button class="btn btn-primary" onclick="saveTelegramSettings()">💾 Simpan Setting</button>
+        <button class="btn btn-success" onclick="triggerTelegramInvoices(true)" style="background: #10b981; color: #fff; border: none;">🚀 Kirim Invoice Hari Ini</button>
       </div>
     </div>
   </div>
@@ -2251,6 +2284,64 @@
 
     function closeCashModal() {
       document.getElementById('cash-modal').style.display = 'none';
+    }
+
+    // ── TELEGRAM BOT INVOICE REMINDER LOGIC ──
+    function openTelegramModal() {
+      document.getElementById('tg-bot-token').value = localStorage.getItem('MT_TG_BOT_TOKEN') || '';
+      document.getElementById('tg-chat-id').value = localStorage.getItem('MT_TG_CHAT_ID') || '';
+      document.getElementById('telegram-modal').style.display = 'flex';
+    }
+
+    function closeTelegramModal() {
+      document.getElementById('telegram-modal').style.display = 'none';
+    }
+
+    function saveTelegramSettings() {
+      const token = document.getElementById('tg-bot-token').value.trim();
+      const chatId = document.getElementById('tg-chat-id').value.trim();
+      localStorage.setItem('MT_TG_BOT_TOKEN', token);
+      localStorage.setItem('MT_TG_CHAT_ID', chatId);
+      showToast('✅ Setting Bot Telegram berhasil disimpan!');
+    }
+
+    async function triggerTelegramInvoices(forceAll = false) {
+      const botToken = localStorage.getItem('MT_TG_BOT_TOKEN') || document.getElementById('tg-bot-token')?.value?.trim();
+      const chatId = localStorage.getItem('MT_TG_CHAT_ID') || document.getElementById('tg-chat-id')?.value?.trim();
+
+      if (!botToken || !chatId) {
+        showToast('⚠️ Masukkan Bot Token & Chat ID Telegram terlebih dahulu!');
+        openTelegramModal();
+        return;
+      }
+
+      showToast('⏳ Mengecek & mengirim invoice tagihan ke Telegram...');
+
+      try {
+        const resp = await fetch('/api/telegram-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            botToken,
+            chatId,
+            kontrak: masterKontrak,
+            force: forceAll
+          })
+        });
+
+        const data = await resp.json();
+        if (data.ok) {
+          if (data.dueCount > 0) {
+            showToast(`🚀 ${data.dueCount} Invoice tagihan berhasil dikirim ke Telegram!`);
+          } else {
+            showToast('ℹ️ Tidak ada tagihan sewa yang jatuh tempo pada hari ini.');
+          }
+        } else {
+          showToast(`❌ Gagal: ${data.error}`);
+        }
+      } catch (e) {
+        showToast(`❌ Error: ${e.message}`);
+      }
     }
 
     function handleTopAdd() {
