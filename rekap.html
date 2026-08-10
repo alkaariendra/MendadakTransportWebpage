@@ -109,8 +109,8 @@
     }
     .tab-group { display: flex; gap: 0.25rem; }
     .tab-btn {
-      padding: 0.75rem 1rem; background: transparent; border: none;
-      color: var(--text-secondary); font-size: 0.82rem; font-weight: 600;
+      padding: 0.75rem 1.15rem; background: transparent; border: none;
+      color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;
       cursor: pointer; display: flex; align-items: center; gap: 6px;
       border-bottom: 2px solid transparent; transition: all 0.2s ease;
     }
@@ -126,10 +126,10 @@
     }
     .year-btn.active { background: var(--accent-red); color: #fff; }
 
-    /* Main Container (Full screen width) */
+    /* Main Container */
     .container { width: 100%; max-width: 100%; padding: 1rem 1.25rem; flex: 1; }
 
-    /* KPI Summary Row (5 Compact Cards) */
+    /* Interactive Clickable KPI Cards */
     .stats-grid {
       display: grid; grid-template-columns: repeat(5, 1fr);
       gap: 0.75rem; margin-bottom: 1rem;
@@ -141,17 +141,50 @@
       background: var(--bg-card); border: 1px solid var(--border-color);
       border-radius: var(--radius-md); padding: 0.85rem 1rem; display: flex;
       flex-direction: column; gap: 0.2rem; position: relative; overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; transition: all 0.2s ease;
     }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3.5px; height: 100%; }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.2); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .stat-card.active-card {
+      border-color: #fff !important; box-shadow: 0 0 16px rgba(255,255,255,0.25) !important;
+      background: rgba(30, 41, 59, 0.95) !important;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
     .stat-card.total::before { background: var(--accent-red); }
     .stat-card.paid::before { background: var(--color-lunas); }
     .stat-card.pending::before { background: var(--color-belum); }
     .stat-card.feemonth::before { background: var(--color-dp); }
     .stat-card.feeyear::before { background: #3b82f6; }
+    
+    .card-top-row { display: flex; justify-content: space-between; align-items: center; }
     .stat-label { font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; }
+    .click-hint { font-size: 0.65rem; color: var(--text-muted); opacity: 0.8; }
     .stat-value { font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     .stat-sub { font-size: 0.68rem; color: var(--text-muted); }
+
+    /* Collapsible Drill-Down Breakdown Panel */
+    .drilldown-panel {
+      display: none; background: rgba(17, 24, 39, 0.95); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;
+      animation: fadeIn 0.25s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .drilldown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+    .drilldown-title { font-size: 0.95rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    
+    .drilldown-grid {
+      display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.25rem; align-items: start;
+    }
+    @media (max-width: 900px) {
+      .drilldown-grid { grid-template-columns: 1fr; }
+    }
+    .breakdown-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .breakdown-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0,0,0,0.3); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color); font-size: 0.78rem;
+    }
+    .breakdown-name { font-weight: 700; color: #fff; }
+    .breakdown-meta { color: var(--text-secondary); font-size: 0.7rem; }
+    .breakdown-val { font-weight: 800; }
 
     /* Action & Legend Bar */
     .table-top-actions {
@@ -165,7 +198,7 @@
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--text-secondary); }
     .legend-box { width: 9px; height: 9px; border-radius: 2px; }
 
-    /* Matrix Table 100% Fit (Fixed layout, no horizontal scroll) */
+    /* Matrix Table 100% Fit */
     .matrix-wrapper {
       background: var(--bg-card); border: 1px solid var(--border-color);
       border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin-bottom: 1.25rem;
@@ -173,31 +206,33 @@
     }
     .matrix-table {
       width: 100%; border-collapse: collapse; text-align: center;
-      table-layout: fixed; font-size: 0.72rem;
+      table-layout: fixed; font-size: 0.71rem;
     }
     .matrix-table th {
       background: rgba(0, 0, 0, 0.6); padding: 0.55rem 0.15rem; color: var(--text-secondary);
-      font-weight: 700; font-size: 0.68rem; border: 1px solid var(--border-color); text-transform: uppercase;
+      font-weight: 700; font-size: 0.67rem; border: 1px solid var(--border-color); text-transform: uppercase;
+      letter-spacing: 0.2px;
     }
     .matrix-table td {
-      padding: 0.45rem 0.15rem; border: 1px solid var(--border-color); vertical-align: middle;
+      padding: 0.45rem 0.12rem; border: 1px solid var(--border-color); vertical-align: middle;
       overflow: hidden; text-overflow: ellipsis;
     }
     .matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
     /* Fixed Column Widths for Kontrak Matrix */
     .col-k-no { width: 2.2%; }
-    .col-k-renter { width: 10%; text-align: left !important; padding-left: 0.4rem !important; }
-    .col-k-model { width: 9.5%; text-align: left !important; padding-left: 0.4rem !important; }
-    .col-k-plat { width: 6.5%; }
-    .col-k-start { width: 6.2%; font-size: 0.68rem; color: #60a5fa; font-weight: 600; }
-    .col-k-month { width: 3.8%; } /* 12 x 3.8% = 45.6% */
-    .col-k-total { width: 7.2%; font-weight: 800; }
-    .col-k-feebln { width: 5.2%; }
-    .col-k-feethn { width: 5.4%; }
-    .col-k-aksi { width: 4.4%; }
+    .col-k-renter { width: 9.5%; text-align: left !important; padding-left: 0.35rem !important; }
+    .col-k-model { width: 8.8%; text-align: left !important; padding-left: 0.35rem !important; }
+    .col-k-plat { width: 6.2%; }
+    .col-k-start { width: 5.4%; font-size: 0.66rem; color: #60a5fa; font-weight: 600; }
+    .col-k-end { width: 5.4%; font-size: 0.66rem; color: #f59e0b; font-weight: 600; }
+    .col-k-month { width: 3.6%; } /* 12 x 3.6% = 43.2% */
+    .col-k-total { width: 6.8%; font-weight: 800; }
+    .col-k-feebln { width: 4.8%; }
+    .col-k-feethn { width: 4.8%; }
+    .col-k-aksi { width: 4.1%; }
 
-    /* Custom Table for Daily Rentals */
+    /* Daily Rentals Table */
     .daily-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
     .daily-table th {
       background: rgba(0, 0, 0, 0.6); padding: 0.65rem 0.85rem; color: var(--text-secondary);
@@ -209,7 +244,7 @@
     /* Month Cell Statuses */
     .cell-status {
       display: block; width: 100%; padding: 3px 1px; border-radius: 3px;
-      font-weight: 700; font-size: 0.66rem; cursor: pointer; transition: all 0.15s ease;
+      font-weight: 700; font-size: 0.65rem; cursor: pointer; transition: all 0.15s ease;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .cell-status:hover { transform: scale(1.04); }
@@ -220,7 +255,7 @@
 
     .plate-tag {
       display: inline-block; background: #000; color: #fff; font-weight: 700;
-      font-size: 0.68rem; padding: 2px 4px; border-radius: 3px; border: 1px solid #333;
+      font-size: 0.67rem; padding: 2px 4px; border-radius: 3px; border: 1px solid #333;
     }
 
     .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
@@ -316,7 +351,7 @@
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Sync Telegram &amp; Web</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span>Interactive Drill-Down</span></div>
       <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
@@ -328,7 +363,6 @@
     <div class="tab-group">
       <button class="tab-btn active" id="tab-btn-kontrak" onclick="switchTab('tab-kontrak')">📑 Rekap Kontrak Bulanan / Tahunan</button>
       <button class="tab-btn" id="tab-btn-harian" onclick="switchTab('tab-harian')">🚗 Rekap Sewa Keluar Harian &amp; Invoice</button>
-      <button class="tab-btn" id="tab-btn-analytics" onclick="switchTab('tab-analytics')">📊 Grafik &amp; Analisis Fee</button>
     </div>
     <div class="year-switch" id="year-switch-box">
       <button class="year-btn active" id="btn-2026" onclick="setYear(2026)">Tahun 2026</button>
@@ -341,32 +375,76 @@
 
     <!-- ==================== TAB 1: REKAP KONTRAK BULANAN / TAHUNAN ==================== -->
     <section id="tab-kontrak" class="section active">
-      <!-- KPI Summary Row for Kontrak -->
+      
+      <!-- 5 Interactive Clickable KPI Cards -->
       <div class="stats-grid">
-        <div class="stat-card total">
-          <span class="stat-label">Total Omset Kontrak (1 Thn)</span>
+        <div class="stat-card total" id="card-total" onclick="toggleDrilldown('total')">
+          <div class="card-top-row">
+            <span class="stat-label">Total Omset Sewa (1 Thn)</span>
+            <span class="click-hint">🔍 Rincian</span>
+          </div>
           <div class="stat-value" id="kpi-total">Rp 320.400.000</div>
-          <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar</span>
+          <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar (2026)</span>
         </div>
-        <div class="stat-card paid">
-          <span class="stat-label">Sudah Terbayar (Lunas)</span>
+
+        <div class="stat-card paid" id="card-paid" onclick="toggleDrilldown('paid')">
+          <div class="card-top-row">
+            <span class="stat-label">Sudah Terbayar (Lunas)</span>
+            <span class="click-hint">🔍 Rincian</span>
+          </div>
           <div class="stat-value" id="kpi-paid" style="color: var(--color-lunas);">Rp 171.200.000</div>
           <span class="stat-sub">Pembayaran diterima</span>
         </div>
-        <div class="stat-card pending">
-          <span class="stat-label">Piutang / Belum Bayar</span>
+
+        <div class="stat-card pending" id="card-pending" onclick="toggleDrilldown('pending')">
+          <div class="card-top-row">
+            <span class="stat-label">Piutang / Belum Bayar</span>
+            <span class="click-hint">🔍 Rincian</span>
+          </div>
           <div class="stat-value" id="kpi-pending" style="color: var(--color-belum);">Rp 149.200.000</div>
           <span class="stat-sub">Sisa tagihan berjalan</span>
         </div>
-        <div class="stat-card feemonth">
-          <span class="stat-label">Total Fee / Bulan</span>
+
+        <div class="stat-card feemonth" id="card-feemonth" onclick="toggleDrilldown('feemonth')">
+          <div class="card-top-row">
+            <span class="stat-label">Total Fee / Bulan</span>
+            <span class="click-hint">🔍 Rincian</span>
+          </div>
           <div class="stat-value" id="kpi-feemonth" style="color: var(--color-dp);">Rp 5.550.000</div>
           <span class="stat-sub">Fee pemilik per bulan</span>
         </div>
-        <div class="stat-card feeyear">
-          <span class="stat-label">Total Fee / Tahun</span>
+
+        <div class="stat-card feeyear" id="card-feeyear" onclick="toggleDrilldown('feeyear')">
+          <div class="card-top-row">
+            <span class="stat-label">Total Fee / Tahun</span>
+            <span class="click-hint">🔍 Rincian</span>
+          </div>
           <div class="stat-value" id="kpi-feeyear" style="color: #60a5fa;">Rp 46.600.000</div>
           <span class="stat-sub">Total fee pemilik 1 tahun</span>
+        </div>
+      </div>
+
+      <!-- Collapsible Drilldown & Embedded Chart Panel -->
+      <div id="drilldown-box" class="drilldown-panel">
+        <div class="drilldown-header">
+          <div class="drilldown-title" id="drilldown-title-text">
+            <span>📊 Rincian Sumber Nilai: Total Omset Kontrak</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="closeDrilldown()">✕ Tutup Rincian</button>
+        </div>
+        <div class="drilldown-grid">
+          <div>
+            <h4 style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.6rem;" id="drilldown-list-title">Rincian Per Unit / Pengontrak:</h4>
+            <div class="breakdown-list" id="drilldown-list-container">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding:0.85rem; border-radius: var(--radius-sm); border:1px solid var(--border-color);">
+            <h4 style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.5rem;" id="drilldown-chart-title">Visualisasi Analisis:</h4>
+            <div style="height: 220px; position: relative;">
+              <canvas id="drilldownChartCanvas"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -384,7 +462,7 @@
         </div>
       </div>
 
-      <!-- Matrix Table Kontrak (100% Fit Screen) -->
+      <!-- Matrix Table Kontrak (Dengan Tgl Mulai & Tgl Selesai) -->
       <div class="matrix-wrapper">
         <table class="matrix-table">
           <thead>
@@ -394,6 +472,7 @@
               <th class="col-k-model">Nama Unit</th>
               <th class="col-k-plat">PLAT</th>
               <th class="col-k-start">Tgl Mulai</th>
+              <th class="col-k-end">Tgl Selesai</th>
               <th class="col-k-month">Jan</th>
               <th class="col-k-month">Feb</th>
               <th class="col-k-month">Mar</th>
@@ -421,7 +500,6 @@
 
     <!-- ==================== TAB 2: REKAP SEWA KELUAR HARIAN ==================== -->
     <section id="tab-harian" class="section">
-      <!-- KPI Summary Row for Daily -->
       <div class="stats-grid">
         <div class="stat-card total">
           <span class="stat-label">Total Omset Sewa Harian</span>
@@ -481,24 +559,6 @@
       </div>
     </section>
 
-    <!-- ==================== TAB 3: GRAFIK & ANALISIS ==================== -->
-    <section id="tab-analytics" class="section">
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
-          <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.75rem;">📊 Grafik Pemasukan per Bulan (<span id="chart-year-label">2026</span>)</h3>
-          <div style="height: 280px; position: relative;">
-            <canvas id="monthlyChart"></canvas>
-          </div>
-        </div>
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
-          <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.75rem;">🚘 Kontribusi Omset per Unit</h3>
-          <div style="height: 280px; position: relative;">
-            <canvas id="unitShareChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
   <!-- ==================== MODAL 1: EDIT / NEW KONTRAK ==================== -->
@@ -528,6 +588,10 @@
           <div class="form-group">
             <label class="form-label">Tanggal Mulai Kontrak</label>
             <input type="date" id="edit-start-date" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Selesai Kontrak</label>
+            <input type="date" id="edit-end-date" class="form-input" required>
           </div>
           <div class="form-group">
             <label class="form-label">Fee Pemilik / Bulan</label>
@@ -643,13 +707,15 @@
     const DEFAULT_PIN = "1234";
     let activeYear = 2026;
     let currentTab = 'tab-kontrak';
+    let currentDrilldown = null;
+    let drilldownChart = null;
     const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    // ── MASTER DATA KONTRAK (BULANAN / TAHUNAN) ──
+    // ── MASTER DATA KONTRAK (DENGAN START & END DATE) ──
     const defaultMasterKontrak = {
       2026: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-01', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
           months: [
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
@@ -658,7 +724,7 @@
           ]
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-01-01', fee: 'NO FEE', fee_year: 'Rp. 0',
+          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'NO FEE', fee_year: 'Rp. 0',
           months: [
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
@@ -667,7 +733,7 @@
           ]
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-01-01', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
+          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
           months: [
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
@@ -676,7 +742,7 @@
           ]
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-01-01', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
           months: [
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
@@ -685,35 +751,35 @@
           ]
         },
         {
-          no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-01-01', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
+          no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         },
         {
-          no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-01-01', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
+          no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         }
       ],
       2027: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2027-01-01', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
           months: Array(12).fill(0).map(() => ({ amt: 5500000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2027-01-01', fee: 'NO FEE', fee_year: 'Rp. 0',
+          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'NO FEE', fee_year: 'Rp. 0',
           months: Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2027-01-01', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
+          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 6000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2027-01-01', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
           months: Array(12).fill(0).map(() => ({ amt: 6200000, st: 'BELUM_BAYAR' }))
         }
       ]
     };
 
-    // ── DATA SEWA KELUAR HARIAN ──
+    // ── DATA SEWA HARIAN ──
     const defaultDailyRentals = [
       { id: 'MT-673/INV/XII/2025', client: 'Ibu Fatimah', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil Include', start: '2025-12-01', end: '2025-12-05', dur: 5, rate: 900000, extra: 0, total: 4500000, status: 'LUNAS (CASH)' },
       { id: 'MT-674/INV/XII/2025', client: 'Ibu Rizelsa Aura', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-07', end: '2025-12-11', dur: 4, rate: 500000, extra: 0, total: 2000000, status: 'LUNAS (CASH)' },
@@ -724,8 +790,6 @@
 
     let masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
     let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
-    let monthlyChart = null;
-    let unitShareChart = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
@@ -736,25 +800,24 @@
         document.getElementById('lock-screen').style.display = 'none';
       }
 
-      // Load stored custom edits
-      const savedK = localStorage.getItem('mt_master_kontrak_v3');
+      const savedK = localStorage.getItem('mt_master_kontrak_v5');
       if (savedK) { try { masterKontrak = JSON.parse(savedK); } catch(e) {} }
 
-      const savedD = localStorage.getItem('mt_daily_rentals_v3');
+      const savedD = localStorage.getItem('mt_daily_rentals_v5');
       if (savedD) { try { dailyRentals = JSON.parse(savedD); } catch(e) {} }
 
       renderMatrix();
       renderDaily();
-      initCharts();
     });
 
     function setYear(yr) {
       activeYear = yr;
       document.getElementById('btn-2026').classList.toggle('active', yr === 2026);
       document.getElementById('btn-2027').classList.toggle('active', yr === 2027);
-      document.getElementById('chart-year-label').textContent = yr;
       renderMatrix();
-      updateCharts();
+      if (currentDrilldown) {
+        showDrilldown(currentDrilldown);
+      }
     }
 
     // ── RENDER MATRIX KONTRAK ──
@@ -808,7 +871,8 @@
         totalFeeYear += feeYearNum;
 
         const feeYearDisplay = item.fee_year ? item.fee_year : (feeYearNum > 0 ? `Rp. ${feeYearNum.toLocaleString('id-ID')}` : 'Rp. 0');
-        const formattedDate = item.start_date ? formatDateDisplay(item.start_date) : `01 Jan ${activeYear}`;
+        const formattedStart = item.start_date ? formatDateDisplay(item.start_date) : `01 Jan ${activeYear.toString().slice(-2)}`;
+        const formattedEnd = item.end_date ? formatDateDisplay(item.end_date) : `31 Des ${activeYear.toString().slice(-2)}`;
 
         return `
           <tr>
@@ -816,7 +880,8 @@
             <td class="col-k-renter"><strong style="color:#fff;">${item.renter}</strong></td>
             <td class="col-k-model"><span style="color:var(--text-secondary);">${item.model}</span></td>
             <td class="col-k-plat"><div class="plate-tag">${item.plate}</div></td>
-            <td class="col-k-start">${formattedDate}</td>
+            <td class="col-k-start">${formattedStart}</td>
+            <td class="col-k-end">${formattedEnd}</td>
             ${monthsHtml}
             <td class="col-k-total" style="color:#fff;">Rp ${(rowSum / 1000000).toFixed(1)}jt</td>
             <td class="col-k-feebln" style="color:var(--color-dp); font-weight:700;">${item.fee}</td>
@@ -843,7 +908,10 @@
       try {
         const d = new Date(dStr);
         if (isNaN(d.getTime())) return dStr;
-        return `${d.getDate().toString().padStart(2, '0')} ${monthsList[d.getMonth()]} ${d.getFullYear()}`;
+        const day = d.getDate().toString().padStart(2, '0');
+        const m = monthsList[d.getMonth()];
+        const y = d.getFullYear().toString().slice(-2);
+        return `${day} ${m} '${y}`;
       } catch(e) {
         return dStr;
       }
@@ -860,6 +928,178 @@
 
       saveAll();
       showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah!`);
+    }
+
+    // ── INTERACTIVE DRILL-DOWN EXPLANATION FOR TOP CARDS ──
+    function toggleDrilldown(type) {
+      if (currentDrilldown === type) {
+        closeDrilldown();
+      } else {
+        showDrilldown(type);
+      }
+    }
+
+    function closeDrilldown() {
+      currentDrilldown = null;
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-card'));
+      document.getElementById('drilldown-box').style.display = 'none';
+      if (drilldownChart) { drilldownChart.destroy(); drilldownChart = null; }
+    }
+
+    function showDrilldown(type) {
+      currentDrilldown = type;
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-card'));
+      const activeCard = document.getElementById(`card-${type}`);
+      if (activeCard) activeCard.classList.add('active-card');
+
+      const list = masterKontrak[activeYear] || [];
+      const container = document.getElementById('drilldown-list-container');
+      const box = document.getElementById('drilldown-box');
+      box.style.display = 'block';
+
+      let title = '';
+      let listHtml = '';
+      let chartLabels = [];
+      let chartData = [];
+      let chartColors = ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'];
+
+      if (type === 'total') {
+        title = `📊 Rincian Sumber Nilai: Total Omset Kontrak Tahun ${activeYear}`;
+        document.getElementById('drilldown-list-title').textContent = 'Kontribusi Omset per Pengontrak & Unit:';
+        document.getElementById('drilldown-chart-title').textContent = 'Persentase Omset Kontrak:';
+
+        list.forEach((u, i) => {
+          const uTotal = u.months.reduce((a, b) => a + b.amt, 0);
+          chartLabels.push(`${u.renter} (${u.model})`);
+          chartData.push(uTotal);
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter}</div>
+                <div class="breakdown-meta">${u.model} · ${u.plate} (12 Bulan)</div>
+              </div>
+              <div class="breakdown-val" style="color:#fff;">Rp ${uTotal.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      } else if (type === 'paid') {
+        title = `🟢 Rincian Pembayaran Masuk (Sudah Lunas) Tahun ${activeYear}`;
+        document.getElementById('drilldown-list-title').textContent = 'Jumlah Uang Sewa yang Sudah Diterima per Unit:';
+        document.getElementById('drilldown-chart-title').textContent = 'Porsi Pembayaran Lunas:';
+
+        list.forEach((u, i) => {
+          const paidMonths = u.months.filter(m => m.st === 'SUDAH_BAYAR');
+          const uPaid = paidMonths.reduce((a, b) => a + b.amt, 0);
+          chartLabels.push(`${u.renter}`);
+          chartData.push(uPaid);
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter}</div>
+                <div class="breakdown-meta">${u.model} · <span style="color:var(--color-lunas); font-weight:700;">${paidMonths.length}/12 Bulan Lunas</span></div>
+              </div>
+              <div class="breakdown-val" style="color:var(--color-lunas);">Rp ${uPaid.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      } else if (type === 'pending') {
+        title = `🔴 Rincian Piutang / Belum Bayar Tahun ${activeYear}`;
+        document.getElementById('drilldown-list-title').textContent = 'Sisa Tagihan yang Belum Dibayar per Unit:';
+        document.getElementById('drilldown-chart-title').textContent = 'Porsi Piutang Berjalan:';
+
+        list.forEach((u, i) => {
+          const unPaidMonths = u.months.filter(m => m.st !== 'SUDAH_BAYAR');
+          const uPending = unPaidMonths.reduce((a, b) => a + b.amt, 0);
+          if (uPending > 0) {
+            chartLabels.push(`${u.renter}`);
+            chartData.push(uPending);
+          }
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter}</div>
+                <div class="breakdown-meta">${u.model} · <span style="color:var(--color-belum); font-weight:700;">${unPaidMonths.length} Bulan Belum Lunas</span></div>
+              </div>
+              <div class="breakdown-val" style="color:var(--color-belum);">Rp ${uPending.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      } else if (type === 'feemonth') {
+        title = `🟠 Rincian Fee Bulanan Mitra Pemilik Unit (${activeYear})`;
+        document.getElementById('drilldown-list-title').textContent = 'Fee Rutin yang Dibayarkan ke Pemilik Setiap Bulan:';
+        document.getElementById('drilldown-chart-title').textContent = 'Distribusi Fee Bulanan:';
+
+        list.forEach((u, i) => {
+          const feeNum = parseInt(String(u.fee).replace(/[^0-9]/g, '')) || 0;
+          if (feeNum > 0) {
+            chartLabels.push(`${u.renter} (${u.model})`);
+            chartData.push(feeNum);
+          }
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter} (${u.model})</div>
+                <div class="breakdown-meta">Plat: ${u.plate}</div>
+              </div>
+              <div class="breakdown-val" style="color:var(--color-dp);">${u.fee} / bln</div>
+            </div>
+          `;
+        });
+      } else if (type === 'feeyear') {
+        title = `🔵 Rincian Total Fee Tahunan Mitra Pemilik Unit (${activeYear})`;
+        document.getElementById('drilldown-list-title').textContent = 'Akumulasi Fee Pemilik Selama 1 Tahun:';
+        document.getElementById('drilldown-chart-title').textContent = 'Porsi Fee Tahunan:';
+
+        list.forEach((u, i) => {
+          const feeMonthNum = parseInt(String(u.fee).replace(/[^0-9]/g, '')) || 0;
+          let feeYearNum = u.fee_year ? (parseInt(String(u.fee_year).replace(/[^0-9]/g, '')) || 0) : feeMonthNum * 12;
+          if (feeYearNum > 0) {
+            chartLabels.push(`${u.renter}`);
+            chartData.push(feeYearNum);
+          }
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter} (${u.model})</div>
+                <div class="breakdown-meta">Fee Bulanan: ${u.fee}</div>
+              </div>
+              <div class="breakdown-val" style="color:#60a5fa;">Rp ${feeYearNum.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('drilldown-title-text').innerHTML = `<span>${title}</span>`;
+      container.innerHTML = listHtml;
+
+      renderDrilldownChart(chartLabels, chartData, chartColors);
+    }
+
+    function renderDrilldownChart(labels, data, colors) {
+      const ctx = document.getElementById('drilldownChartCanvas').getContext('2d');
+      if (drilldownChart) drilldownChart.destroy();
+
+      drilldownChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#9ca3af', font: { size: 9 }, boxWidth: 8 }
+            }
+          }
+        }
+      });
     }
 
     // ── RENDER DAILY RENTALS ──
@@ -912,6 +1152,7 @@
       document.getElementById('edit-model').value = item.model;
       document.getElementById('edit-plate').value = item.plate;
       document.getElementById('edit-start-date').value = item.start_date || `${activeYear}-01-01`;
+      document.getElementById('edit-end-date').value = item.end_date || `${activeYear}-12-31`;
       document.getElementById('edit-fee').value = item.fee;
       document.getElementById('edit-fee-year').value = item.fee_year || '';
       document.getElementById('edit-rate-default').value = item.months[0]?.amt || 5000000;
@@ -928,6 +1169,7 @@
       document.getElementById('edit-model').value = '';
       document.getElementById('edit-plate').value = '';
       document.getElementById('edit-start-date').value = `${activeYear}-01-01`;
+      document.getElementById('edit-end-date').value = `${activeYear}-12-31`;
       document.getElementById('edit-fee').value = 'NO FEE';
       document.getElementById('edit-fee-year').value = 'Rp. 0';
       document.getElementById('edit-rate-default').value = 5000000;
@@ -969,6 +1211,7 @@
       const model = document.getElementById('edit-model').value;
       const plate = document.getElementById('edit-plate').value;
       const startDate = document.getElementById('edit-start-date').value;
+      const endDate = document.getElementById('edit-end-date').value;
       const fee = document.getElementById('edit-fee').value;
       const feeYear = document.getElementById('edit-fee-year').value;
       const yr = Number(document.getElementById('edit-year-select').value);
@@ -983,14 +1226,14 @@
       if (rowIdx >= 0) {
         masterKontrak[activeYear][rowIdx] = {
           ...masterKontrak[activeYear][rowIdx],
-          renter, model, plate, start_date: startDate, fee, fee_year: feeYear, months
+          renter, model, plate, start_date: startDate, end_date: endDate, fee, fee_year: feeYear, months
         };
         showToast(`✅ Data kontrak ${renter} diperbarui!`);
       } else {
         const newNo = (masterKontrak[yr].length + 1);
         masterKontrak[yr].push({
           no: newNo,
-          renter, model, plate, start_date: startDate, fee, fee_year: feeYear, months
+          renter, model, plate, start_date: startDate, end_date: endDate, fee, fee_year: feeYear, months
         });
         setYear(yr);
         showToast(`✅ Unit baru ${renter} (${model}) ditambahkan!`);
@@ -1110,83 +1353,11 @@
     }
 
     function saveAll() {
-      localStorage.setItem('mt_master_kontrak_v3', JSON.stringify(masterKontrak));
-      localStorage.setItem('mt_daily_rentals_v3', JSON.stringify(dailyRentals));
+      localStorage.setItem('mt_master_kontrak_v5', JSON.stringify(masterKontrak));
+      localStorage.setItem('mt_daily_rentals_v5', JSON.stringify(dailyRentals));
       renderMatrix();
       renderDaily();
-      updateCharts();
-    }
-
-    // ── CHARTS INITIALIZATION ──
-    function initCharts() {
-      const ctx1 = document.getElementById('monthlyChart').getContext('2d');
-      monthlyChart = new Chart(ctx1, {
-        type: 'bar',
-        data: getChartData(),
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#9ca3af' } } },
-          scales: {
-            x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
-          }
-        }
-      });
-
-      const ctx2 = document.getElementById('unitShareChart').getContext('2d');
-      unitShareChart = new Chart(ctx2, {
-        type: 'doughnut',
-        data: getDonutData(),
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 8, font: { size: 10 } } } }
-        }
-      });
-    }
-
-    function getChartData() {
-      const paidByMonth = Array(12).fill(0);
-      const pendingByMonth = Array(12).fill(0);
-
-      (masterKontrak[activeYear] || []).forEach(u => {
-        u.months.forEach((m, idx) => {
-          if (m.st === 'SUDAH_BAYAR') paidByMonth[idx] += m.amt;
-          else pendingByMonth[idx] += m.amt;
-        });
-      });
-
-      return {
-        labels: monthsList,
-        datasets: [
-          { label: 'Sudah Terbayar (Lunas)', data: paidByMonth, backgroundColor: '#10b981', borderRadius: 4 },
-          { label: 'Belum Terbayar (Piutang)', data: pendingByMonth, backgroundColor: '#ef4444', borderRadius: 4 }
-        ]
-      };
-    }
-
-    function getDonutData() {
-      const list = masterKontrak[activeYear] || [];
-      return {
-        labels: list.map(u => `${u.renter} (${u.model})`),
-        datasets: [{
-          data: list.map(u => u.months.reduce((a, b) => a + b.amt, 0)),
-          backgroundColor: ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'],
-          borderWidth: 0
-        }]
-      };
-    }
-
-    function updateCharts() {
-      if (monthlyChart) {
-        monthlyChart.data = getChartData();
-        monthlyChart.update();
-      }
-      if (unitShareChart) {
-        unitShareChart.data = getDonutData();
-        unitShareChart.update();
-      }
+      if (currentDrilldown) showDrilldown(currentDrilldown);
     }
 
     function exportCurrentData() {
@@ -1197,14 +1368,14 @@
       } else {
         const list = masterKontrak[activeYear] || [];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        let rows = [[`REKAP KONTRAK MOBIL ${activeYear}`], ['No.', 'Pengontrak', 'Nama Unit', 'PLAT', 'Tgl Mulai', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']];
+        let rows = [[`REKAP KONTRAK MOBIL ${activeYear}`], ['No.', 'Pengontrak', 'Nama Unit', 'PLAT', 'Tgl Mulai', 'Tgl Selesai', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']];
 
         list.forEach(item => {
           const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
           const totalNum = item.months.reduce((a, b) => a + b.amt, 0);
           const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
           const feeYearStr = item.fee_year || (feeMonthNum > 0 ? `Rp. ${(feeMonthNum * 12).toLocaleString('id-ID')}` : 'Rp. 0');
-          rows.push([item.no, item.renter, item.model, item.plate, item.start_date || `01-01-${activeYear}`, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
+          rows.push([item.no, item.renter, item.model, item.plate, item.start_date || `01-01-${activeYear}`, item.end_date || `31-12-${activeYear}`, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
         });
         downloadCsv(rows, `REKAP_KONTRAK_${activeYear}_MENDADAK.csv`);
       }
@@ -1254,13 +1425,10 @@
         document.getElementById('tab-btn-kontrak').classList.add('active');
         document.getElementById('year-switch-box').style.display = 'flex';
         document.getElementById('btn-top-add').textContent = '➕ Tambah Kontrak';
-      } else if (id === 'tab-harian') {
+      } else {
         document.getElementById('tab-btn-harian').classList.add('active');
         document.getElementById('year-switch-box').style.display = 'none';
         document.getElementById('btn-top-add').textContent = '➕ Buat Sewa Harian';
-      } else {
-        document.getElementById('tab-btn-analytics').classList.add('active');
-        document.getElementById('year-switch-box').style.display = 'flex';
       }
 
       document.getElementById(id).classList.add('active');
