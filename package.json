@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/alkaariendra/MendadakTransportWebpage/issues"
   },
-  "homepage": "https://github.com/alkaariendra/MendadakTransportWebpage#readme"
+  "homepage": "https://github.com/alkaariendra/MendadakTransportWebpage#readme",
+  "dependencies": {
+    "@upstash/redis": "^1.38.2"
+  }
 }

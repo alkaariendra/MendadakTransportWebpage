@@ -13,4 +13,4 @@ baileys-order-bot/.env
 baileys-order-bot/auth/
 baileys-order-bot/qr.png
 baileys-order-bot/server-qr.png
-baileys-order-bot/node_modules/
+node_modules/
