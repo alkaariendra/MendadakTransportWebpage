@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Master Rekap Kontrak Mobil &amp; Motor | Mendadak Transport</title>
+  <title>Workspace Rekap Rental &amp; Kontrak | Mendadak Transport</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
       --accent-red: #d71920;
       --accent-red-hover: #b8141a;
       
-      /* Status Colors from Master Excel */
+      /* Status Colors */
       --color-lunas: #10b981;
       --color-lunas-bg: rgba(16, 185, 129, 0.15);
       --color-lunas-border: rgba(16, 185, 129, 0.35);
@@ -101,7 +101,7 @@
     }
     .live-dot { width: 7px; height: 7px; background: var(--color-lunas); border-radius: 50%; box-shadow: 0 0 6px var(--color-lunas); }
 
-    /* Navigation & Year Selector */
+    /* Navigation & Tabs */
     .nav-tabs {
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 1.5rem; background: rgba(17, 24, 39, 0.6); border-bottom: 1px solid var(--border-color);
@@ -126,10 +126,10 @@
     }
     .year-btn.active { background: var(--accent-red); color: #fff; }
 
-    /* Main Container (Full screen width utilization) */
+    /* Main Container (Full screen width) */
     .container { width: 100%; max-width: 100%; padding: 1rem 1.25rem; flex: 1; }
 
-    /* KPI Summary Cards (5 Compact Cards) */
+    /* KPI Summary Row (5 Compact Cards) */
     .stats-grid {
       display: grid; grid-template-columns: repeat(5, 1fr);
       gap: 0.75rem; margin-bottom: 1rem;
@@ -178,7 +178,6 @@
     .matrix-table th {
       background: rgba(0, 0, 0, 0.6); padding: 0.55rem 0.15rem; color: var(--text-secondary);
       font-weight: 700; font-size: 0.68rem; border: 1px solid var(--border-color); text-transform: uppercase;
-      letter-spacing: 0.2px;
     }
     .matrix-table td {
       padding: 0.45rem 0.15rem; border: 1px solid var(--border-color); vertical-align: middle;
@@ -186,20 +185,31 @@
     }
     .matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
-    /* Fixed Column Widths (Sum = 100%) */
-    .col-no { width: 2.5%; }
-    .col-unit { width: 14%; text-align: left !important; padding-left: 0.5rem !important; }
-    .col-plat { width: 7.5%; }
-    .col-month { width: 4.3%; } /* 12 months = 51.6% */
-    .col-total { width: 7.8%; font-weight: 800; }
-    .col-feebln { width: 5.8%; }
-    .col-feethn { width: 6%; }
-    .col-aksi { width: 4.8%; }
+    /* Fixed Column Widths for Kontrak Matrix */
+    .col-k-no { width: 2.2%; }
+    .col-k-renter { width: 10%; text-align: left !important; padding-left: 0.4rem !important; }
+    .col-k-model { width: 9.5%; text-align: left !important; padding-left: 0.4rem !important; }
+    .col-k-plat { width: 6.5%; }
+    .col-k-start { width: 6.2%; font-size: 0.68rem; color: #60a5fa; font-weight: 600; }
+    .col-k-month { width: 3.8%; } /* 12 x 3.8% = 45.6% */
+    .col-k-total { width: 7.2%; font-weight: 800; }
+    .col-k-feebln { width: 5.2%; }
+    .col-k-feethn { width: 5.4%; }
+    .col-k-aksi { width: 4.4%; }
+
+    /* Custom Table for Daily Rentals */
+    .daily-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
+    .daily-table th {
+      background: rgba(0, 0, 0, 0.6); padding: 0.65rem 0.85rem; color: var(--text-secondary);
+      font-weight: 700; font-size: 0.72rem; border-bottom: 1px solid var(--border-color); text-transform: uppercase;
+    }
+    .daily-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .daily-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
     /* Month Cell Statuses */
     .cell-status {
       display: block; width: 100%; padding: 3px 1px; border-radius: 3px;
-      font-weight: 700; font-size: 0.67rem; cursor: pointer; transition: all 0.15s ease;
+      font-weight: 700; font-size: 0.66rem; cursor: pointer; transition: all 0.15s ease;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .cell-status:hover { transform: scale(1.04); }
@@ -212,6 +222,11 @@
       display: inline-block; background: #000; color: #fff; font-weight: 700;
       font-size: 0.68rem; padding: 2px 4px; border-radius: 3px; border: 1px solid #333;
     }
+
+    .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
+    .badge-ready { background: rgba(16, 185, 129, 0.12); color: var(--color-lunas); border: 1px solid var(--color-lunas-border); }
+    .badge-belum { background: rgba(239, 68, 68, 0.12); color: var(--color-belum); border: 1px solid var(--color-belum-border); }
+    .badge-dp { background: rgba(245, 158, 11, 0.12); color: var(--color-dp); border: 1px solid var(--color-dp-border); }
 
     /* Buttons */
     .btn {
@@ -229,14 +244,14 @@
     .btn-danger:hover { background: rgba(239, 68, 68, 0.35); color: #fff; }
     .btn-icon { padding: 3px 5px; font-size: 0.68rem; border-radius: 3px; }
 
-    /* Edit Modal */
-    #edit-modal {
+    /* Modals */
+    .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999;
       display: none; align-items: center; justify-content: center; padding: 1.5rem; backdrop-filter: blur(10px);
     }
-    .edit-modal-box {
+    .modal-box {
       background: var(--bg-secondary); border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg); padding: 1.75rem; width: 100%; max-width: 760px;
+      border-radius: var(--radius-lg); padding: 1.75rem; width: 100%; max-width: 780px;
       max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.8);
     }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
@@ -282,10 +297,10 @@
     <div class="lock-box">
       <img src="assets/logo-mendadak-transport.png" alt="Mendadak Transport Logo" class="logo-img">
       <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Master Rekap Kontrak Unit</p>
+      <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Workspace Rental Harian &amp; Kontrak</p>
       <form id="pin-form" onsubmit="handlePinSubmit(event)">
         <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="6" autofocus required>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;">Buka Master Rekap</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;">Buka Workspace</button>
       </form>
       <p id="pin-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 0.65rem; display: none;">PIN salah, silakan coba lagi.</p>
     </div>
@@ -297,13 +312,13 @@
       <img src="assets/logo-mendadak-transport.png" alt="Logo" class="top-logo">
       <div>
         <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-        <div class="brand-sub">Master Rekap Kontrak Unit (2026 - 2027)</div>
+        <div class="brand-sub">Workspace Operasional Rental &amp; Kontrak Unit</div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Editable Fit Screen</span></div>
-      <button class="btn btn-primary btn-sm" onclick="openNewContractModal()">➕ Tambah Unit</button>
-      <button class="btn btn-secondary btn-sm" onclick="exportExcelCsv()">📥 Export CSV</button>
+      <div class="live-badge"><div class="live-dot"></div><span>Sync Telegram &amp; Web</span></div>
+      <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
     </div>
   </header>
@@ -311,10 +326,11 @@
   <!-- Navigation Tabs -->
   <nav class="nav-tabs">
     <div class="tab-group">
-      <button class="tab-btn active" onclick="switchTab('tab-matrix')">📑 Tabel Matriks Kontrak (Jan - Des)</button>
-      <button class="tab-btn" onclick="switchTab('tab-analytics')">📊 Grafik &amp; Analisis Fee</button>
+      <button class="tab-btn active" id="tab-btn-kontrak" onclick="switchTab('tab-kontrak')">📑 Rekap Kontrak Bulanan / Tahunan</button>
+      <button class="tab-btn" id="tab-btn-harian" onclick="switchTab('tab-harian')">🚗 Rekap Sewa Keluar Harian &amp; Invoice</button>
+      <button class="tab-btn" id="tab-btn-analytics" onclick="switchTab('tab-analytics')">📊 Grafik &amp; Analisis Fee</button>
     </div>
-    <div class="year-switch">
+    <div class="year-switch" id="year-switch-box">
       <button class="year-btn active" id="btn-2026" onclick="setYear(2026)">Tahun 2026</button>
       <button class="year-btn" id="btn-2027" onclick="setYear(2027)">Tahun 2027</button>
     </div>
@@ -323,74 +339,77 @@
   <!-- Main Container -->
   <main class="container">
 
-    <!-- KPI Summary Row (5 Cards) -->
-    <section class="stats-grid">
-      <div class="stat-card total">
-        <span class="stat-label">Total Omset Sewa (1 Thn)</span>
-        <div class="stat-value" id="kpi-total">Rp 320.400.000</div>
-        <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar</span>
+    <!-- ==================== TAB 1: REKAP KONTRAK BULANAN / TAHUNAN ==================== -->
+    <section id="tab-kontrak" class="section active">
+      <!-- KPI Summary Row for Kontrak -->
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <span class="stat-label">Total Omset Kontrak (1 Thn)</span>
+          <div class="stat-value" id="kpi-total">Rp 320.400.000</div>
+          <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar</span>
+        </div>
+        <div class="stat-card paid">
+          <span class="stat-label">Sudah Terbayar (Lunas)</span>
+          <div class="stat-value" id="kpi-paid" style="color: var(--color-lunas);">Rp 171.200.000</div>
+          <span class="stat-sub">Pembayaran diterima</span>
+        </div>
+        <div class="stat-card pending">
+          <span class="stat-label">Piutang / Belum Bayar</span>
+          <div class="stat-value" id="kpi-pending" style="color: var(--color-belum);">Rp 149.200.000</div>
+          <span class="stat-sub">Sisa tagihan berjalan</span>
+        </div>
+        <div class="stat-card feemonth">
+          <span class="stat-label">Total Fee / Bulan</span>
+          <div class="stat-value" id="kpi-feemonth" style="color: var(--color-dp);">Rp 5.550.000</div>
+          <span class="stat-sub">Fee pemilik per bulan</span>
+        </div>
+        <div class="stat-card feeyear">
+          <span class="stat-label">Total Fee / Tahun</span>
+          <div class="stat-value" id="kpi-feeyear" style="color: #60a5fa;">Rp 46.600.000</div>
+          <span class="stat-sub">Total fee pemilik 1 tahun</span>
+        </div>
       </div>
-      <div class="stat-card paid">
-        <span class="stat-label">Sudah Terbayar (Lunas)</span>
-        <div class="stat-value" id="kpi-paid" style="color: var(--color-lunas);">Rp 171.200.000</div>
-        <span class="stat-sub">Pembayaran diterima</span>
-      </div>
-      <div class="stat-card pending">
-        <span class="stat-label">Piutang / Belum Bayar</span>
-        <div class="stat-value" id="kpi-pending" style="color: var(--color-belum);">Rp 149.200.000</div>
-        <span class="stat-sub">Sisa tagihan berjalan</span>
-      </div>
-      <div class="stat-card feemonth">
-        <span class="stat-label">Total Fee / Bulan</span>
-        <div class="stat-value" id="kpi-feemonth" style="color: var(--color-dp);">Rp 5.550.000</div>
-        <span class="stat-sub">Fee pemilik per bulan</span>
-      </div>
-      <div class="stat-card feeyear">
-        <span class="stat-label">Total Fee / Tahun</span>
-        <div class="stat-value" id="kpi-feeyear" style="color: #60a5fa;">Rp 46.600.000</div>
-        <span class="stat-sub">Total fee pemilik 1 tahun</span>
-      </div>
-    </section>
 
-    <!-- Top Action Bar & Legend -->
-    <div class="table-top-actions">
-      <div class="legend-bar">
-        <span style="font-weight: 700; font-size: 0.72rem; color:#fff;">KETERANGAN:</span>
-        <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span>🟢 LUNAS</span></div>
-        <div class="legend-item"><div class="legend-box" style="background: var(--color-belum);"></div><span>🔴 BELUM BAYAR</span></div>
-        <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span>🟠 DP / 1/2</span></div>
-        <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span>⚪ MULAI KONTRAK</span></div>
+      <!-- Action & Legend Bar -->
+      <div class="table-top-actions">
+        <div class="legend-bar">
+          <span style="font-weight: 700; font-size: 0.72rem; color:#fff;">KETERANGAN:</span>
+          <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span>🟢 LUNAS</span></div>
+          <div class="legend-item"><div class="legend-box" style="background: var(--color-belum);"></div><span>🔴 BELUM BAYAR</span></div>
+          <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span>🟠 DP / 1/2</span></div>
+          <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span>⚪ MULAI KONTRAK</span></div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="resetToExcelDefault()">🔄 Reset Default Excel</button>
+        </div>
       </div>
-      <div style="display: flex; gap: 0.5rem;">
-        <button class="btn btn-secondary btn-sm" onclick="resetToExcelDefault()">🔄 Reset ke Default Excel</button>
-      </div>
-    </div>
 
-    <!-- TAB 1: MATRIX TABEL KONTRAK (FIT 100% TANPA SCROLL HORIZONTAL) -->
-    <section id="tab-matrix" class="section active">
+      <!-- Matrix Table Kontrak (100% Fit Screen) -->
       <div class="matrix-wrapper">
         <table class="matrix-table">
           <thead>
             <tr>
-              <th class="col-no">No.</th>
-              <th class="col-unit">Nama Unit &amp; Pengontrak</th>
-              <th class="col-plat">PLAT</th>
-              <th class="col-month">Jan</th>
-              <th class="col-month">Feb</th>
-              <th class="col-month">Mar</th>
-              <th class="col-month">Apr</th>
-              <th class="col-month">Mei</th>
-              <th class="col-month">Jun</th>
-              <th class="col-month">Jul</th>
-              <th class="col-month">Ags</th>
-              <th class="col-month">Sep</th>
-              <th class="col-month">Okt</th>
-              <th class="col-month">Nov</th>
-              <th class="col-month">Des</th>
-              <th class="col-total">TOTAL</th>
-              <th class="col-feebln">FEE/BLN</th>
-              <th class="col-feethn">FEE/THN</th>
-              <th class="col-aksi">AKSI</th>
+              <th class="col-k-no">No.</th>
+              <th class="col-k-renter">Pengontrak / Klien</th>
+              <th class="col-k-model">Nama Unit</th>
+              <th class="col-k-plat">PLAT</th>
+              <th class="col-k-start">Tgl Mulai</th>
+              <th class="col-k-month">Jan</th>
+              <th class="col-k-month">Feb</th>
+              <th class="col-k-month">Mar</th>
+              <th class="col-k-month">Apr</th>
+              <th class="col-k-month">Mei</th>
+              <th class="col-k-month">Jun</th>
+              <th class="col-k-month">Jul</th>
+              <th class="col-k-month">Ags</th>
+              <th class="col-k-month">Sep</th>
+              <th class="col-k-month">Okt</th>
+              <th class="col-k-month">Nov</th>
+              <th class="col-k-month">Des</th>
+              <th class="col-k-total">TOTAL</th>
+              <th class="col-k-feebln">FEE/BLN</th>
+              <th class="col-k-feethn">FEE/THN</th>
+              <th class="col-k-aksi">AKSI</th>
             </tr>
           </thead>
           <tbody id="matrix-tbody">
@@ -400,7 +419,69 @@
       </div>
     </section>
 
-    <!-- TAB 2: ANALISIS GRAFIK & FEE -->
+    <!-- ==================== TAB 2: REKAP SEWA KELUAR HARIAN ==================== -->
+    <section id="tab-harian" class="section">
+      <!-- KPI Summary Row for Daily -->
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <span class="stat-label">Total Omset Sewa Harian</span>
+          <div class="stat-value" id="kpi-daily-total">Rp 15.650.000</div>
+          <span class="stat-sub">Dari transaksi harian</span>
+        </div>
+        <div class="stat-card paid">
+          <span class="stat-label">Total Terbayar Lunas</span>
+          <div class="stat-value" id="kpi-daily-paid" style="color: var(--color-lunas);">Rp 15.650.000</div>
+          <span class="stat-sub">Lunas Cash &amp; Transfer</span>
+        </div>
+        <div class="stat-card pending">
+          <span class="stat-label">Pending / Belum Lunas</span>
+          <div class="stat-value" id="kpi-daily-pending" style="color: var(--color-belum);">Rp 0</div>
+          <span class="stat-sub">Tagihan berjalan</span>
+        </div>
+        <div class="stat-card feemonth">
+          <span class="stat-label">Unit Sedang Keluar</span>
+          <div class="stat-value" id="kpi-daily-busy" style="color: var(--color-dp);">0 Unit</div>
+          <span class="stat-sub">Status disewa</span>
+        </div>
+        <div class="stat-card feeyear">
+          <span class="stat-label">Unit Siaga (Ready)</span>
+          <div class="stat-value" id="kpi-daily-ready" style="color: #60a5fa;">10 Unit</div>
+          <span class="stat-sub">Siap disewa</span>
+        </div>
+      </div>
+
+      <div class="table-top-actions">
+        <div style="font-weight: 700; font-size: 0.95rem; color:#fff;">📋 Rekap Transaksi &amp; Invoice Sewa Harian</div>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-primary btn-sm" onclick="openNewDailyModal()">➕ Buat Sewa Harian Baru</button>
+        </div>
+      </div>
+
+      <div class="matrix-wrapper">
+        <table class="daily-table">
+          <thead>
+            <tr>
+              <th style="width: 140px;">No Invoice</th>
+              <th>Penyewa / Customer</th>
+              <th>Unit Mobil</th>
+              <th>Plat Nomor</th>
+              <th>Tgl Sewa (Mulai - Selesai)</th>
+              <th>Durasi</th>
+              <th>Layanan</th>
+              <th>Tarif / Hari</th>
+              <th>Total Biaya</th>
+              <th>Status Bayar</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="daily-tbody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: GRAFIK & ANALISIS ==================== -->
     <section id="tab-analytics" class="section">
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
@@ -420,9 +501,9 @@
 
   </main>
 
-  <!-- EDIT / NEW MODAL DIALOG (BISA KERJA & EDIT LANGSUNG DI WEB) -->
-  <div id="edit-modal">
-    <div class="edit-modal-box">
+  <!-- ==================== MODAL 1: EDIT / NEW KONTRAK ==================== -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal-box">
       <div class="modal-header">
         <h3 class="modal-title" id="modal-title-text">✏️ Edit Data Kontrak Unit</h3>
         <button class="close-btn" onclick="closeEditModal()">&times;</button>
@@ -433,16 +514,20 @@
 
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Nama Pengontrak</label>
+            <label class="form-label">Nama Pengontrak / Klien</label>
             <input type="text" id="edit-renter" class="form-input" placeholder="Ayah Ratu" required>
           </div>
           <div class="form-group">
             <label class="form-label">Nama Unit / Model</label>
-            <input type="text" id="edit-model" class="form-input" placeholder="Brio / Avanza Allnew" required>
+            <input type="text" id="edit-model" class="form-input" placeholder="Honda Brio / Avanza All New" required>
           </div>
           <div class="form-group">
             <label class="form-label">Plat Nomor</label>
             <input type="text" id="edit-plate" class="form-input" placeholder="B 1861 VZN" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Mulai Kontrak</label>
+            <input type="date" id="edit-start-date" class="form-input" required>
           </div>
           <div class="form-group">
             <label class="form-label">Fee Pemilik / Bulan</label>
@@ -478,18 +563,93 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL 2: EDIT / NEW SEWA HARIAN ==================== -->
+  <div id="daily-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="daily-modal-title">➕ Tambah Transaksi Sewa Harian Baru</h3>
+        <button class="close-btn" onclick="closeDailyModal()">&times;</button>
+      </div>
+
+      <form id="daily-form" onsubmit="handleSaveDaily(event)">
+        <input type="hidden" id="daily-edit-idx">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nama Penyewa / Customer</label>
+            <input type="text" id="daily-client" class="form-input" placeholder="Ibu Fatimah / Bpk Hendra" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unit Mobil</label>
+            <select id="daily-car" class="form-select" required>
+              <option value="Toyota Innova Reborn">Toyota Innova Reborn (DR 1003 MT)</option>
+              <option value="Toyota Innova Zenix Q">Toyota Innova Zenix Q (DR 1004 MT)</option>
+              <option value="Toyota Fortuner VRZ">Toyota Fortuner VRZ (DR 1005 MT)</option>
+              <option value="All New Avanza">All New Avanza (DR 1001 MT)</option>
+              <option value="Mitsubishi Xpander">Mitsubishi Xpander (DR 1002 MT)</option>
+              <option value="Toyota Alphard Transformer">Toyota Alphard Transformer (DR 1006 MT)</option>
+              <option value="Toyota Hiace Premio">Toyota Hiace Premio (DR 1008 MT)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plat Nomor</label>
+            <input type="text" id="daily-plate" class="form-input" placeholder="DR 1003 MT" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jenis Layanan</label>
+            <select id="daily-service" class="form-select">
+              <option value="Sewa Mobil LK">Sewa Mobil LK (Lepas Kunci)</option>
+              <option value="Sewa Mobil Include">Sewa Mobil Include (Driver + BBM)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tanggal Mulai Sewa</label>
+            <input type="date" id="daily-start-date" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durasi (Hari)</label>
+            <input type="number" id="daily-duration" class="form-input" value="3" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tarif Sewa / Hari (Rp)</label>
+            <input type="number" id="daily-rate" class="form-input" placeholder="500000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Biaya Tambahan / Ongkir (Rp)</label>
+            <input type="number" id="daily-extra" class="form-input" placeholder="0" value="0">
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Status Pembayaran</label>
+            <select id="daily-payment" class="form-select">
+              <option value="LUNAS (CASH)">🟢 LUNAS (CASH)</option>
+              <option value="LUNAS (TRANSFER)">🟢 LUNAS (TRANSFER)</option>
+              <option value="DP (UANG MUKA)">🟠 DP (UANG MUKA)</option>
+              <option value="BELUM BAYAR">🔴 BELUM BAYAR</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeDailyModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">💾 Simpan Sewa Harian</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast" class="toast-box"></div>
 
   <script>
     const DEFAULT_PIN = "1234";
     let activeYear = 2026;
+    let currentTab = 'tab-kontrak';
     const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    // ── MASTER DATA DEFAULTS ──
-    const defaultMaster = {
+    // ── MASTER DATA KONTRAK (BULANAN / TAHUNAN) ──
+    const defaultMasterKontrak = {
       2026: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-01', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
           months: [
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
@@ -498,7 +658,7 @@
           ]
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', fee_year: 'Rp. 0',
+          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-01-01', fee: 'NO FEE', fee_year: 'Rp. 0',
           months: [
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
@@ -507,7 +667,7 @@
           ]
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
+          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-01-01', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
           months: [
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
@@ -516,7 +676,7 @@
           ]
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-01-01', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
           months: [
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
@@ -525,40 +685,49 @@
           ]
         },
         {
-          no: 5, renter: 'Rachmad Satriowibowo', model: 'Vario 155', plate: 'DR 5229 CV', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
+          no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-01-01', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         },
         {
-          no: 6, renter: 'Rachmad Satriowibowo', model: 'Fazzio', plate: 'DR 3416 EP', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
+          no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-01-01', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         }
       ],
       2027: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2027-01-01', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
           months: Array(12).fill(0).map(() => ({ amt: 5500000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', fee_year: 'Rp. 0',
+          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2027-01-01', fee: 'NO FEE', fee_year: 'Rp. 0',
           months: Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
+          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2027-01-01', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 6000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2027-01-01', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
           months: Array(12).fill(0).map(() => ({ amt: 6200000, st: 'BELUM_BAYAR' }))
         }
       ]
     };
 
-    let masterData = JSON.parse(JSON.stringify(defaultMaster));
+    // ── DATA SEWA KELUAR HARIAN ──
+    const defaultDailyRentals = [
+      { id: 'MT-673/INV/XII/2025', client: 'Ibu Fatimah', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil Include', start: '2025-12-01', end: '2025-12-05', dur: 5, rate: 900000, extra: 0, total: 4500000, status: 'LUNAS (CASH)' },
+      { id: 'MT-674/INV/XII/2025', client: 'Ibu Rizelsa Aura', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-07', end: '2025-12-11', dur: 4, rate: 500000, extra: 0, total: 2000000, status: 'LUNAS (CASH)' },
+      { id: 'MT-675/INV/XII/2025', client: 'Ibu Hairunnisa', car: 'Toyota Innova Zenix Q', plate: 'DR 1004 MT', service: 'Sewa Mobil LK', start: '2025-12-14', end: '2025-12-16', dur: 3, rate: 1000000, extra: 0, total: 3000000, status: 'LUNAS (CASH)' },
+      { id: 'MT-676/INV/XII/2025', client: 'Bpk Anang Irianto', car: 'Toyota Fortuner VRZ', plate: 'DR 1005 MT', service: 'Sewa Mobil LK', start: '2025-12-16', end: '2025-12-19', dur: 4, rate: 1000000, extra: 0, total: 4000000, status: 'LUNAS (CASH)' },
+      { id: 'MT-677/INV/XII/2025', client: 'Bpk Made Takuya', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-21', end: '2025-12-25', dur: 4, rate: 500000, extra: 150000, total: 2150000, status: 'LUNAS (CASH)' }
+    ];
+
+    let masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
+    let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
     let monthlyChart = null;
     let unitShareChart = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Clean address bar so there is no .html in URL
       if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
         window.history.replaceState({}, document.title, '/');
       }
@@ -567,13 +736,15 @@
         document.getElementById('lock-screen').style.display = 'none';
       }
 
-      // Load stored custom edits if any
-      const saved = localStorage.getItem('mt_master_rekap_v2');
-      if (saved) {
-        try { masterData = JSON.parse(saved); } catch(e) {}
-      }
+      // Load stored custom edits
+      const savedK = localStorage.getItem('mt_master_kontrak_v3');
+      if (savedK) { try { masterKontrak = JSON.parse(savedK); } catch(e) {} }
+
+      const savedD = localStorage.getItem('mt_daily_rentals_v3');
+      if (savedD) { try { dailyRentals = JSON.parse(savedD); } catch(e) {} }
 
       renderMatrix();
+      renderDaily();
       initCharts();
     });
 
@@ -586,8 +757,9 @@
       updateCharts();
     }
 
+    // ── RENDER MATRIX KONTRAK ──
     function renderMatrix() {
-      const list = masterData[activeYear] || [];
+      const list = masterKontrak[activeYear] || [];
       const tbody = document.getElementById('matrix-tbody');
 
       let totalGross = 0;
@@ -612,7 +784,7 @@
           else if (m.st === 'MULAI_KONTRAK') cls = 'cell-mulai';
 
           return `
-            <td class="col-month">
+            <td class="col-k-month">
               <span class="cell-status ${cls}" title="Klik cepat ubah status (${monthsList[mIdx]})" onclick="toggleMonthStatus(${rowIdx}, ${mIdx})">
                 ${txt}
               </span>
@@ -624,7 +796,6 @@
         totalPaid += rowPaid;
         totalPending += (rowSum - rowPaid);
 
-        // Parse fee monthly & yearly
         const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
         totalFeeMonth += feeMonthNum;
 
@@ -637,20 +808,20 @@
         totalFeeYear += feeYearNum;
 
         const feeYearDisplay = item.fee_year ? item.fee_year : (feeYearNum > 0 ? `Rp. ${feeYearNum.toLocaleString('id-ID')}` : 'Rp. 0');
+        const formattedDate = item.start_date ? formatDateDisplay(item.start_date) : `01 Jan ${activeYear}`;
 
         return `
           <tr>
-            <td class="col-no"><strong>${item.no || (rowIdx + 1)}</strong></td>
-            <td class="col-unit">
-              <div style="font-weight:700; color:#fff; font-size:0.76rem; line-height:1.2;">${item.renter}</div>
-              <div style="color:var(--text-secondary); font-size:0.68rem;">${item.model}</div>
-            </td>
-            <td class="col-plat"><div class="plate-tag">${item.plate}</div></td>
+            <td class="col-k-no"><strong>${item.no || (rowIdx + 1)}</strong></td>
+            <td class="col-k-renter"><strong style="color:#fff;">${item.renter}</strong></td>
+            <td class="col-k-model"><span style="color:var(--text-secondary);">${item.model}</span></td>
+            <td class="col-k-plat"><div class="plate-tag">${item.plate}</div></td>
+            <td class="col-k-start">${formattedDate}</td>
             ${monthsHtml}
-            <td class="col-total" style="color:#fff;">Rp ${(rowSum / 1000000).toFixed(1)}jt</td>
-            <td class="col-feebln" style="color:var(--color-dp); font-weight:700;">${item.fee}</td>
-            <td class="col-feethn" style="color:#60a5fa; font-weight:700;">${feeYearDisplay}</td>
-            <td class="col-aksi">
+            <td class="col-k-total" style="color:#fff;">Rp ${(rowSum / 1000000).toFixed(1)}jt</td>
+            <td class="col-k-feebln" style="color:var(--color-dp); font-weight:700;">${item.fee}</td>
+            <td class="col-k-feethn" style="color:#60a5fa; font-weight:700;">${feeYearDisplay}</td>
+            <td class="col-k-aksi">
               <div style="display:flex; justify-content:center; gap:2px;">
                 <button class="btn btn-edit btn-icon" title="Edit" onclick="openEditModal(${rowIdx})">✏️</button>
                 <button class="btn btn-danger btn-icon" title="Hapus" onclick="deleteContract(${rowIdx})">🗑️</button>
@@ -660,7 +831,6 @@
         `;
       }).join('');
 
-      // Update KPI Cards
       document.getElementById('kpi-total').textContent = `Rp ${totalGross.toLocaleString('id-ID')}`;
       document.getElementById('kpi-paid').textContent = `Rp ${totalPaid.toLocaleString('id-ID')}`;
       document.getElementById('kpi-pending').textContent = `Rp ${totalPending.toLocaleString('id-ID')}`;
@@ -669,8 +839,18 @@
       document.getElementById('kpi-unit-count').textContent = `${list.length} Unit Terdaftar (${activeYear})`;
     }
 
+    function formatDateDisplay(dStr) {
+      try {
+        const d = new Date(dStr);
+        if (isNaN(d.getTime())) return dStr;
+        return `${d.getDate().toString().padStart(2, '0')} ${monthsList[d.getMonth()]} ${d.getFullYear()}`;
+      } catch(e) {
+        return dStr;
+      }
+    }
+
     function toggleMonthStatus(rowIdx, mIdx) {
-      const item = masterData[activeYear][rowIdx];
+      const item = masterKontrak[activeYear][rowIdx];
       const m = item.months[mIdx];
 
       if (m.st === 'SUDAH_BAYAR') m.st = 'BELUM_BAYAR';
@@ -682,9 +862,48 @@
       showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah!`);
     }
 
-    // ── EDIT MODAL LOGIC ──
+    // ── RENDER DAILY RENTALS ──
+    function renderDaily() {
+      const tbody = document.getElementById('daily-tbody');
+      let totalDaily = 0;
+      let totalPaid = 0;
+      let totalPending = 0;
+
+      tbody.innerHTML = dailyRentals.map((d, idx) => {
+        totalDaily += d.total;
+        if (d.status.includes('LUNAS')) totalPaid += d.total;
+        else totalPending += d.total;
+
+        let badgeCls = d.status.includes('LUNAS') ? 'badge-ready' : d.status.includes('DP') ? 'badge-dp' : 'badge-belum';
+
+        return `
+          <tr>
+            <td><strong>${d.id}</strong></td>
+            <td><strong style="color:#fff;">${d.client}</strong></td>
+            <td>${d.car}</td>
+            <td><div class="plate-tag">${d.plate || 'DR 1003 MT'}</div></td>
+            <td>${formatDateDisplay(d.start)} s/d ${formatDateDisplay(d.end)}</td>
+            <td>${d.dur} Hari</td>
+            <td><small style="color:var(--text-secondary);">${d.service}</small></td>
+            <td>Rp ${Number(d.rate).toLocaleString('id-ID')}</td>
+            <td style="font-weight:700; color:#fff;">Rp ${Number(d.total).toLocaleString('id-ID')}</td>
+            <td><span class="badge ${badgeCls}">${d.status}</span></td>
+            <td>
+              <button class="btn btn-edit btn-sm" onclick="openEditDailyModal(${idx})">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteDaily(${idx})">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('kpi-daily-total').textContent = `Rp ${totalDaily.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-daily-paid').textContent = `Rp ${totalPaid.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-daily-pending').textContent = `Rp ${totalPending.toLocaleString('id-ID')}`;
+    }
+
+    // ── MODAL KONTRAK LOGIC ──
     function openEditModal(rowIdx) {
-      const item = masterData[activeYear][rowIdx];
+      const item = masterKontrak[activeYear][rowIdx];
       if (!item) return;
 
       document.getElementById('modal-title-text').textContent = `✏️ Edit Kontrak: ${item.renter} (${item.model})`;
@@ -692,6 +911,7 @@
       document.getElementById('edit-renter').value = item.renter;
       document.getElementById('edit-model').value = item.model;
       document.getElementById('edit-plate').value = item.plate;
+      document.getElementById('edit-start-date').value = item.start_date || `${activeYear}-01-01`;
       document.getElementById('edit-fee').value = item.fee;
       document.getElementById('edit-fee-year').value = item.fee_year || '';
       document.getElementById('edit-rate-default').value = item.months[0]?.amt || 5000000;
@@ -707,6 +927,7 @@
       document.getElementById('edit-renter').value = '';
       document.getElementById('edit-model').value = '';
       document.getElementById('edit-plate').value = '';
+      document.getElementById('edit-start-date').value = `${activeYear}-01-01`;
       document.getElementById('edit-fee').value = 'NO FEE';
       document.getElementById('edit-fee-year').value = 'Rp. 0';
       document.getElementById('edit-rate-default').value = 5000000;
@@ -747,6 +968,7 @@
       const renter = document.getElementById('edit-renter').value;
       const model = document.getElementById('edit-model').value;
       const plate = document.getElementById('edit-plate').value;
+      const startDate = document.getElementById('edit-start-date').value;
       const fee = document.getElementById('edit-fee').value;
       const feeYear = document.getElementById('edit-fee-year').value;
       const yr = Number(document.getElementById('edit-year-select').value);
@@ -759,19 +981,19 @@
       }
 
       if (rowIdx >= 0) {
-        masterData[activeYear][rowIdx] = {
-          ...masterData[activeYear][rowIdx],
-          renter, model, plate, fee, fee_year: feeYear, months
+        masterKontrak[activeYear][rowIdx] = {
+          ...masterKontrak[activeYear][rowIdx],
+          renter, model, plate, start_date: startDate, fee, fee_year: feeYear, months
         };
-        showToast(`✅ Data kontrak ${renter} berhasil diperbarui!`);
+        showToast(`✅ Data kontrak ${renter} diperbarui!`);
       } else {
-        const newNo = (masterData[yr].length + 1);
-        masterData[yr].push({
+        const newNo = (masterKontrak[yr].length + 1);
+        masterKontrak[yr].push({
           no: newNo,
-          renter, model, plate, fee, fee_year: feeYear, months
+          renter, model, plate, start_date: startDate, fee, fee_year: feeYear, months
         });
         setYear(yr);
-        showToast(`✅ Unit baru ${renter} (${model}) berhasil ditambahkan!`);
+        showToast(`✅ Unit baru ${renter} (${model}) ditambahkan!`);
       }
 
       saveAll();
@@ -779,11 +1001,11 @@
     }
 
     function deleteContract(rowIdx) {
-      const item = masterData[activeYear][rowIdx];
-      if (confirm(`Apakah Anda yakin ingin menghapus data kontrak ${item.renter} (${item.model})?`)) {
-        masterData[activeYear].splice(rowIdx, 1);
+      const item = masterKontrak[activeYear][rowIdx];
+      if (confirm(`Hapus data kontrak ${item.renter} (${item.model})?`)) {
+        masterKontrak[activeYear].splice(rowIdx, 1);
         saveAll();
-        showToast('🗑️ Data kontrak berhasil dihapus.');
+        showToast('🗑️ Data kontrak dihapus.');
       }
     }
 
@@ -791,17 +1013,107 @@
       document.getElementById('edit-modal').style.display = 'none';
     }
 
+    // ── MODAL SEWA HARIAN LOGIC ──
+    function openNewDailyModal() {
+      document.getElementById('daily-modal-title').textContent = '➕ Buat Sewa Harian Baru';
+      document.getElementById('daily-edit-idx').value = '-1';
+      document.getElementById('daily-client').value = '';
+      document.getElementById('daily-plate').value = 'DR 1003 MT';
+      document.getElementById('daily-start-date').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('daily-duration').value = '3';
+      document.getElementById('daily-rate').value = '500000';
+      document.getElementById('daily-extra').value = '0';
+      document.getElementById('daily-modal').style.display = 'flex';
+    }
+
+    function openEditDailyModal(idx) {
+      const d = dailyRentals[idx];
+      if (!d) return;
+
+      document.getElementById('daily-modal-title').textContent = `✏️ Edit Sewa: ${d.client}`;
+      document.getElementById('daily-edit-idx').value = idx;
+      document.getElementById('daily-client').value = d.client;
+      document.getElementById('daily-car').value = d.car;
+      document.getElementById('daily-plate').value = d.plate || 'DR 1003 MT';
+      document.getElementById('daily-service').value = d.service;
+      document.getElementById('daily-start-date').value = d.start;
+      document.getElementById('daily-duration').value = d.dur;
+      document.getElementById('daily-rate').value = d.rate;
+      document.getElementById('daily-extra').value = d.extra || 0;
+      document.getElementById('daily-payment').value = d.status;
+      document.getElementById('daily-modal').style.display = 'flex';
+    }
+
+    function handleSaveDaily(e) {
+      e.preventDefault();
+      const editIdx = parseInt(document.getElementById('daily-edit-idx').value);
+      const client = document.getElementById('daily-client').value;
+      const car = document.getElementById('daily-car').value;
+      const plate = document.getElementById('daily-plate').value;
+      const service = document.getElementById('daily-service').value;
+      const start = document.getElementById('daily-start-date').value;
+      const dur = Number(document.getElementById('daily-duration').value || 1);
+      const rate = Number(document.getElementById('daily-rate').value || 0);
+      const extra = Number(document.getElementById('daily-extra').value || 0);
+      const status = document.getElementById('daily-payment').value;
+
+      const total = (dur * rate) + extra;
+      const startD = new Date(start);
+      const endD = new Date(startD.getTime() + (dur * 86400000));
+      const end = endD.toISOString().slice(0, 10);
+
+      if (editIdx >= 0) {
+        dailyRentals[editIdx] = {
+          ...dailyRentals[editIdx],
+          client, car, plate, service, start, end, dur, rate, extra, total, status
+        };
+        showToast(`✅ Data sewa harian ${client} diperbarui!`);
+      } else {
+        const randNum = Math.floor(100 + Math.random() * 900);
+        const newId = `MT-${randNum}/INV/VIII/2026`;
+        dailyRentals.unshift({
+          id: newId, client, car, plate, service, start, end, dur, rate, extra, total, status
+        });
+        showToast(`✅ Sewa harian ${client} (${newId}) berhasil ditambahkan!`);
+      }
+
+      saveAll();
+      closeDailyModal();
+    }
+
+    function deleteDaily(idx) {
+      if (confirm('Hapus transaksi sewa harian ini?')) {
+        dailyRentals.splice(idx, 1);
+        saveAll();
+        showToast('🗑️ Transaksi sewa harian dihapus.');
+      }
+    }
+
+    function closeDailyModal() {
+      document.getElementById('daily-modal').style.display = 'none';
+    }
+
+    function handleTopAdd() {
+      if (currentTab === 'tab-harian') {
+        openNewDailyModal();
+      } else {
+        openNewContractModal();
+      }
+    }
+
     function resetToExcelDefault() {
-      if (confirm('Reset seluruh data ke format awal file Excel REKAP KONTRAK.xlsx?')) {
-        masterData = JSON.parse(JSON.stringify(defaultMaster));
+      if (confirm('Reset seluruh data kontrak ke format awal file Excel REKAP KONTRAK.xlsx?')) {
+        masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
         saveAll();
         showToast('🔄 Data berhasil di-reset ke default Excel!');
       }
     }
 
     function saveAll() {
-      localStorage.setItem('mt_master_rekap_v2', JSON.stringify(masterData));
+      localStorage.setItem('mt_master_kontrak_v3', JSON.stringify(masterKontrak));
+      localStorage.setItem('mt_daily_rentals_v3', JSON.stringify(dailyRentals));
       renderMatrix();
+      renderDaily();
       updateCharts();
     }
 
@@ -838,7 +1150,7 @@
       const paidByMonth = Array(12).fill(0);
       const pendingByMonth = Array(12).fill(0);
 
-      (masterData[activeYear] || []).forEach(u => {
+      (masterKontrak[activeYear] || []).forEach(u => {
         u.months.forEach((m, idx) => {
           if (m.st === 'SUDAH_BAYAR') paidByMonth[idx] += m.amt;
           else pendingByMonth[idx] += m.amt;
@@ -855,7 +1167,7 @@
     }
 
     function getDonutData() {
-      const list = masterData[activeYear] || [];
+      const list = masterKontrak[activeYear] || [];
       return {
         labels: list.map(u => `${u.renter} (${u.model})`),
         datasets: [{
@@ -877,28 +1189,33 @@
       }
     }
 
-    function exportExcelCsv() {
-      const list = masterData[activeYear] || [];
-      const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      let rows = [];
+    function exportCurrentData() {
+      if (currentTab === 'tab-harian') {
+        let rows = [['No Invoice', 'Penyewa', 'Unit Mobil', 'Plat', 'Mulai', 'Selesai', 'Durasi', 'Layanan', 'Tarif', 'Total', 'Status']];
+        dailyRentals.forEach(d => rows.push([d.id, d.client, d.car, d.plate, d.start, d.end, `${d.dur} Hari`, d.service, d.rate, d.total, d.status]));
+        downloadCsv(rows, `REKAP_SEWA_HARIAN_MENDADAK.csv`);
+      } else {
+        const list = masterKontrak[activeYear] || [];
+        const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        let rows = [[`REKAP KONTRAK MOBIL ${activeYear}`], ['No.', 'Pengontrak', 'Nama Unit', 'PLAT', 'Tgl Mulai', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']];
 
-      rows.push([`REKAP KONTRAK MOBIL ${activeYear}`]);
-      rows.push(['No.', 'Nama Unit & Pengontrak', 'PLAT', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']);
+        list.forEach(item => {
+          const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
+          const totalNum = item.months.reduce((a, b) => a + b.amt, 0);
+          const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
+          const feeYearStr = item.fee_year || (feeMonthNum > 0 ? `Rp. ${(feeMonthNum * 12).toLocaleString('id-ID')}` : 'Rp. 0');
+          rows.push([item.no, item.renter, item.model, item.plate, item.start_date || `01-01-${activeYear}`, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
+        });
+        downloadCsv(rows, `REKAP_KONTRAK_${activeYear}_MENDADAK.csv`);
+      }
+    }
 
-      list.forEach(item => {
-        const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
-        const totalNum = item.months.reduce((a, b) => a + b.amt, 0);
-        const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
-        const feeYearStr = item.fee_year || (feeMonthNum > 0 ? `Rp. ${(feeMonthNum * 12).toLocaleString('id-ID')}` : 'Rp. 0');
-        
-        rows.push([item.no, `${item.renter} / ${item.model}`, item.plate, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
-      });
-
+    function downloadCsv(rows, filename) {
       const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.map(x => `"${x || ''}"`).join(',')).join('\n');
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement('a');
       link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `REKAP_KONTRAK_${activeYear}_MENDADAK.csv`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -929,9 +1246,23 @@
     }
 
     function switchTab(id) {
+      currentTab = id;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      event.target.classList.add('active');
+
+      if (id === 'tab-kontrak') {
+        document.getElementById('tab-btn-kontrak').classList.add('active');
+        document.getElementById('year-switch-box').style.display = 'flex';
+        document.getElementById('btn-top-add').textContent = '➕ Tambah Kontrak';
+      } else if (id === 'tab-harian') {
+        document.getElementById('tab-btn-harian').classList.add('active');
+        document.getElementById('year-switch-box').style.display = 'none';
+        document.getElementById('btn-top-add').textContent = '➕ Buat Sewa Harian';
+      } else {
+        document.getElementById('tab-btn-analytics').classList.add('active');
+        document.getElementById('year-switch-box').style.display = 'flex';
+      }
+
       document.getElementById(id).classList.add('active');
     }
   </script>
