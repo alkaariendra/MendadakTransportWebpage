@@ -1190,7 +1190,7 @@
     // ── MASTER DATA KONTRAK (UTAMA) ──
     const defaultMasterKontrak = [
       {
-        no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
+        no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-22', end_date: '2027-12-22', fee: 'Rp. 1.850.000', fee_year: 'Rp. 11.100.000',
         months: [
           { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
           { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
@@ -1199,39 +1199,49 @@
         ]
       },
       {
-        no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'NO FEE', fee_year: 'Rp. 0',
+        no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-07-01', end_date: '2027-01-01', fee: 'NO FEE', fee_year: 'Rp. 0',
         months: [
-          { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
-          { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
-          { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' },
           { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }
         ]
       },
       {
-        no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
+        no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-07-06', end_date: '2027-01-06', fee: 'Rp. 500.000', fee_year: 'Rp. 3.000.000',
         months: [
-          { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
-          { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
           { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' },
           { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }
         ]
       },
       {
-        no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
+        no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-07-24', end_date: '2027-01-24', fee: 'Rp. 700.000', fee_year: 'Rp. 4.200.000',
         months: [
-          { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
-          { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
           { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' },
           { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }
         ]
       },
       {
-        no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
-        months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
+        no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-08-04', end_date: '2026-12-04', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
+        months: [
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' },
+          { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }
+        ]
       },
       {
-        no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
-        months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
+        no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-08-04', end_date: '2026-12-04', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
+        months: [
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
+          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' },
+          { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }
+        ]
       }
     ];
 
