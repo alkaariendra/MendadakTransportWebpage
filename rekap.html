@@ -3,20 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Private Workspace & Pembukuan Rental | Mendadak Transport</title>
+  <title>Master Rekap Kontrak Mobil &amp; Motor | Mendadak Transport</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/logo-mendadak-transport.png">
-  <!-- Chart.js for financial and fleet analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg-primary: #090d16;
       --bg-secondary: #111827;
       --bg-card: rgba(17, 24, 39, 0.85);
-      --bg-card-hover: rgba(26, 36, 56, 0.95);
       --border-color: rgba(255, 255, 255, 0.08);
       --border-active: rgba(215, 25, 32, 0.5);
       --text-primary: #f9fafb;
@@ -24,15 +22,28 @@
       --text-muted: #6b7280;
       --accent-red: #d71920;
       --accent-red-hover: #b8141a;
-      --accent-red-glow: rgba(215, 25, 32, 0.25);
-      --status-ready: #10b981;
-      --status-short: #f59e0b;
-      --status-long: #3b82f6;
-      --status-service: #ef4444;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      
+      /* Status Colors from Master Excel */
+      --color-lunas: #10b981;
+      --color-lunas-bg: rgba(16, 185, 129, 0.15);
+      --color-lunas-border: rgba(16, 185, 129, 0.35);
+      
+      --color-belum: #ef4444;
+      --color-belum-bg: rgba(239, 68, 68, 0.15);
+      --color-belum-border: rgba(239, 68, 68, 0.35);
+      
+      --color-dp: #f59e0b;
+      --color-dp-bg: rgba(245, 158, 11, 0.15);
+      --color-dp-border: rgba(245, 158, 11, 0.35);
+      
+      --color-mulai: #9ca3af;
+      --color-mulai-bg: rgba(156, 163, 175, 0.15);
+      --color-mulai-border: rgba(156, 163, 175, 0.35);
+
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -84,18 +95,18 @@
     .live-badge {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3); color: var(--status-ready);
+      border: 1px solid rgba(16, 185, 129, 0.3); color: var(--color-lunas);
       font-size: 0.8rem; font-weight: 600; border-radius: 9999px;
     }
-    .live-dot { width: 8px; height: 8px; background: var(--status-ready); border-radius: 50%; box-shadow: 0 0 8px var(--status-ready); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .live-dot { width: 8px; height: 8px; background: var(--color-lunas); border-radius: 50%; box-shadow: 0 0 8px var(--color-lunas); }
 
-    /* Navigation Tabs */
+    /* Navigation & Year Selector */
     .nav-tabs {
-      display: flex; gap: 0.5rem; padding: 0 2rem;
-      background: rgba(17, 24, 39, 0.5); border-bottom: 1px solid var(--border-color);
-      overflow-x: auto;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 2rem; background: rgba(17, 24, 39, 0.5); border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap; gap: 0.5rem;
     }
+    .tab-group { display: flex; gap: 0.5rem; overflow-x: auto; }
     .tab-btn {
       padding: 0.9rem 1.25rem; background: transparent; border: none;
       color: var(--text-secondary); font-size: 0.9rem; font-weight: 600;
@@ -105,8 +116,17 @@
     .tab-btn:hover { color: #fff; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--accent-red); }
 
+    .year-switch {
+      display: flex; gap: 4px; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);
+    }
+    .year-btn {
+      padding: 5px 14px; background: transparent; border: none; color: var(--text-secondary);
+      font-size: 0.85rem; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .year-btn.active { background: var(--accent-red); color: #fff; }
+
     /* Container */
-    .container { max-width: 1440px; width: 100%; margin: 0 auto; padding: 1.75rem; flex: 1; }
+    .container { max-width: 1560px; width: 100%; margin: 0 auto; padding: 1.75rem; flex: 1; }
 
     /* KPI Summary Cards */
     .stats-grid {
@@ -116,108 +136,94 @@
     .stat-card {
       background: var(--bg-card); border: 1px solid var(--border-color);
       border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex;
-      flex-direction: column; gap: 0.4rem; position: relative; overflow: hidden;
+      flex-direction: column; gap: 0.35rem; position: relative; overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
     .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
-    .stat-card.rev::before { background: var(--status-ready); }
-    .stat-card.exp::before { background: var(--status-service); }
-    .stat-card.profit::before { background: var(--accent-red); }
-    .stat-card.ready::before { background: var(--status-ready); }
-    .stat-card.busy::before { background: var(--status-short); }
-    .stat-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
+    .stat-card.paid::before { background: var(--color-lunas); }
+    .stat-card.pending::before { background: var(--color-belum); }
+    .stat-card.fee::before { background: var(--color-dp); }
+    .stat-card.total::before { background: var(--accent-red); }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
     .stat-value { font-size: 1.65rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* Grid Layouts for Work Area */
-    .dashboard-grid {
-      display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;
+    /* Legend Bar */
+    .legend-bar {
+      display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+      background: rgba(17, 24, 39, 0.7); padding: 0.75rem 1.25rem;
+      border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 1.25rem;
     }
-    @media (max-width: 1024px) {
-      .dashboard-grid { grid-template-columns: 1fr; }
-    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); }
+    .legend-box { width: 12px; height: 12px; border-radius: 3px; }
 
-    .chart-card {
+    /* Matrix Table (Jan - Des) */
+    .matrix-wrapper {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 1.5rem; display: flex;
-      flex-direction: column; gap: 1rem;
+      border-radius: var(--radius-md); overflow-x: auto; box-shadow: 0 6px 18px rgba(0,0,0,0.3); margin-bottom: 1.75rem;
     }
-    .chart-header { display: flex; justify-content: space-between; align-items: center; }
-    .chart-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .matrix-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.8rem; }
+    .matrix-table th {
+      background: rgba(0, 0, 0, 0.5); padding: 0.75rem 0.6rem; color: var(--text-secondary);
+      font-weight: 700; font-size: 0.75rem; border: 1px solid var(--border-color); text-transform: uppercase;
+    }
+    .matrix-table td {
+      padding: 0.65rem 0.5rem; border: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap;
+    }
+    .matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-    /* Work Form Box (Bisa Ketik Langsung di Web) */
-    .quick-entry-card {
-      background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.75rem;
+    /* Month Cell Statuses */
+    .cell-status {
+      display: inline-block; width: 100%; padding: 4px 6px; border-radius: 4px;
+      font-weight: 700; font-size: 0.75rem; cursor: pointer; transition: all 0.15s ease;
     }
-    .entry-form-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem; margin-top: 1rem;
-    }
-    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
-    .form-input, .form-select, .form-textarea {
-      background: var(--bg-primary); border: 1px solid var(--border-color);
-      color: #fff; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm);
-      font-size: 0.85rem; outline: none; font-family: inherit;
-    }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      border-color: var(--border-active);
+    .cell-status:hover { transform: scale(1.05); }
+    .cell-lunas { background: var(--color-lunas-bg); color: var(--color-lunas); border: 1px solid var(--color-lunas-border); }
+    .cell-belum { background: var(--color-belum-bg); color: var(--color-belum); border: 1px solid var(--color-belum-border); }
+    .cell-dp { background: var(--color-dp-bg); color: var(--color-dp); border: 1px solid var(--color-dp-border); }
+    .cell-mulai { background: var(--color-mulai-bg); color: var(--color-mulai); border: 1px solid var(--color-mulai-border); }
+
+    .plate-tag {
+      display: inline-block; background: #000; color: #fff; font-weight: 700;
+      font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #333; margin-top: 2px;
     }
 
     /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 0.65rem 1.25rem; border-radius: var(--radius-sm); font-size: 0.85rem;
+      padding: 0.6rem 1.15rem; border-radius: var(--radius-sm); font-size: 0.85rem;
       font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s ease;
     }
     .btn-primary { background: var(--accent-red); color: #fff; }
     .btn-primary:hover { background: var(--accent-red-hover); transform: translateY(-1px); }
     .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-color); }
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
-    .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
-    .btn-success { background: var(--status-ready); color: #fff; }
-    .btn-danger { background: var(--status-service); color: #fff; }
+    .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.75rem; }
 
-    /* Tables */
-    .table-wrapper {
+    /* Form Card */
+    .form-card {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); overflow-x: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.75rem;
     }
-    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-    .custom-table th {
-      background: rgba(0, 0, 0, 0.4); padding: 0.85rem 1rem; color: var(--text-secondary);
-      font-weight: 600; font-size: 0.75rem; border-bottom: 1px solid var(--border-color); text-transform: uppercase;
+    .form-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;
     }
-    .custom-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-    .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-    /* Badges */
-    .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
-    .badge-ready { background: rgba(16, 185, 129, 0.12); color: var(--status-ready); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-short { background: rgba(245, 158, 11, 0.12); color: var(--status-short); border: 1px solid rgba(245, 158, 11, 0.3); }
-    .badge-long { background: rgba(59, 130, 246, 0.12); color: var(--status-long); border: 1px solid rgba(59, 130, 246, 0.3); }
-    .badge-service { background: rgba(239, 68, 68, 0.12); color: var(--status-service); border: 1px solid rgba(239, 68, 68, 0.3); }
-
-    /* Fleet Cards Grid */
-    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.25rem; }
-    .fleet-card {
-      background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+    .form-input, .form-select {
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      color: #fff; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm);
+      font-size: 0.85rem; outline: none; font-family: inherit;
     }
-    .fleet-plate { display: inline-block; background: #000; color: #fff; font-weight: 700; font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; border: 1px solid #333; margin-top: 2px; }
+    .form-input:focus, .form-select:focus { border-color: var(--border-active); }
 
     .section { display: none; }
-    .section.active { display: block; animation: fadeIn 0.25s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .section.active { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
-    .section-title { font-size: 1.3rem; font-weight: 700; color: #fff; }
-
-    /* Toast */
     .toast-box {
       position: fixed; bottom: 2rem; right: 2rem; background: #1f2937;
-      border-left: 4px solid var(--status-ready); color: #fff; padding: 1rem 1.5rem;
+      border-left: 4px solid var(--color-lunas); color: #fff; padding: 1rem 1.5rem;
       border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 99999;
       display: none; animation: slideIn 0.3s ease;
     }
@@ -231,10 +237,10 @@
     <div class="lock-box">
       <img src="assets/logo-mendadak-transport.png" alt="Mendadak Transport Logo" class="logo-img">
       <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Interactive Fleet &amp; Cashflow Workspace</p>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Master Rekap Kontrak Mobil &amp; Motor</p>
       <form id="pin-form" onsubmit="handlePinSubmit(event)">
         <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="6" autofocus required>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Buka Workspace</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Buka Master Rekap</button>
       </form>
       <p id="pin-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 0.75rem; display: none;">PIN salah, silakan coba lagi.</p>
     </div>
@@ -246,584 +252,373 @@
       <img src="assets/logo-mendadak-transport.png" alt="Logo" class="top-logo">
       <div>
         <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-        <div class="brand-sub">Workspace Operasional &amp; Pembukuan Kas</div>
+        <div class="brand-sub">Master Rekap Kontrak Unit (2026 - 2027)</div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Sync Telegram Bot</span></div>
-      <button class="btn btn-primary btn-sm" onclick="switchTab('tab-invoices')">➕ Buat Invoice</button>
-      <button class="btn btn-secondary btn-sm" onclick="switchTab('tab-pembukuan')">💵 Catat Kas</button>
+      <div class="live-badge"><div class="live-dot"></div><span>Data Utama Aktif</span></div>
+      <button class="btn btn-secondary btn-sm" onclick="exportExcelCsv()">📥 Export CSV / Excel</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
     </div>
   </header>
 
   <!-- Navigation Tabs -->
   <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-dashboard')">📊 Dashboard &amp; Grafik Keuangan</button>
-    <button class="tab-btn" onclick="switchTab('tab-pembukuan')">💵 Pembukuan Kas (Inflow &amp; Outflow)</button>
-    <button class="tab-btn" onclick="switchTab('tab-invoices')">📑 Kelola Invoice &amp; Kontrak</button>
-    <button class="tab-btn" onclick="switchTab('tab-armada')">🚗 Status Armada &amp; Dispatch</button>
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="switchTab('tab-matrix')">📑 Tabel Matriks Kontrak (Jan - Des)</button>
+      <button class="tab-btn" onclick="switchTab('tab-analytics')">📊 Grafik &amp; Analisis Fee</button>
+      <button class="tab-btn" onclick="switchTab('tab-add')">➕ Tambah Kontrak Baru</button>
+    </div>
+    <div class="year-switch">
+      <button class="year-btn active" id="btn-2026" onclick="setYear(2026)">Tahun 2026</button>
+      <button class="year-btn" id="btn-2027" onclick="setYear(2027)">Tahun 2027</button>
+    </div>
   </nav>
 
-  <!-- Main Workspace -->
+  <!-- Main Container -->
   <main class="container">
 
     <!-- KPI Summary Row -->
     <section class="stats-grid">
-      <div class="stat-card rev">
-        <span class="stat-label">Total Omset / Pemasukan</span>
-        <div class="stat-value" id="kpi-inflow">Rp 15.650.000</div>
-        <span class="stat-sub">Dari 5 transaksi invoice</span>
+      <div class="stat-card total">
+        <span class="stat-label">Total Omset Sewa (1 Tahun)</span>
+        <div class="stat-value" id="kpi-total">Rp 320.400.000</div>
+        <span class="stat-sub" id="kpi-unit-count">6 Unit Kontrak Terdaftar</span>
       </div>
-      <div class="stat-card exp">
-        <span class="stat-label">Total Pengeluaran Kas</span>
-        <div class="stat-value" id="kpi-outflow">Rp 2.450.000</div>
-        <span class="stat-sub">BBM, Cuci, Servis, Komisi</span>
+      <div class="stat-card paid">
+        <span class="stat-label">Total Sudah Terbayar (Lunas)</span>
+        <div class="stat-value" id="kpi-paid" style="color: var(--color-lunas);">Rp 171.200.000</div>
+        <span class="stat-sub">Pembayaran telah diterima</span>
       </div>
-      <div class="stat-card profit">
-        <span class="stat-label">Laba Bersih (Net Profit)</span>
-        <div class="stat-value" id="kpi-net">Rp 13.200.000</div>
-        <span class="stat-sub">Margin profit bersih rental</span>
+      <div class="stat-card pending">
+        <span class="stat-label">Total Piutang / Belum Bayar</span>
+        <div class="stat-value" id="kpi-pending" style="color: var(--color-belum);">Rp 149.200.000</div>
+        <span class="stat-sub">Sisa tagihan berjalan</span>
       </div>
-      <div class="stat-card ready">
-        <span class="stat-label">Armada Siaga / Ready</span>
-        <div class="stat-value" id="kpi-ready">9 Unit</div>
-        <span class="stat-sub">Dari total 10 armada</span>
-      </div>
-      <div class="stat-card busy">
-        <span class="stat-label">Sewa &amp; Kontrak Aktif</span>
-        <div class="stat-value" id="kpi-active">1 Unit</div>
-        <span class="stat-sub">Sedang berjalan</span>
+      <div class="stat-card fee">
+        <span class="stat-label">Total Fee Bulanan Pemilik</span>
+        <div class="stat-value" id="kpi-fee" style="color: var(--color-dp);">Rp 5.550.000 / bln</div>
+        <span class="stat-sub">Brio, Avanza, Vario, Fazzio</span>
       </div>
     </section>
 
-    <!-- TAB 1: DASHBOARD & CHARTS -->
-    <section id="tab-dashboard" class="section active">
-      <div class="dashboard-grid">
-        <!-- Chart 1: Arus Kas & Omset -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="chart-title">📈 Tren Pendapatan &amp; Pengeluaran Rental (2025/2026)</h3>
-            <span style="font-size:0.75rem; color:var(--text-muted);">Real-time chart</span>
-          </div>
-          <div style="height: 280px; position: relative;">
-            <canvas id="cashflowChart"></canvas>
-          </div>
-        </div>
+    <!-- Legend Keterangan Warna Sesuai Excel Master -->
+    <div class="legend-bar">
+      <span style="font-weight: 700; font-size: 0.8rem; color:#fff;">KETERANGAN STATUS:</span>
+      <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span><strong>HIJAU:</strong> SUDAH BAYAR (LUNAS)</span></div>
+      <div class="legend-item"><div class="legend-box" style="background: var(--color-belum);"></div><span><strong>MERAH:</strong> BELUM BAYAR</span></div>
+      <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span><strong>ABU-ABU:</strong> MULAI KONTRAK</span></div>
+      <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span><strong>ORANGE:</strong> BAYAR SETENGAH (DP)</span></div>
+      <span style="margin-left: auto; font-size:0.75rem; color:var(--text-muted);">*Klik kotak bulan untuk ubah status pembayaran</span>
+    </div>
 
-        <!-- Chart 2: Utilitas Armada Terlaris -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="chart-title">🚘 Unit Paling Sering Disewa</h3>
-          </div>
-          <div style="height: 280px; position: relative;">
-            <canvas id="carUsageChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Action Table on Dashboard -->
-      <div class="section-header">
-        <h2 class="section-title">5 Transaksi Invoice Terbaru</h2>
-        <button class="btn btn-secondary btn-sm" onclick="exportCsv('invoices')">📥 Export CSV</button>
-      </div>
-      <div class="table-wrapper">
-        <table class="custom-table">
+    <!-- TAB 1: MATRIX TABEL KONTRAK (JAN - DES) -->
+    <section id="tab-matrix" class="section active">
+      <div class="matrix-wrapper">
+        <table class="matrix-table">
           <thead>
             <tr>
-              <th>No Invoice</th>
-              <th>Customer</th>
-              <th>Unit Mobil</th>
-              <th>Periode Sewa</th>
-              <th>Durasi</th>
-              <th>Total Biaya</th>
-              <th>Status Bayar</th>
-              <th>Aksi Langsung</th>
+              <th style="width: 35px;">No.</th>
+              <th style="text-align: left; min-width: 190px;">Nama Unit &amp; Pengontrak</th>
+              <th style="min-width: 100px;">PLAT</th>
+              <th>Jan</th>
+              <th>Feb</th>
+              <th>Mar</th>
+              <th>Apr</th>
+              <th>Mei</th>
+              <th>Jun</th>
+              <th>Jul</th>
+              <th>Ags</th>
+              <th>Sep</th>
+              <th>Okt</th>
+              <th>Nov</th>
+              <th>Des</th>
+              <th style="min-width: 110px;">FEE/BULAN</th>
+              <th style="min-width: 110px;">TOTAL</th>
             </tr>
           </thead>
-          <tbody id="dash-invoice-table">
-            <!-- Rendered by JS -->
+          <tbody id="matrix-tbody">
+            <!-- Rendered by JS based on selected Year -->
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- TAB 2: PEMBUKUAN KAS (BISA INPUT LANGSUNG DI WEB) -->
-    <section id="tab-pembukuan" class="section">
-      <div class="quick-entry-card">
-        <div class="section-header" style="margin-bottom: 0.5rem;">
-          <h3 class="chart-title">💵 Form Catat Kas Masuk / Kas Keluar Langsung</h3>
-          <span style="font-size:0.8rem; color:var(--text-secondary);">Ketik di sini, data langsung tersimpan &amp; menghitung laba otomatis</span>
+    <!-- TAB 2: ANALISIS GRAFIK & FEE -->
+    <section id="tab-analytics" class="section">
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+          <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">📊 Grafik Pemasukan per Bulan (<span id="chart-year-label">2026</span>)</h3>
+          <div style="height: 300px; position: relative;">
+            <canvas id="monthlyChart"></canvas>
+          </div>
         </div>
-        <form id="cash-entry-form" onsubmit="handleCashEntry(event)">
-          <div class="entry-form-grid">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+          <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">🚘 Kontribusi Omset per Unit</h3>
+          <div style="height: 300px; position: relative;">
+            <canvas id="unitShareChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: FORM TAMBAH KONTRAK BARU -->
+    <section id="tab-add" class="section">
+      <div class="form-card">
+        <h3 style="font-size: 1.1rem; color:#fff; margin-bottom: 0.5rem;">➕ Form Tambah Unit Kontrak Baru</h3>
+        <p style="font-size: 0.8rem; color: var(--text-secondary);">Tambahkan unit mobil/motor baru ke dalam tabel matriks kontrak</p>
+        <form id="add-contract-form" onsubmit="handleAddContract(event)">
+          <div class="form-grid">
             <div class="form-group">
-              <label class="form-label">Jenis Kas</label>
-              <select id="cash-type" class="form-select" required>
-                <option value="OUT">🔴 Pengeluaran (BBM / Servis / Cuci / Driver)</option>
-                <option value="IN">🟢 Pemasukan (Pelunasan Sewa / DP / Tambahan)</option>
+              <label class="form-label">Nama Pengontrak</label>
+              <input type="text" id="add-renter" class="form-input" placeholder="Misal: Ayah Ratu / PT Nusa" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama Unit / Model</label>
+              <input type="text" id="add-model" class="form-input" placeholder="Misal: Avanza All New / Brio" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Plat Nomor</label>
+              <input type="text" id="add-plate" class="form-input" placeholder="DR 1234 XY" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tarif Sewa Per Bulan (Rp)</label>
+              <input type="number" id="add-rate" class="form-input" placeholder="5500000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fee Pemilik Per Bulan (Rp)</label>
+              <input type="text" id="add-fee" class="form-input" placeholder="Rp. 1.850.000 / NO FEE" value="NO FEE">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tahun Kontrak</label>
+              <select id="add-year" class="form-select">
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Kategori</label>
-              <select id="cash-cat" class="form-select">
-                <option value="BBM / Bensin">BBM / Bensin</option>
-                <option value="Cuci Mobil">Cuci Mobil</option>
-                <option value="Servis & Oli">Servis &amp; Ganti Oli</option>
-                <option value="Gaji / Fee Driver">Fee / Gaji Driver</option>
-                <option value="Sewa Mobil">Sewa Mobil Pelanggan</option>
-                <option value="Lain-lain">Lain-lain / Operasional</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nominal (Rp)</label>
-              <input type="number" id="cash-amount" class="form-input" placeholder="Contoh: 150000" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tanggal</label>
-              <input type="date" id="cash-date" class="form-input" required>
-            </div>
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label class="form-label">Keterangan / Rincian</label>
-              <input type="text" id="cash-desc" class="form-input" placeholder="Misal: Beli Pertamax Innova DR 1003 MT atau Cuci Mobil Xpander" required>
             </div>
           </div>
-          <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary">💾 Simpan Catatan Kas</button>
+          <div style="margin-top: 1.25rem; display:flex; justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary">💾 Simpan ke Master Rekap</button>
           </div>
         </form>
-      </div>
-
-      <!-- Tabel Buku Kas -->
-      <div class="section-header">
-        <h2 class="section-title">Buku Jurnal Kas Harian</h2>
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-secondary btn-sm" onclick="exportCsv('cashflow')">📥 Export Buku Kas</button>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Tipe</th>
-              <th>Kategori</th>
-              <th>Keterangan / Rincian</th>
-              <th>Nominal Masuk</th>
-              <th>Nominal Keluar</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="cash-table-body">
-            <!-- Dynamic Cash Entries -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- TAB 3: MANAJEMEN INVOICE & KONTRAK (BISA KETIK LANGSUNG DI WEB) -->
-    <section id="tab-invoices" class="section">
-      <div class="quick-entry-card">
-        <div class="section-header" style="margin-bottom: 0.5rem;">
-          <h3 class="chart-title">📑 Form Buat Invoice / Kontrak Sewa Langsung di Web</h3>
-          <span style="font-size:0.8rem; color:var(--text-secondary);">Tersimpan otomatis ke database &amp; siap cetak PDF</span>
-        </div>
-        <form id="invoice-entry-form" onsubmit="handleInvoiceEntry(event)">
-          <div class="entry-form-grid">
-            <div class="form-group">
-              <label class="form-label">Nama Customer / Klien</label>
-              <input type="text" id="inv-client" class="form-input" placeholder="Contoh: Ibu Rina / PT Semesta" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Pilih Unit Mobil</label>
-              <select id="inv-car" class="form-select" required>
-                <option value="Toyota Innova Reborn">Toyota Innova Reborn</option>
-                <option value="Toyota Innova Zenix Q">Toyota Innova Zenix Q</option>
-                <option value="Toyota Fortuner VRZ">Toyota Fortuner VRZ</option>
-                <option value="All New Avanza">All New Avanza</option>
-                <option value="Mitsubishi Xpander">Mitsubishi Xpander</option>
-                <option value="Toyota Alphard">Toyota Alphard</option>
-                <option value="Toyota Hiace Premio">Toyota Hiace Premio</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Jenis Layanan</label>
-              <select id="inv-service" class="form-select">
-                <option value="Sewa Mobil LK">Sewa Mobil LK (Lepas Kunci)</option>
-                <option value="Sewa Mobil Include">Sewa Mobil Include (Driver+BBM)</option>
-                <option value="Kontrak Bulanan">Kontrak Bulanan Perusahaan</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Durasi (Hari / Bulan)</label>
-              <input type="number" id="inv-duration" class="form-input" value="3" min="1" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tanggal Mulai Sewa</label>
-              <input type="date" id="inv-start" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tarif Per Hari (Rp)</label>
-              <input type="number" id="inv-rate" class="form-input" placeholder="500000" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Biaya Tambahan / Ongkir (Rp)</label>
-              <input type="number" id="inv-extra" class="form-input" placeholder="0">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Status Bayar</label>
-              <select id="inv-payment" class="form-select">
-                <option value="LUNAS (CASH)">LUNAS (CASH)</option>
-                <option value="LUNAS (TRANSFER)">LUNAS (TRANSFER)</option>
-                <option value="DP (UANG MUKA)">DP (UANG MUKA)</option>
-                <option value="BELUM BAYAR">BELUM BAYAR</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
-            <button type="submit" class="btn btn-primary">💾 Simpan &amp; Tambahkan ke Rekap</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="section-header">
-        <h2 class="section-title">Daftar Rekap Invoice &amp; Kontrak Aktif</h2>
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-secondary btn-sm" onclick="exportCsv('invoices')">📥 Export Rekap</button>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>No Invoice / Kontrak</th>
-              <th>Customer</th>
-              <th>Unit Mobil</th>
-              <th>Layanan</th>
-              <th>Periode Sewa</th>
-              <th>Durasi</th>
-              <th>Total Tarif</th>
-              <th>Status Bayar</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="invoices-full-table">
-            <!-- Dynamic Invoices Table -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- TAB 4: STATUS ARMADA & DISPATCH -->
-    <section id="tab-armada" class="section">
-      <div class="section-header">
-        <h2 class="section-title">Status Ketersediaan 10 Armada</h2>
-        <span style="font-size:0.85rem; color:var(--text-secondary);">Klik tombol status untuk ubah langsung</span>
-      </div>
-      <div class="fleet-grid" id="fleet-live-grid">
-        <!-- Rendered by JS with interactive status toggle -->
       </div>
     </section>
 
   </main>
 
-  <!-- Toast Box -->
   <div id="toast" class="toast-box"></div>
 
   <script>
     const DEFAULT_PIN = "1234";
+    let activeYear = 2026;
 
-    // ── DATA STORE (State) ──
-    let invoicesData = [
-      { id: 'MT-673/INV/XII/2025', client: 'Ibu Fatimah', car: 'Toyota Innova Reborn', service: 'Sewa Mobil Include', start: '01 Des 2025', end: '05 Des 2025', dur: 5, rate: 900000, extra: 0, total: 4500000, status: 'LUNAS (CASH)' },
-      { id: 'MT-674/INV/XII/2025', client: 'Ibu Rizelsa Aura', car: 'Toyota Innova Reborn', service: 'Sewa Mobil LK', start: '07 Des 2025', end: '11 Des 2025', dur: 4, rate: 500000, extra: 0, total: 2000000, status: 'LUNAS (CASH)' },
-      { id: 'MT-675/INV/XII/2025', client: 'Ibu Hairunnisa', car: 'Toyota Innova Zenix Q', service: 'Sewa Mobil LK', start: '14 Des 2025', end: '16 Des 2025', dur: 3, rate: 1000000, extra: 0, total: 3000000, status: 'LUNAS (CASH)' },
-      { id: 'MT-676/INV/XII/2025', client: 'Bpk Anang Irianto', car: 'Toyota Fortuner VRZ', service: 'Sewa Mobil LK', start: '16 Des 2025', end: '19 Des 2025', dur: 4, rate: 1000000, extra: 0, total: 4000000, status: 'LUNAS (CASH)' },
-      { id: 'MT-677/INV/XII/2025', client: 'Bpk Made Takuya', car: 'Toyota Innova Reborn', service: 'Sewa Mobil LK', start: '21 Des 2025', end: '25 Des 2025', dur: 4, rate: 500000, extra: 150000, total: 2150000, status: 'LUNAS (CASH)' }
-    ];
+    // ── MASTER DATA FROM REKAP KONTRAK.XLSX ──
+    const masterData = {
+      2026: [
+        {
+          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', total: 'Rp. 66.000.000',
+          months: [
+            { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
+            { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
+            { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' },
+            { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }
+          ]
+        },
+        {
+          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', total: 'Rp. 60.000.000',
+          months: [
+            { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
+            { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
+            { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' },
+            { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }
+          ]
+        },
+        {
+          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', total: 'Rp. 72.000.000',
+          months: [
+            { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
+            { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
+            { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' },
+            { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }
+          ]
+        },
+        {
+          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', total: 'Rp. 74.400.000',
+          months: [
+            { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
+            { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
+            { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' },
+            { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }
+          ]
+        },
+        {
+          no: 5, renter: 'Rachmad Satriowibowo', model: 'Vario 155', plate: 'DR 5229 CV', fee: 'Rp. 2.000.000', total: 'Rp. 24.000.000',
+          months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
+        },
+        {
+          no: 6, renter: 'Rachmad Satriowibowo', model: 'Fazzio', plate: 'DR 3416 EP', fee: 'Rp. 500.000', total: 'Rp. 24.000.000',
+          months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
+        }
+      ],
+      2027: [
+        {
+          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', total: 'Rp. 66.000.000',
+          months: Array(12).fill(0).map(() => ({ amt: 5500000, st: 'BELUM_BAYAR' }))
+        },
+        {
+          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', total: 'Rp. 60.000.000',
+          months: Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }))
+        },
+        {
+          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', total: 'Rp. 72.000.000',
+          months: Array(12).fill(0).map(() => ({ amt: 6000000, st: 'BELUM_BAYAR' }))
+        },
+        {
+          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', total: 'Rp. 74.400.000',
+          months: Array(12).fill(0).map(() => ({ amt: 6200000, st: 'BELUM_BAYAR' }))
+        }
+      ]
+    };
 
-    let cashEntries = [
-      { id: 1, date: '2025-12-05', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Ibu Fatimah (5 Hari Include)', in: 4500000, out: 0 },
-      { id: 2, date: '2025-12-06', type: 'OUT', cat: 'BBM / Bensin', desc: 'Isi Pertamax Innova Reborn DR 1003 MT', in: 0, out: 400000 },
-      { id: 3, date: '2025-12-06', type: 'OUT', cat: 'Cuci Mobil', desc: 'Cuci poles bersih Innova Reborn', in: 0, out: 50000 },
-      { id: 4, date: '2025-12-08', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Ibu Rizelsa Aura (4 Hari LK)', in: 2000000, out: 0 },
-      { id: 5, date: '2025-12-12', type: 'OUT', cat: 'Servis & Oli', desc: 'Ganti Oli & Filter Innova Reborn DR 1003 MT', in: 0, out: 650000 },
-      { id: 6, date: '2025-12-16', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Ibu Hairunnisa (Zenix 3 Hari)', in: 3000000, out: 0 },
-      { id: 7, date: '2025-12-19', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Bpk Anang (Fortuner 4 Hari)', in: 4000000, out: 0 },
-      { id: 8, date: '2025-12-20', type: 'OUT', cat: 'Gaji / Fee Driver', desc: 'Fee Driver Luar Kota Mandalika Tour', in: 0, out: 1200000 },
-      { id: 9, date: '2025-12-25', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Bpk Made Takuya (+ Ongkir PP)', in: 2150000, out: 0 },
-      { id: 10, date: '2025-12-26', type: 'OUT', cat: 'BBM / Bensin', desc: 'Bensin Fortuner VRZ DR 1005 MT', in: 0, out: 150000 }
-    ];
-
-    let armadaList = [
-      { plate: 'DR 1001 MT', model: 'All New Avanza', km: 25100, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1002 MT', model: 'Mitsubishi Xpander', km: 31000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1003 MT', model: 'Toyota Innova Reborn', km: 42000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1004 MT', model: 'Toyota Innova Zenix Q', km: 15000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1005 MT', model: 'Toyota Fortuner VRZ', km: 28000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1006 MT', model: 'Toyota Alphard Transformer', km: 18000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1007 MT', model: 'Toyota Hiace Commuter', km: 55000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1008 MT', model: 'Toyota Hiace Premio', km: 22000, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1009 MT', model: 'Honda Brio RS', km: 19500, fuel: 'Full', status: 'READY' },
-      { plate: 'DR 1010 MT', model: 'Vespa Matic Sprint', km: 8200, fuel: 'Full', status: 'READY' }
-    ];
-
-    let cashflowChart = null;
-    let carUsageChart = null;
+    let monthlyChart = null;
+    let unitShareChart = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Set default dates
-      const today = new Date().toISOString().slice(0, 10);
-      document.getElementById('cash-date').value = today;
-      document.getElementById('inv-start').value = today;
-
-      // Check session
       if (sessionStorage.getItem('fleet_auth') === 'true') {
         document.getElementById('lock-screen').style.display = 'none';
       }
 
-      // Load saved storage
-      loadStoredData();
-      renderAll();
+      // Load stored custom edits if any
+      const saved = localStorage.getItem('mt_master_rekap');
+      if (saved) {
+        try { Object.assign(masterData, JSON.parse(saved)); } catch(e) {}
+      }
+
+      renderMatrix();
       initCharts();
     });
 
-    function loadStoredData() {
-      const storedInv = localStorage.getItem('mt_invoices');
-      if (storedInv) invoicesData = JSON.parse(storedInv);
-
-      const storedCash = localStorage.getItem('mt_cash');
-      if (storedCash) cashEntries = JSON.parse(storedCash);
-
-      const storedArmada = localStorage.getItem('mt_armada');
-      if (storedArmada) armadaList = JSON.parse(storedArmada);
-    }
-
-    function saveAll() {
-      localStorage.setItem('mt_invoices', JSON.stringify(invoicesData));
-      localStorage.setItem('mt_cash', JSON.stringify(cashEntries));
-      localStorage.setItem('mt_armada', JSON.stringify(armadaList));
-      renderAll();
+    function setYear(yr) {
+      activeYear = yr;
+      document.getElementById('btn-2026').classList.toggle('active', yr === 2026);
+      document.getElementById('btn-2027').classList.toggle('active', yr === 2027);
+      document.getElementById('chart-year-label').textContent = yr;
+      renderMatrix();
       updateCharts();
     }
 
-    function renderAll() {
-      // 1. Calculate Totals
-      const totalIn = cashEntries.reduce((acc, c) => acc + (c.in || 0), 0);
-      const totalOut = cashEntries.reduce((acc, c) => acc + (c.out || 0), 0);
-      const netProfit = totalIn - totalOut;
+    function renderMatrix() {
+      const list = masterData[activeYear] || [];
+      const tbody = document.getElementById('matrix-tbody');
 
-      const readyCount = armadaList.filter(a => a.status === 'READY').length;
-      const busyCount = armadaList.filter(a => a.status !== 'READY').length;
+      let totalGross = 0;
+      let totalPaid = 0;
+      let totalPending = 0;
+      let totalFee = 0;
 
-      document.getElementById('kpi-inflow').textContent = `Rp ${totalIn.toLocaleString('id-ID')}`;
-      document.getElementById('kpi-outflow').textContent = `Rp ${totalOut.toLocaleString('id-ID')}`;
-      document.getElementById('kpi-net').textContent = `Rp ${netProfit.toLocaleString('id-ID')}`;
-      document.getElementById('kpi-ready').textContent = `${readyCount} Unit`;
-      document.getElementById('kpi-active').textContent = `${busyCount} Unit`;
+      tbody.innerHTML = list.map((item, rowIdx) => {
+        let rowSum = 0;
+        let rowPaid = 0;
 
-      // 2. Render Dash Invoices
-      const dashTable = document.getElementById('dash-invoice-table');
-      dashTable.innerHTML = invoicesData.slice(0, 5).map(inv => `
-        <tr>
-          <td><strong>${inv.id}</strong></td>
-          <td><strong>${inv.client}</strong></td>
-          <td>${inv.car}</td>
-          <td>${inv.start} s/d ${inv.end}</td>
-          <td>${inv.dur} Hari</td>
-          <td><strong>Rp ${inv.total.toLocaleString('id-ID')}</strong></td>
-          <td><span class="badge badge-ready">${inv.status}</span></td>
-          <td>
-            <button class="btn btn-secondary btn-sm" onclick="printInvoice('${inv.id}')">🖨️ Cetak</button>
-          </td>
-        </tr>
-      `).join('');
+        const monthsHtml = item.months.map((m, mIdx) => {
+          rowSum += m.amt;
+          if (m.st === 'SUDAH_BAYAR') rowPaid += m.amt;
 
-      // 3. Render Full Invoices
-      const fullTable = document.getElementById('invoices-full-table');
-      fullTable.innerHTML = invoicesData.map((inv, idx) => `
-        <tr>
-          <td><strong>${inv.id}</strong></td>
-          <td><strong>${inv.client}</strong></td>
-          <td>${inv.car}</td>
-          <td><small>${inv.service}</small></td>
-          <td>${inv.start} s/d ${inv.end}</td>
-          <td>${inv.dur} Hari</td>
-          <td><strong>Rp ${inv.total.toLocaleString('id-ID')}</strong></td>
-          <td>
-            <select class="form-select" style="padding: 2px 6px; font-size:0.75rem;" onchange="updatePaymentStatus(${idx}, this.value)">
-              <option value="LUNAS (CASH)" ${inv.status.includes('CASH') ? 'selected' : ''}>LUNAS (CASH)</option>
-              <option value="LUNAS (TRANSFER)" ${inv.status.includes('TRANSFER') ? 'selected' : ''}>LUNAS (TRANSFER)</option>
-              <option value="DP (UANG MUKA)" ${inv.status.includes('DP') ? 'selected' : ''}>DP (UANG MUKA)</option>
-              <option value="BELUM BAYAR" ${inv.status.includes('BELUM') ? 'selected' : ''}>BELUM BAYAR</option>
-            </select>
-          </td>
-          <td>
-            <button class="btn btn-secondary btn-sm" onclick="printInvoice('${inv.id}')">🖨️</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteInvoice(${idx})">🗑️</button>
-          </td>
-        </tr>
-      `).join('');
+          let cls = 'cell-belum';
+          let txt = 'Rp ' + (m.amt / 1000000).toFixed(1) + 'jt';
 
-      // 4. Render Cash Entries Table
-      const cashTable = document.getElementById('cash-table-body');
-      cashTable.innerHTML = cashEntries.map((c, idx) => `
-        <tr>
-          <td>${c.date}</td>
-          <td><span class="badge ${c.type === 'IN' ? 'badge-ready' : 'badge-service'}">${c.type === 'IN' ? '🟢 MASUK' : '🔴 KELUAR'}</span></td>
-          <td><strong>${c.cat}</strong></td>
-          <td>${c.desc}</td>
-          <td style="color: var(--status-ready); font-weight:700;">${c.in > 0 ? 'Rp ' + c.in.toLocaleString('id-ID') : '-'}</td>
-          <td style="color: var(--status-service); font-weight:700;">${c.out > 0 ? 'Rp ' + c.out.toLocaleString('id-ID') : '-'}</td>
-          <td><button class="btn btn-danger btn-sm" onclick="deleteCashEntry(${idx})">🗑️</button></td>
-        </tr>
-      `).join('');
+          if (m.st === 'SUDAH_BAYAR') cls = 'cell-lunas';
+          else if (m.st === 'BAYAR_SETENGAH') cls = 'cell-dp';
+          else if (m.st === 'MULAI_KONTRAK') cls = 'cell-mulai';
 
-      // 5. Render Armada List
-      const fleetGrid = document.getElementById('fleet-live-grid');
-      fleetGrid.innerHTML = armadaList.map((car, idx) => {
-        let badge = car.status === 'READY' ? 'badge-ready' : car.status === 'SEWA' ? 'badge-short' : 'badge-service';
+          return `
+            <td>
+              <span class="cell-status ${cls}" title="Klik untuk ubah status" onclick="toggleMonthStatus(${rowIdx}, ${mIdx})">
+                ${txt}
+              </span>
+            </td>
+          `;
+        }).join('');
+
+        totalGross += rowSum;
+        totalPaid += rowPaid;
+        totalPending += (rowSum - rowPaid);
+
+        // Parse fee
+        const feeNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
+        totalFee += feeNum;
+
         return `
-          <div class="fleet-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-              <div>
-                <div style="font-weight:700; font-size:1.1rem; color:#fff;">${car.model}</div>
-                <div class="fleet-plate">${car.plate}</div>
-              </div>
-              <span class="badge ${badge}">${car.status}</span>
-            </div>
-            <div style="font-size:0.8rem; color:var(--text-secondary); background:rgba(0,0,0,0.3); padding:8px; border-radius:6px;">
-              KM Odometer: <strong>${car.km.toLocaleString('id-ID')} KM</strong> · BBM: <strong>${car.fuel}</strong>
-            </div>
-            <div style="display:flex; gap:6px; margin-top:auto;">
-              <button class="btn btn-success btn-sm" style="flex:1;" onclick="setArmadaStatus(${idx}, 'READY')">🟢 Ready</button>
-              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="setArmadaStatus(${idx}, 'SEWA')">🟡 Disewa</button>
-              <button class="btn btn-danger btn-sm" style="flex:1;" onclick="setArmadaStatus(${idx}, 'SERVIS')">🔴 Servis</button>
-            </div>
-          </div>
+          <tr>
+            <td><strong>${item.no}</strong></td>
+            <td style="text-align: left;">
+              <strong>${item.renter}</strong> / <span style="color:var(--text-secondary);">${item.model}</span>
+            </td>
+            <td><div class="plate-tag">${item.plate}</div></td>
+            ${monthsHtml}
+            <td style="color: var(--color-dp); font-weight:700;">${item.fee}</td>
+            <td style="font-weight:800; color:#fff;">Rp ${rowSum.toLocaleString('id-ID')}</td>
+          </tr>
         `;
       }).join('');
+
+      // Update KPI Cards
+      document.getElementById('kpi-total').textContent = `Rp ${totalGross.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-paid').textContent = `Rp ${totalPaid.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-pending').textContent = `Rp ${totalPending.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-fee').textContent = `Rp ${totalFee.toLocaleString('id-ID')} / bln`;
+      document.getElementById('kpi-unit-count').textContent = `${list.length} Unit Kontrak Terdaftar (${activeYear})`;
     }
 
-    // ── FORM HANDLERS (MENGETIK LANGSUNG DI WEB) ──
-    function handleCashEntry(e) {
+    function toggleMonthStatus(rowIdx, mIdx) {
+      const item = masterData[activeYear][rowIdx];
+      const m = item.months[mIdx];
+
+      // Cycle: SUDAH_BAYAR -> BELUM_BAYAR -> BAYAR_SETENGAH -> MULAI_KONTRAK
+      if (m.st === 'SUDAH_BAYAR') m.st = 'BELUM_BAYAR';
+      else if (m.st === 'BELUM_BAYAR') m.st = 'BAYAR_SETENGAH';
+      else if (m.st === 'BAYAR_SETENGAH') m.st = 'MULAI_KONTRAK';
+      else m.st = 'SUDAH_BAYAR';
+
+      localStorage.setItem('mt_master_rekap', JSON.stringify(masterData));
+      renderMatrix();
+      updateCharts();
+      showToast(`✅ Status pembayaran ${item.renter} (${item.model}) diperbarui!`);
+    }
+
+    function handleAddContract(e) {
       e.preventDefault();
-      const type = document.getElementById('cash-type').value;
-      const cat = document.getElementById('cash-cat').value;
-      const amount = Number(document.getElementById('cash-amount').value || 0);
-      const date = document.getElementById('cash-date').value;
-      const desc = document.getElementById('cash-desc').value;
+      const renter = document.getElementById('add-renter').value;
+      const model = document.getElementById('add-model').value;
+      const plate = document.getElementById('add-plate').value;
+      const rate = Number(document.getElementById('add-rate').value || 0);
+      const fee = document.getElementById('add-fee').value;
+      const yr = Number(document.getElementById('add-year').value);
 
-      cashEntries.unshift({
-        id: Date.now(),
-        date,
-        type,
-        cat,
-        desc,
-        in: type === 'IN' ? amount : 0,
-        out: type === 'OUT' ? amount : 0
-      });
+      const newRow = {
+        no: (masterData[yr].length + 1),
+        renter,
+        model,
+        plate,
+        fee,
+        total: `Rp ${(rate * 12).toLocaleString('id-ID')}`,
+        months: Array(12).fill(0).map(() => ({ amt: rate, st: 'BELUM_BAYAR' }))
+      };
 
-      saveAll();
-      showToast('✅ Catatan kas berhasil disimpan!');
-      document.getElementById('cash-amount').value = '';
-      document.getElementById('cash-desc').value = '';
+      masterData[yr].push(newRow);
+      localStorage.setItem('mt_master_rekap', JSON.stringify(masterData));
+      
+      setYear(yr);
+      switchTab('tab-matrix');
+      showToast(`✅ Unit baru ${renter} (${model}) berhasil ditambahkan!`);
+      document.getElementById('add-contract-form').reset();
     }
 
-    function handleInvoiceEntry(e) {
-      e.preventDefault();
-      const client = document.getElementById('inv-client').value;
-      const car = document.getElementById('inv-car').value;
-      const service = document.getElementById('inv-service').value;
-      const duration = Number(document.getElementById('inv-duration').value || 1);
-      const start = document.getElementById('inv-start').value;
-      const rate = Number(document.getElementById('inv-rate').value || 0);
-      const extra = Number(document.getElementById('inv-extra').value || 0);
-      const status = document.getElementById('inv-payment').value;
-
-      const total = (duration * rate) + extra;
-      const randNum = Math.floor(100 + Math.random() * 900);
-      const invoiceNo = `MT-${randNum}/INV/VIII/2026`;
-
-      // End date calculate
-      const startDateObj = new Date(start);
-      const endDateObj = new Date(startDateObj.getTime() + (duration * 86400000));
-      const endStr = `${endDateObj.getDate()} ${endDateObj.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`;
-      const startStr = `${startDateObj.getDate()} ${startDateObj.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`;
-
-      invoicesData.unshift({
-        id: invoiceNo,
-        client,
-        car,
-        service,
-        start: startStr,
-        end: endStr,
-        dur: duration,
-        rate,
-        extra,
-        total,
-        status
-      });
-
-      // Auto record to Cashbook if LUNAS
-      if (status.includes('LUNAS')) {
-        cashEntries.unshift({
-          id: Date.now(),
-          date: start,
-          type: 'IN',
-          cat: 'Sewa Mobil',
-          desc: `Invoice ${invoiceNo} · ${client} (${car} ${duration} hari)`,
-          in: total,
-          out: 0
-        });
-      }
-
-      saveAll();
-      showToast(`✅ Invoice ${invoiceNo} untuk ${client} berhasil dibuat!`);
-      document.getElementById('inv-client').value = '';
-      document.getElementById('inv-rate').value = '';
-      document.getElementById('inv-extra').value = '';
-    }
-
-    function updatePaymentStatus(idx, val) {
-      invoicesData[idx].status = val;
-      saveAll();
-      showToast('✅ Status pembayaran diperbarui!');
-    }
-
-    function deleteInvoice(idx) {
-      if (confirm('Hapus data invoice ini dari rekap?')) {
-        invoicesData.splice(idx, 1);
-        saveAll();
-      }
-    }
-
-    function deleteCashEntry(idx) {
-      if (confirm('Hapus catatan kas ini?')) {
-        cashEntries.splice(idx, 1);
-        saveAll();
-      }
-    }
-
-    function setArmadaStatus(idx, st) {
-      armadaList[idx].status = st;
-      saveAll();
-      showToast(`🚘 Status ${armadaList[idx].model} diubah menjadi ${st}`);
-    }
-
-    // ── CHARTS INITIALIZATION ──
     function initCharts() {
-      // 1. Cashflow Bar Chart
-      const ctx1 = document.getElementById('cashflowChart').getContext('2d');
-      cashflowChart = new Chart(ctx1, {
+      const ctx1 = document.getElementById('monthlyChart').getContext('2d');
+      monthlyChart = new Chart(ctx1, {
         type: 'bar',
-        data: {
-          labels: ['Desember 2025', 'Januari 2026', 'Agustus 2026 (Live)'],
-          datasets: [
-            { label: 'Pemasukan (Rp)', data: [15650000, 18500000, 21500000], backgroundColor: '#10b981', borderRadius: 6 },
-            { label: 'Pengeluaran (Rp)', data: [2450000, 3100000, 3800000], backgroundColor: '#ef4444', borderRadius: 6 }
-          ]
-        },
+        data: getChartData(),
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -835,54 +630,81 @@
         }
       });
 
-      // 2. Car Usage Doughnut Chart
-      const ctx2 = document.getElementById('carUsageChart').getContext('2d');
-      carUsageChart = new Chart(ctx2, {
+      const ctx2 = document.getElementById('unitShareChart').getContext('2d');
+      unitShareChart = new Chart(ctx2, {
         type: 'doughnut',
-        data: {
-          labels: ['Innova Reborn', 'Fortuner VRZ', 'Innova Zenix', 'Avanza / Xpander', 'Hiace / Alphard'],
-          datasets: [{
-            data: [45, 20, 15, 12, 8],
-            backgroundColor: ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
-            borderWidth: 0
-          }]
-        },
+        data: getDonutData(),
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 12 } } }
+          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 10 } } }
         }
       });
     }
 
+    function getChartData() {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+      const paidByMonth = Array(12).fill(0);
+      const pendingByMonth = Array(12).fill(0);
+
+      (masterData[activeYear] || []).forEach(u => {
+        u.months.forEach((m, idx) => {
+          if (m.st === 'SUDAH_BAYAR') paidByMonth[idx] += m.amt;
+          else pendingByMonth[idx] += m.amt;
+        });
+      });
+
+      return {
+        labels: months,
+        datasets: [
+          { label: 'Sudah Terbayar (Lunas)', data: paidByMonth, backgroundColor: '#10b981', borderRadius: 4 },
+          { label: 'Belum Terbayar (Piutang)', data: pendingByMonth, backgroundColor: '#ef4444', borderRadius: 4 }
+        ]
+      };
+    }
+
+    function getDonutData() {
+      const list = masterData[activeYear] || [];
+      return {
+        labels: list.map(u => `${u.renter} (${u.model})`),
+        datasets: [{
+          data: list.map(u => u.months.reduce((a, b) => a + b.amt, 0)),
+          backgroundColor: ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
+          borderWidth: 0
+        }]
+      };
+    }
+
     function updateCharts() {
-      if (cashflowChart) cashflowChart.update();
-      if (carUsageChart) carUsageChart.update();
-    }
-
-    function printInvoice(id) {
-      const inv = invoicesData.find(i => i.id === id);
-      if (!inv) return;
-      alert(`🖨️ Mencetak Invoice: ${inv.id}\nCustomer: ${inv.client}\nUnit: ${inv.car}\nTotal: Rp ${inv.total.toLocaleString('id-ID')}\n\n*Format PDF resmi berlogo Mendadak Transport juga tersedia otomatis di bot Telegram.`);
-    }
-
-    function exportCsv(type) {
-      let rows = [];
-      let filename = `export_mendadak_${type}_${Date.now()}.csv`;
-
-      if (type === 'invoices') {
-        rows.push(['No Invoice', 'Customer', 'Unit Mobil', 'Layanan', 'Mulai', 'Selesai', 'Durasi', 'Total Tarif', 'Status']);
-        invoicesData.forEach(i => rows.push([i.id, i.client, i.car, i.service, i.start, i.end, i.dur, i.total, i.status]));
-      } else {
-        rows.push(['Tanggal', 'Tipe', 'Kategori', 'Keterangan', 'Pemasukan', 'Pengeluaran']);
-        cashEntries.forEach(c => rows.push([c.date, c.type, c.cat, c.desc, c.in, c.out]));
+      if (monthlyChart) {
+        monthlyChart.data = getChartData();
+        monthlyChart.update();
       }
+      if (unitShareChart) {
+        unitShareChart.data = getDonutData();
+        unitShareChart.update();
+      }
+    }
+
+    function exportExcelCsv() {
+      const list = masterData[activeYear] || [];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      let rows = [];
+
+      rows.push([`REKAP KONTRAK MOBIL ${activeYear}`]);
+      rows.push(['No.', 'Nama Unit & Pengontrak', 'PLAT', ...months, 'FEE/BULAN', 'TOTAL']);
+
+      list.forEach(item => {
+        const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
+        const totalNum = item.months.reduce((a, b) => a + b.amt, 0);
+        rows.push([item.no, `${item.renter} / ${item.model}`, item.plate, ...mCols, item.fee, `Rp ${totalNum.toLocaleString('id-ID')}`]);
+      });
 
       const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.map(x => `"${x || ''}"`).join(',')).join('\n');
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement('a');
       link.setAttribute('href', encodedUri);
-      link.setAttribute('download', filename);
+      link.setAttribute('download', `REKAP_KONTRAK_${activeYear}_MENDADAK.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
