@@ -117,15 +117,6 @@
     .tab-btn:hover { color: #fff; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--accent-red); }
 
-    .year-switch {
-      display: flex; gap: 3px; background: rgba(0,0,0,0.4); padding: 3px; border-radius: 6px; border: 1px solid var(--border-color);
-    }
-    .year-btn {
-      padding: 4px 12px; background: transparent; border: none; color: var(--text-secondary);
-      font-size: 0.78rem; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;
-    }
-    .year-btn.active { background: var(--accent-red); color: #fff; }
-
     /* Main Container */
     .container { width: 100%; max-width: 100%; padding: 1rem 1.25rem; flex: 1; }
 
@@ -360,7 +351,7 @@
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Sync Kas &amp; Armada</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span>Autosave Aktif</span></div>
       <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
@@ -373,10 +364,6 @@
       <button class="tab-btn active" id="tab-btn-kontrak" onclick="switchTab('tab-kontrak')">📑 Rekap Kontrak Bulanan / Tahunan</button>
       <button class="tab-btn" id="tab-btn-harian" onclick="switchTab('tab-harian')">🚗 Rekap Sewa Keluar Harian &amp; Invoice</button>
       <button class="tab-btn" id="tab-btn-kas" onclick="switchTab('tab-kas')">💵 Rekap Uang Keluar Masuk (Buku Kas &amp; Sumber Dana)</button>
-    </div>
-    <div class="year-switch" id="year-switch-box">
-      <button class="year-btn active" id="btn-2026" onclick="setYear(2026)">Tahun 2026</button>
-      <button class="year-btn" id="btn-2027" onclick="setYear(2027)">Tahun 2027</button>
     </div>
   </nav>
 
@@ -394,7 +381,7 @@
             <span class="click-hint">🔍 Rincian</span>
           </div>
           <div class="stat-value" id="kpi-total">Rp 320.400.000</div>
-          <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar (2026)</span>
+          <span class="stat-sub" id="kpi-unit-count">6 Unit Terdaftar</span>
         </div>
 
         <div class="stat-card paid" id="card-paid" onclick="toggleDrilldown('paid')">
@@ -688,13 +675,6 @@
             <label class="form-label">Tarif Bulanan Default (Rp)</label>
             <input type="number" id="edit-rate-default" class="form-input" placeholder="5500000" oninput="applyDefaultRateToAll(this.value)">
           </div>
-          <div class="form-group">
-            <label class="form-label">Tahun Kontrak</label>
-            <select id="edit-year-select" class="form-select">
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-            </select>
-          </div>
         </div>
 
         <h4 style="font-size: 0.85rem; color: #fff; margin-bottom: 0.5rem;">📅 Status &amp; Nominal Pembayaran Tiap Bulan (Januari - Desember):</h4>
@@ -873,79 +853,62 @@
 
   <script>
     const DEFAULT_PIN = "1234";
-    let activeYear = 2026;
+    const STABLE_STORAGE_KEY_KONTRAK = "MENDADAK_KONTRAK_PERMANENT_V1";
+    const STABLE_STORAGE_KEY_DAILY   = "MENDADAK_DAILY_PERMANENT_V1";
+    const STABLE_STORAGE_KEY_CASH    = "MENDADAK_CASH_PERMANENT_V1";
+
     let currentTab = 'tab-kontrak';
     let currentDrilldown = null;
     let drilldownChart = null;
     const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    // ── MASTER DATA KONTRAK ──
-    const defaultMasterKontrak = {
-      2026: [
-        {
-          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
-          months: [
-            { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
-            { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
-            { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' },
-            { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }
-          ]
-        },
-        {
-          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'NO FEE', fee_year: 'Rp. 0',
-          months: [
-            { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
-            { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
-            { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' },
-            { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }
-          ]
-        },
-        {
-          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
-          months: [
-            { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
-            { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
-            { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' },
-            { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }
-          ]
-        },
-        {
-          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
-          months: [
-            { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
-            { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
-            { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' },
-            { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }
-          ]
-        },
-        {
-          no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
-          months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
-        },
-        {
-          no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
-          months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
-        }
-      ],
-      2027: [
-        {
-          no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
-          months: Array(12).fill(0).map(() => ({ amt: 5500000, st: 'BELUM_BAYAR' }))
-        },
-        {
-          no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'NO FEE', fee_year: 'Rp. 0',
-          months: Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }))
-        },
-        {
-          no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
-          months: Array(12).fill(0).map(() => ({ amt: 6000000, st: 'BELUM_BAYAR' }))
-        },
-        {
-          no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2027-01-01', end_date: '2027-12-31', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
-          months: Array(12).fill(0).map(() => ({ amt: 6200000, st: 'BELUM_BAYAR' }))
-        }
-      ]
-    };
+    // ── MASTER DATA KONTRAK (UTAMA) ──
+    const defaultMasterKontrak = [
+      {
+        no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 1.850.000', fee_year: 'Rp. 22.200.000',
+        months: [
+          { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
+          { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
+          { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' },
+          { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }
+        ]
+      },
+      {
+        no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'NO FEE', fee_year: 'Rp. 0',
+        months: [
+          { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
+          { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
+          { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' },
+          { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }
+        ]
+      },
+      {
+        no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 6.000.000',
+        months: [
+          { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
+          { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
+          { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' },
+          { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }
+        ]
+      },
+      {
+        no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 700.000', fee_year: 'Rp. 8.400.000',
+        months: [
+          { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
+          { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
+          { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' },
+          { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }
+        ]
+      },
+      {
+        no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
+        months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
+      },
+      {
+        no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-01-01', end_date: '2026-12-31', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
+        months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
+      }
+    ];
 
     // ── DATA SEWA HARIAN ──
     const defaultDailyRentals = [
@@ -956,9 +919,9 @@
       { id: 'MT-677/INV/XII/2025', client: 'Bpk Made Takuya', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-21', end: '2025-12-25', dur: 4, rate: 500000, extra: 150000, total: 2150000, status: 'LUNAS (CASH)' }
     ];
 
-    // ── DATA BUKU KAS & PENGELUARAN ──
+    // ── DATA BUKU KAS ──
     const defaultCashTransactions = [
-      { id: 1, date: '2026-08-01', type: 'IN', source: 'Bank BCA', cat: 'Pemasukan Sewa', car: 'B 1861 VZN (Brio)', desc: 'Pelunasan Sewa Kontrak Ayah Ratu (Bulan Juli/Ags)', in: 5500000, out: 0 },
+      { id: 1, date: '2026-08-01', type: 'IN', source: 'Bank BCA', cat: 'Pemasukan Sewa', car: 'B 1861 VZN (Brio)', desc: 'Pelunasan Sewa Kontrak Ayah Ratu', in: 5500000, out: 0 },
       { id: 2, date: '2026-08-02', type: 'OUT', source: 'Bank BCA', cat: 'Fee Pemilik / Mitra', car: 'B 1861 VZN (Brio)', desc: 'Transfer Fee Bulanan Pemilik Unit Brio', in: 0, out: 1850000 },
       { id: 3, date: '2026-08-03', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'BBM / Bensin', car: 'DR 1003 MT (Innova Reborn)', desc: 'Isi Pertamax Full Tank Innova Reborn', in: 0, out: 400000 },
       { id: 4, date: '2026-08-04', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'Cuci Mobil / Salon', car: 'DR 1003 MT (Innova Reborn)', desc: 'Cuci poles bersih siap jalan', in: 0, out: 50000 },
@@ -974,6 +937,7 @@
     let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
     let cashTransactions = JSON.parse(JSON.stringify(defaultCashTransactions));
 
+    // ── ROBUST LOCALSTORAGE LOADER WITH AUTO-MIGRATION ──
     document.addEventListener('DOMContentLoaded', () => {
       if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
         window.history.replaceState({}, document.title, '/');
@@ -983,31 +947,79 @@
         document.getElementById('lock-screen').style.display = 'none';
       }
 
-      const savedK = localStorage.getItem('mt_master_kontrak_v6');
-      if (savedK) { try { masterKontrak = JSON.parse(savedK); } catch(e) {} }
+      // 1. Load Kontrak Data (with migration from all old keys)
+      let loadedK = localStorage.getItem(STABLE_STORAGE_KEY_KONTRAK);
+      if (!loadedK) {
+        // Search old keys
+        const oldKeys = ['mt_master_kontrak_v6', 'mt_master_kontrak_v5', 'mt_master_kontrak_v4', 'mt_master_kontrak_v3', 'mt_master_kontrak'];
+        for (const k of oldKeys) {
+          const val = localStorage.getItem(k);
+          if (val) {
+            try {
+              const parsed = JSON.parse(val);
+              const list = Array.isArray(parsed) ? parsed : (parsed[2026] || parsed[2027] || null);
+              if (list && list.length > 0) {
+                masterKontrak = list;
+                localStorage.setItem(STABLE_STORAGE_KEY_KONTRAK, JSON.stringify(masterKontrak));
+                loadedK = true;
+                break;
+              }
+            } catch(e) {}
+          }
+        }
+      } else {
+        try {
+          const parsed = JSON.parse(loadedK);
+          masterKontrak = Array.isArray(parsed) ? parsed : (parsed[2026] || defaultMasterKontrak);
+        } catch(e) {}
+      }
 
-      const savedD = localStorage.getItem('mt_daily_rentals_v6');
-      if (savedD) { try { dailyRentals = JSON.parse(savedD); } catch(e) {} }
+      // 2. Load Daily Rentals
+      let loadedD = localStorage.getItem(STABLE_STORAGE_KEY_DAILY);
+      if (!loadedD) {
+        const oldKeysD = ['mt_daily_rentals_v6', 'mt_daily_rentals_v5', 'mt_daily_rentals_v4', 'mt_daily_rentals_v3'];
+        for (const k of oldKeysD) {
+          const val = localStorage.getItem(k);
+          if (val) {
+            try {
+              dailyRentals = JSON.parse(val);
+              localStorage.setItem(STABLE_STORAGE_KEY_DAILY, JSON.stringify(dailyRentals));
+              loadedD = true;
+              break;
+            } catch(e) {}
+          }
+        }
+      } else {
+        try { dailyRentals = JSON.parse(loadedD); } catch(e) {}
+      }
 
-      const savedC = localStorage.getItem('mt_cash_trans_v6');
-      if (savedC) { try { cashTransactions = JSON.parse(savedC); } catch(e) {} }
+      // 3. Load Cash Transactions
+      let loadedC = localStorage.getItem(STABLE_STORAGE_KEY_CASH);
+      if (!loadedC) {
+        const oldKeysC = ['mt_cash_trans_v6', 'mt_cash_trans_v5'];
+        for (const k of oldKeysC) {
+          const val = localStorage.getItem(k);
+          if (val) {
+            try {
+              cashTransactions = JSON.parse(val);
+              localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
+              loadedC = true;
+              break;
+            } catch(e) {}
+          }
+        }
+      } else {
+        try { cashTransactions = JSON.parse(loadedC); } catch(e) {}
+      }
 
       renderMatrix();
       renderDaily();
       renderCashTable();
     });
 
-    function setYear(yr) {
-      activeYear = yr;
-      document.getElementById('btn-2026').classList.toggle('active', yr === 2026);
-      document.getElementById('btn-2027').classList.toggle('active', yr === 2027);
-      renderMatrix();
-      if (currentDrilldown) showDrilldown(currentDrilldown);
-    }
-
     // ── RENDER MATRIX KONTRAK ──
     function renderMatrix() {
-      const list = masterKontrak[activeYear] || [];
+      const list = masterKontrak || [];
       const tbody = document.getElementById('matrix-tbody');
 
       let totalGross = 0;
@@ -1056,8 +1068,8 @@
         totalFeeYear += feeYearNum;
 
         const feeYearDisplay = item.fee_year ? item.fee_year : (feeYearNum > 0 ? `Rp. ${feeYearNum.toLocaleString('id-ID')}` : 'Rp. 0');
-        const formattedStart = item.start_date ? formatDateDisplay(item.start_date) : `01 Jan ${activeYear.toString().slice(-2)}`;
-        const formattedEnd = item.end_date ? formatDateDisplay(item.end_date) : `31 Des ${activeYear.toString().slice(-2)}`;
+        const formattedStart = item.start_date ? formatDateDisplay(item.start_date) : `01 Jan '26`;
+        const formattedEnd = item.end_date ? formatDateDisplay(item.end_date) : `31 Des '26`;
 
         return `
           <tr>
@@ -1086,7 +1098,7 @@
       document.getElementById('kpi-pending').textContent = `Rp ${totalPending.toLocaleString('id-ID')}`;
       document.getElementById('kpi-feemonth').textContent = `Rp ${totalFeeMonth.toLocaleString('id-ID')}`;
       document.getElementById('kpi-feeyear').textContent = `Rp ${totalFeeYear.toLocaleString('id-ID')}`;
-      document.getElementById('kpi-unit-count').textContent = `${list.length} Unit Terdaftar (${activeYear})`;
+      document.getElementById('kpi-unit-count').textContent = `${list.length} Unit Terdaftar`;
     }
 
     function formatDateDisplay(dStr) {
@@ -1103,7 +1115,7 @@
     }
 
     function toggleMonthStatus(rowIdx, mIdx) {
-      const item = masterKontrak[activeYear][rowIdx];
+      const item = masterKontrak[rowIdx];
       const m = item.months[mIdx];
 
       if (m.st === 'SUDAH_BAYAR') m.st = 'BELUM_BAYAR';
@@ -1112,7 +1124,7 @@
       else m.st = 'SUDAH_BAYAR';
 
       saveAll();
-      showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah!`);
+      showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah & tersimpan!`);
     }
 
     // ── INTERACTIVE DRILL-DOWN EXPLANATION FOR TOP CARDS ──
@@ -1137,7 +1149,7 @@
       const activeCard = document.getElementById(`card-${type}`);
       if (activeCard) activeCard.classList.add('active-card');
 
-      const list = masterKontrak[activeYear] || [];
+      const list = masterKontrak || [];
       const container = document.getElementById('drilldown-list-container');
       const box = document.getElementById('drilldown-box');
       box.style.display = 'block';
@@ -1149,7 +1161,7 @@
       let chartColors = ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'];
 
       if (type === 'total') {
-        title = `📊 Rincian Sumber Nilai: Total Omset Kontrak Tahun ${activeYear}`;
+        title = `📊 Rincian Sumber Nilai: Total Omset Kontrak`;
         document.getElementById('drilldown-list-title').textContent = 'Kontribusi Omset per Pengontrak & Unit:';
         document.getElementById('drilldown-chart-title').textContent = 'Persentase Omset Kontrak:';
 
@@ -1168,7 +1180,7 @@
           `;
         });
       } else if (type === 'paid') {
-        title = `🟢 Rincian Pembayaran Masuk (Sudah Lunas) Tahun ${activeYear}`;
+        title = `🟢 Rincian Pembayaran Masuk (Sudah Lunas)`;
         document.getElementById('drilldown-list-title').textContent = 'Jumlah Uang Sewa yang Sudah Diterima per Unit:';
         document.getElementById('drilldown-chart-title').textContent = 'Porsi Pembayaran Lunas:';
 
@@ -1188,7 +1200,7 @@
           `;
         });
       } else if (type === 'pending') {
-        title = `🔴 Rincian Piutang / Belum Bayar Tahun ${activeYear}`;
+        title = `🔴 Rincian Piutang / Belum Bayar`;
         document.getElementById('drilldown-list-title').textContent = 'Sisa Tagihan yang Belum Dibayar per Unit:';
         document.getElementById('drilldown-chart-title').textContent = 'Porsi Piutang Berjalan:';
 
@@ -1210,7 +1222,7 @@
           `;
         });
       } else if (type === 'feemonth') {
-        title = `🟠 Rincian Fee Bulanan Mitra Pemilik Unit (${activeYear})`;
+        title = `🟠 Rincian Fee Bulanan Mitra Pemilik Unit`;
         document.getElementById('drilldown-list-title').textContent = 'Fee Rutin yang Dibayarkan ke Pemilik Setiap Bulan:';
         document.getElementById('drilldown-chart-title').textContent = 'Distribusi Fee Bulanan:';
 
@@ -1231,7 +1243,7 @@
           `;
         });
       } else if (type === 'feeyear') {
-        title = `🔵 Rincian Total Fee Tahunan Mitra Pemilik Unit (${activeYear})`;
+        title = `🔵 Rincian Total Fee Tahunan Mitra Pemilik Unit`;
         document.getElementById('drilldown-list-title').textContent = 'Akumulasi Fee Pemilik Selama 1 Tahun:';
         document.getElementById('drilldown-chart-title').textContent = 'Porsi Fee Tahunan:';
 
@@ -1336,7 +1348,6 @@
       let totalBca = 0;
       let totalCash = 0;
 
-      // Calculate totals from all items
       cashTransactions.forEach(c => {
         totalIn += (c.in || 0);
         totalOut += (c.out || 0);
@@ -1354,7 +1365,6 @@
       document.getElementById('kpi-kas-bca').textContent = `Rp ${totalBca.toLocaleString('id-ID')}`;
       document.getElementById('kpi-kas-cash').textContent = `Rp ${totalCash.toLocaleString('id-ID')}`;
 
-      // Filter rows
       const filtered = filter === 'ALL' ? cashTransactions : cashTransactions.filter(c => c.source === filter);
 
       tbody.innerHTML = filtered.map((c, idx) => {
@@ -1393,7 +1403,7 @@
 
     // ── MODAL KONTRAK LOGIC ──
     function openEditModal(rowIdx) {
-      const item = masterKontrak[activeYear][rowIdx];
+      const item = masterKontrak[rowIdx];
       if (!item) return;
 
       document.getElementById('modal-title-text').textContent = `✏️ Edit Kontrak: ${item.renter} (${item.model})`;
@@ -1401,12 +1411,11 @@
       document.getElementById('edit-renter').value = item.renter;
       document.getElementById('edit-model').value = item.model;
       document.getElementById('edit-plate').value = item.plate;
-      document.getElementById('edit-start-date').value = item.start_date || `${activeYear}-01-01`;
-      document.getElementById('edit-end-date').value = item.end_date || `${activeYear}-12-31`;
+      document.getElementById('edit-start-date').value = item.start_date || `2026-01-01`;
+      document.getElementById('edit-end-date').value = item.end_date || `2026-12-31`;
       document.getElementById('edit-fee').value = item.fee;
       document.getElementById('edit-fee-year').value = item.fee_year || '';
       document.getElementById('edit-rate-default').value = item.months[0]?.amt || 5000000;
-      document.getElementById('edit-year-select').value = activeYear;
 
       renderMonthsInModal(item.months);
       document.getElementById('edit-modal').style.display = 'flex';
@@ -1418,12 +1427,11 @@
       document.getElementById('edit-renter').value = '';
       document.getElementById('edit-model').value = '';
       document.getElementById('edit-plate').value = '';
-      document.getElementById('edit-start-date').value = `${activeYear}-01-01`;
-      document.getElementById('edit-end-date').value = `${activeYear}-12-31`;
+      document.getElementById('edit-start-date').value = `2026-01-01`;
+      document.getElementById('edit-end-date').value = `2026-12-31`;
       document.getElementById('edit-fee').value = 'NO FEE';
       document.getElementById('edit-fee-year').value = 'Rp. 0';
       document.getElementById('edit-rate-default').value = 5000000;
-      document.getElementById('edit-year-select').value = activeYear;
 
       const newMonths = Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }));
       renderMonthsInModal(newMonths);
@@ -1464,7 +1472,6 @@
       const endDate = document.getElementById('edit-end-date').value;
       const fee = document.getElementById('edit-fee').value;
       const feeYear = document.getElementById('edit-fee-year').value;
-      const yr = Number(document.getElementById('edit-year-select').value);
 
       const months = [];
       for (let i = 0; i < 12; i++) {
@@ -1474,18 +1481,17 @@
       }
 
       if (rowIdx >= 0) {
-        masterKontrak[activeYear][rowIdx] = {
-          ...masterKontrak[activeYear][rowIdx],
+        masterKontrak[rowIdx] = {
+          ...masterKontrak[rowIdx],
           renter, model, plate, start_date: startDate, end_date: endDate, fee, fee_year: feeYear, months
         };
         showToast(`✅ Data kontrak ${renter} diperbarui!`);
       } else {
-        const newNo = (masterKontrak[yr].length + 1);
-        masterKontrak[yr].push({
+        const newNo = masterKontrak.length + 1;
+        masterKontrak.push({
           no: newNo,
           renter, model, plate, start_date: startDate, end_date: endDate, fee, fee_year: feeYear, months
         });
-        setYear(yr);
         showToast(`✅ Unit baru ${renter} (${model}) ditambahkan!`);
       }
 
@@ -1494,9 +1500,9 @@
     }
 
     function deleteContract(rowIdx) {
-      const item = masterKontrak[activeYear][rowIdx];
+      const item = masterKontrak[rowIdx];
       if (confirm(`Hapus data kontrak ${item.renter} (${item.model})?`)) {
-        masterKontrak[activeYear].splice(rowIdx, 1);
+        masterKontrak.splice(rowIdx, 1);
         saveAll();
         showToast('🗑️ Data kontrak dihapus.');
       }
@@ -1568,7 +1574,6 @@
           id: newId, client, car, plate, service, start, end, dur, rate, extra, total, status
         });
 
-        // Auto catat kas masuk jika Lunas
         if (status.includes('LUNAS')) {
           cashTransactions.unshift({
             id: Date.now(),
@@ -1680,9 +1685,16 @@
     }
 
     function saveAll() {
+      // PERMANENT STABLE STORAGE KEYS
+      localStorage.setItem(STABLE_STORAGE_KEY_KONTRAK, JSON.stringify(masterKontrak));
+      localStorage.setItem(STABLE_STORAGE_KEY_DAILY, JSON.stringify(dailyRentals));
+      localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
+
+      // Also mirror to legacy keys for maximum safety
       localStorage.setItem('mt_master_kontrak_v6', JSON.stringify(masterKontrak));
       localStorage.setItem('mt_daily_rentals_v6', JSON.stringify(dailyRentals));
       localStorage.setItem('mt_cash_trans_v6', JSON.stringify(cashTransactions));
+
       renderMatrix();
       renderDaily();
       renderCashTable();
@@ -1697,18 +1709,18 @@
       } else if (currentTab === 'tab-kas') {
         exportCashCsv();
       } else {
-        const list = masterKontrak[activeYear] || [];
+        const list = masterKontrak || [];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        let rows = [[`REKAP KONTRAK MOBIL ${activeYear}`], ['No.', 'Pengontrak', 'Nama Unit', 'PLAT', 'Tgl Mulai', 'Tgl Selesai', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']];
+        let rows = [[`REKAP KONTRAK MOBIL MENDADAK TRANSPORT`], ['No.', 'Pengontrak', 'Nama Unit', 'PLAT', 'Tgl Mulai', 'Tgl Selesai', ...fullMonths, 'TOTAL', 'FEE/BULAN', 'TOTAL FEE/TAHUN']];
 
         list.forEach(item => {
           const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
           const totalNum = item.months.reduce((a, b) => a + b.amt, 0);
           const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
           const feeYearStr = item.fee_year || (feeMonthNum > 0 ? `Rp. ${(feeMonthNum * 12).toLocaleString('id-ID')}` : 'Rp. 0');
-          rows.push([item.no, item.renter, item.model, item.plate, item.start_date || `01-01-${activeYear}`, item.end_date || `31-12-${activeYear}`, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
+          rows.push([item.no, item.renter, item.model, item.plate, item.start_date || `01-01-2026`, item.end_date || `31-12-2026`, ...mCols, `Rp ${totalNum.toLocaleString('id-ID')}`, item.fee, feeYearStr]);
         });
-        downloadCsv(rows, `REKAP_KONTRAK_${activeYear}_MENDADAK.csv`);
+        downloadCsv(rows, `REKAP_KONTRAK_MENDADAK.csv`);
       }
     }
 
@@ -1762,15 +1774,12 @@
 
       if (id === 'tab-kontrak') {
         document.getElementById('tab-btn-kontrak').classList.add('active');
-        document.getElementById('year-switch-box').style.display = 'flex';
         document.getElementById('btn-top-add').textContent = '➕ Tambah Kontrak';
       } else if (id === 'tab-harian') {
         document.getElementById('tab-btn-harian').classList.add('active');
-        document.getElementById('year-switch-box').style.display = 'none';
         document.getElementById('btn-top-add').textContent = '➕ Buat Sewa Harian';
       } else {
         document.getElementById('tab-btn-kas').classList.add('active');
-        document.getElementById('year-switch-box').style.display = 'none';
         document.getElementById('btn-top-add').textContent = '🔴 Catat Pengeluaran';
       }
 
