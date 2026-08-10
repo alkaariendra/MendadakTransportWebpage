@@ -1272,7 +1272,7 @@
 
     let masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
     let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
-    let cashTransactions = JSON.parse(JSON.stringify(defaultCashTransactions));
+    let cashTransactions = [];
     let masterArmada = JSON.parse(JSON.stringify(defaultMasterArmada));
 
     // ── ROBUST LOCALSTORAGE LOADER WITH AUTO-MIGRATION ──
@@ -1378,20 +1378,12 @@
       // 3. Load Cash Transactions
       let loadedC = localStorage.getItem(STABLE_STORAGE_KEY_CASH);
       if (!loadedC) {
-        const oldKeysC = ['mt_cash_trans_v6', 'mt_cash_trans_v5'];
-        for (const k of oldKeysC) {
-          const val = localStorage.getItem(k);
-          if (val) {
-            try {
-              cashTransactions = JSON.parse(val);
-              localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
-              loadedC = true;
-              break;
-            } catch(e) {}
-          }
-        }
+        cashTransactions = [];
       } else {
-        try { cashTransactions = JSON.parse(loadedC); } catch(e) {}
+        try {
+          const parsed = JSON.parse(loadedC);
+          cashTransactions = Array.isArray(parsed) ? parsed : [];
+        } catch(e) {}
       }
 
       // 4. Load Master Armada Data
@@ -1560,6 +1552,16 @@
     function syncContractCashflowToLedger(showToastNotice = false) {
       if (!masterKontrak || masterKontrak.length === 0) return;
 
+      const currentDateStr = '2026-08-10'; // Cutoff date
+
+      // Filter out any future date contract transactions if present
+      cashTransactions = cashTransactions.filter(c => {
+        if (c.tag && c.date > currentDateStr && (c.tag.startsWith('CONTRACT_IN_') || c.tag.startsWith('CONTRACT_OUT_LEASING_'))) {
+          return false;
+        }
+        return true;
+      });
+
       let addedCount = 0;
       masterKontrak.forEach((item, rIdx) => {
         const renter = item.renter || 'Penyewa';
@@ -1580,44 +1582,47 @@
             const mNumStr = (mIdx + 1).toString().padStart(2, '0');
             const transDate = `2026-${mNumStr}-${startDay}`;
 
-            const tagIn = `CONTRACT_IN_${rIdx}_${mIdx}`;
-            const tagOut = `CONTRACT_OUT_LEASING_${rIdx}_${mIdx}`;
+            // DO NOT record future months (after 10 August 2026)
+            if (transDate <= currentDateStr) {
+              const tagIn = `CONTRACT_IN_${rIdx}_${mIdx}`;
+              const tagOut = `CONTRACT_OUT_LEASING_${rIdx}_${mIdx}`;
 
-            const existsIn = cashTransactions.some(c => c.tag === tagIn || (c.desc && c.desc.includes(`Pelunasan Sewa Kontrak ${renter} (${model}) - Bulan ${monthName}`)));
-            
-            if (!existsIn) {
-              // 1. Inflow: Total rental payment from customer (e.g. Rp 5.500.000)
-              cashTransactions.unshift({
-                id: Date.now() + Math.random(),
-                tag: tagIn,
-                date: transDate,
-                type: 'IN',
-                source: 'Bank BCA',
-                cat: 'Pelunasan Sewa Kontrak',
-                car: `${plate} (${model})`,
-                desc: `Pelunasan Sewa Kontrak ${renter} (${model}) - Bulan ${monthName} '26`,
-                in: m.amt,
-                out: 0
-              });
-
-              // 2. Outflow: Leasing installment to Mandiri Finance (Rental Amount minus Owner Fee, e.g. Rp 3.650.000)
-              const leasingOutflow = m.amt - feeMonthNum;
-              if (leasingOutflow > 0) {
+              const existsIn = cashTransactions.some(c => c.tag === tagIn || (c.desc && c.desc.includes(`Pelunasan Sewa Kontrak ${renter} (${model}) - Bulan ${monthName}`)));
+              
+              if (!existsIn) {
+                // 1. Inflow: Total rental payment from customer (e.g. Rp 5.500.000)
                 cashTransactions.unshift({
-                  id: Date.now() + Math.random() + 1,
-                  tag: tagOut,
+                  id: Date.now() + Math.random(),
+                  tag: tagIn,
                   date: transDate,
-                  type: 'OUT',
+                  type: 'IN',
                   source: 'Bank BCA',
-                  cat: 'Angsuran Leasing / Mandiri Finance',
+                  cat: 'Pelunasan Sewa Kontrak',
                   car: `${plate} (${model})`,
-                  desc: `Setoran Angsuran Leasing Mandiri Finance ${model} (${plate}) - Bulan ${monthName} '26`,
-                  in: 0,
-                  out: leasingOutflow
+                  desc: `Pelunasan Sewa Kontrak ${renter} (${model}) - Bulan ${monthName} '26`,
+                  in: m.amt,
+                  out: 0
                 });
-              }
 
-              addedCount++;
+                // 2. Outflow: Leasing installment to Mandiri Finance (Rental Amount minus Owner Fee, e.g. Rp 3.650.000)
+                const leasingOutflow = m.amt - feeMonthNum;
+                if (leasingOutflow > 0) {
+                  cashTransactions.unshift({
+                    id: Date.now() + Math.random() + 1,
+                    tag: tagOut,
+                    date: transDate,
+                    type: 'OUT',
+                    source: 'Bank BCA',
+                    cat: 'Angsuran Leasing / Mandiri Finance',
+                    car: `${plate} (${model})`,
+                    desc: `Setoran Angsuran Leasing Mandiri Finance ${model} (${plate}) - Bulan ${monthName} '26`,
+                    in: 0,
+                    out: leasingOutflow
+                  });
+                }
+
+                addedCount++;
+              }
             }
           }
         });
