@@ -17,19 +17,22 @@ export default async function handler(req, res) {
       const kontrak = await redis.get('rekap:kontrak');
       const daily   = await redis.get('rekap:daily');
       const cash    = await redis.get('rekap:cash');
+      const armada  = await redis.get('rekap:armada');
       return res.status(200).json({
         ok: true,
         kontrak: kontrak || null,
         daily:   daily   || null,
         cash:    cash    || null,
+        armada:  armada  || null,
       });
     }
 
     if (req.method === 'POST') {
-      const { kontrak, daily, cash } = req.body || {};
+      const { kontrak, daily, cash, armada } = req.body || {};
       if (kontrak !== undefined) await redis.set('rekap:kontrak', kontrak);
       if (daily   !== undefined) await redis.set('rekap:daily',   daily);
       if (cash    !== undefined) await redis.set('rekap:cash',    cash);
+      if (armada  !== undefined) await redis.set('rekap:armada',  armada);
       return res.status(200).json({ ok: true, saved: true, timestamp: new Date().toISOString() });
     }
 

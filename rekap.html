@@ -364,6 +364,7 @@
       <button class="tab-btn active" id="tab-btn-kontrak" onclick="switchTab('tab-kontrak')">📑 Rekap Kontrak Bulanan / Tahunan</button>
       <button class="tab-btn" id="tab-btn-harian" onclick="switchTab('tab-harian')">🚗 Rekap Sewa Keluar Harian &amp; Invoice</button>
       <button class="tab-btn" id="tab-btn-kas" onclick="switchTab('tab-kas')">💵 Rekap Uang Keluar Masuk (Buku Kas &amp; Sumber Dana)</button>
+      <button class="tab-btn" id="tab-btn-armada" onclick="switchTab('tab-armada')">🚘 List Mobil &amp; Plat Nomor</button>
     </div>
   </nav>
 
@@ -629,6 +630,69 @@
       </div>
     </section>
 
+    <!-- ==================== TAB 4: LIST MOBIL & PLAT NOMOR (MASTER ARMADA) ==================== -->
+    <section id="tab-armada" class="section">
+      <!-- Summary Statistics for Armada -->
+      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem;">
+        <div class="stat-card total" style="cursor: default;">
+          <span class="stat-label">Total Unit Armada</span>
+          <span class="stat-val" id="stat-armada-total">0 Unit</span>
+          <span class="stat-sub">Semua Kendaraan</span>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid var(--accent); cursor: default;">
+          <span class="stat-label">Dalam Kontrak</span>
+          <span class="stat-val" id="stat-armada-kontrak" style="color: var(--accent);">0 Unit</span>
+          <span class="stat-sub">Sewa Bulan/Tahun</span>
+        </div>
+        <div class="stat-card paid" style="cursor: default;">
+          <span class="stat-label">Ready / Siaga</span>
+          <span class="stat-val" id="stat-armada-ready" style="color: var(--success);">0 Unit</span>
+          <span class="stat-sub">Siap Sewa Harian</span>
+        </div>
+        <div class="stat-card fee" style="cursor: default;">
+          <span class="stat-label">Dalam Perbaikan</span>
+          <span class="stat-val" id="stat-armada-servis" style="color: var(--danger);">0 Unit</span>
+          <span class="stat-sub">Servis / Maintenance</span>
+        </div>
+      </div>
+
+      <!-- Header Action Bar for Armada -->
+      <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.25rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem 0;">🚘 Master List Mobil &amp; Plat Nomor Armada</h2>
+            <p style="font-size: 0.825rem; color: var(--text-sub); margin: 0;">Kelola daftar seluruh kendaraan armada Mendadak Transport (Mobil &amp; Motor)</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="search-armada" class="form-input" placeholder="🔍 Cari mobil / plat..." oninput="renderArmadaTable()" style="width: 220px; padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+            <button class="btn btn-primary" onclick="openNewArmadaModal()">➕ Tambah Mobil / Unit Baru</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Armada Data Table -->
+      <div class="matrix-card">
+        <div class="table-container">
+          <table class="rekap-table" id="armada-table">
+            <thead>
+              <tr>
+                <th style="width: 45px; text-align: center;">No.</th>
+                <th>Nama Mobil / Model</th>
+                <th>Plat Nomor</th>
+                <th>Jenis / Kategori</th>
+                <th style="text-align: center;">Status Armada</th>
+                <th>Catatan / Pemilik</th>
+                <th style="text-align: center; width: 110px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="armada-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ==================== MODAL 1: EDIT / NEW KONTRAK ==================== -->
@@ -849,6 +913,66 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL 4: EDIT / TAMBAH MOBIL ==================== -->
+  <div id="armada-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="armada-modal-title">🚘 Tambah Unit Mobil Baru</h3>
+        <button class="close-btn" onclick="closeArmadaModal()">&times;</button>
+      </div>
+
+      <form id="armada-form" onsubmit="handleSaveArmada(event)">
+        <input type="hidden" id="armada-idx">
+
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Nama Mobil / Model Kendaraan</label>
+            <input type="text" id="armada-model" class="form-input" placeholder="Contoh: Toyota Avanza All New / Honda Brio / Innova Zenix" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Plat Nomor Kendaraan</label>
+            <input type="text" id="armada-plate" class="form-input" placeholder="Contoh: DR 1009 MT / B 1861 VZN" required style="text-transform: uppercase;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Jenis / Kategori</label>
+            <select id="armada-type" class="form-input" required>
+              <option value="Mobil MPV">Mobil MPV (Avanza/Xenia/Xpander)</option>
+              <option value="City Car">City Car (Brio/Agya/Jazz)</option>
+              <option value="Mobil SUV">Mobil SUV (Fortuner/Pajero)</option>
+              <option value="Mobil MPV Premium">Mobil MPV Premium (Innova/Zenix/Alphard)</option>
+              <option value="Motor Matic">Motor Matic (Vario/Fazzio/NMAX)</option>
+              <option value="Motor Retro">Motor Retro (Vespa Matic)</option>
+              <option value="Minibus / HiAce">Minibus (HiAce Commuter/Premio)</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Status Unit Saat Ini</label>
+            <select id="armada-status" class="form-input" required>
+              <option value="READY">🟢 READY (Siaga Sewa Harian)</option>
+              <option value="KONTRAK">🔵 KONTRAK (Sewa Bulan/Tahun)</option>
+              <option value="SEWA_HARIAN">🟡 SEWA HARIAN (Sedang Jalan)</option>
+              <option value="SERVIS">🔴 SERVIS (Maintenance Bengkel)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan / Informasi Pemilik</label>
+            <input type="text" id="armada-notes" class="form-input" placeholder="Misal: Milik Ayah Ratu / Unit Pribadi Mendadak">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeArmadaModal()">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-armada">💾 Simpan Data Mobil</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast" class="toast-box"></div>
 
   <script>
@@ -856,6 +980,7 @@
     const STABLE_STORAGE_KEY_KONTRAK = "MENDADAK_KONTRAK_PERMANENT_V1";
     const STABLE_STORAGE_KEY_DAILY   = "MENDADAK_DAILY_PERMANENT_V1";
     const STABLE_STORAGE_KEY_CASH    = "MENDADAK_CASH_PERMANENT_V1";
+    const STABLE_STORAGE_KEY_ARMADA  = "MENDADAK_ARMADA_PERMANENT_V1";
     const CLOUD_SYNC_URL = '/api/sync';
 
     let currentTab = 'tab-kontrak';
@@ -934,9 +1059,23 @@
       { id: 10, date: '2026-08-10', type: 'OUT', source: 'Bank BCA', cat: 'Fee Pemilik / Mitra', car: 'W 1248 DJ (Avanza)', desc: 'Transfer Fee Mitra Pemilik Unit Mama Dina', in: 0, out: 500000 }
     ];
 
+    // ── DATA MASTER ARMADA (LIST MOBIL & PLAT) ──
+    const defaultMasterArmada = [
+      { id: 1, model: 'Honda Brio', plate: 'B 1861 VZN', type: 'City Car', status: 'KONTRAK', notes: 'Kontrak Ayah Ratu (Fee Rp 1.850.000)' },
+      { id: 2, model: 'Toyota Avanza All New', plate: 'D 1229 VDM', type: 'Mobil MPV', status: 'KONTRAK', notes: 'Kontrak Ayah Elok (NO FEE)' },
+      { id: 3, model: 'Toyota Avanza All New', plate: 'W 1248 DJ', type: 'Mobil MPV', status: 'KONTRAK', notes: 'Kontrak Mama Dina (Fee Rp 500.000)' },
+      { id: 4, model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', type: 'Mobil MPV', status: 'KONTRAK', notes: 'Kontrak Ayah Ratu (Fee Rp 700.000)' },
+      { id: 5, model: 'Honda Vario 155', plate: 'DR 5229 CV', type: 'Motor Matic', status: 'KONTRAK', notes: 'Kontrak Rachmad Satriowibowo' },
+      { id: 6, model: 'Yamaha Fazzio', plate: 'DR 3416 EP', type: 'Motor Matic', status: 'KONTRAK', notes: 'Kontrak Rachmad Satriowibowo' },
+      { id: 7, model: 'Toyota Innova Reborn', plate: 'DR 1003 MT', type: 'Mobil MPV Premium', status: 'READY', notes: 'Unit Sewa Harian Siaga' },
+      { id: 8, model: 'Toyota Innova Zenix Q', plate: 'DR 1004 MT', type: 'Mobil MPV Premium', status: 'READY', notes: 'Unit Sewa Harian Siaga' },
+      { id: 9, model: 'Toyota Fortuner VRZ', plate: 'DR 1005 MT', type: 'Mobil SUV', status: 'READY', notes: 'Unit Sewa Harian Siaga' }
+    ];
+
     let masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
     let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
     let cashTransactions = JSON.parse(JSON.stringify(defaultCashTransactions));
+    let masterArmada = JSON.parse(JSON.stringify(defaultMasterArmada));
 
     // ── ROBUST LOCALSTORAGE LOADER WITH AUTO-MIGRATION ──
     // ── CLOUD SYNC HELPERS ──
@@ -962,6 +1101,11 @@
           localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
           changed = true;
         }
+        if (data.armada && Array.isArray(data.armada)) {
+          masterArmada = data.armada;
+          localStorage.setItem(STABLE_STORAGE_KEY_ARMADA, JSON.stringify(masterArmada));
+          changed = true;
+        }
         return changed;
       } catch (e) {
         console.warn('[CloudSync] Load gagal, pakai localStorage:', e.message);
@@ -977,7 +1121,8 @@
           body: JSON.stringify({
             kontrak: masterKontrak,
             daily: dailyRentals,
-            cash: cashTransactions
+            cash: cashTransactions,
+            armada: masterArmada
           }),
           signal: AbortSignal.timeout(5000)
         });
@@ -1047,8 +1192,13 @@
             } catch(e) {}
           }
         }
+      // 4. Load Master Armada Data
+      let loadedA = localStorage.getItem(STABLE_STORAGE_KEY_ARMADA);
+      if (!loadedA) {
+        masterArmada = defaultMasterArmada;
+        localStorage.setItem(STABLE_STORAGE_KEY_ARMADA, JSON.stringify(masterArmada));
       } else {
-        try { cashTransactions = JSON.parse(loadedC); } catch(e) {}
+        try { masterArmada = JSON.parse(loadedA); } catch(e) {}
       }
     }
 
@@ -1066,12 +1216,14 @@
       renderMatrix();
       renderDaily();
       renderCashTable();
+      renderArmadaTable();
 
       const cloudLoaded = await loadFromCloud();
       if (cloudLoaded) {
         renderMatrix();
         renderDaily();
         renderCashTable();
+        renderArmadaTable();
         showToast('☁️ Data cloud tersinkronisasi!');
       } else {
         // If cloud has no data yet, push local data up
@@ -1086,6 +1238,7 @@
         renderMatrix();
         renderDaily();
         renderCashTable();
+        renderArmadaTable();
       }
     });
 
@@ -1743,6 +1896,8 @@
         openNewDailyModal();
       } else if (currentTab === 'tab-kas') {
         openNewCashModal('OUT');
+      } else if (currentTab === 'tab-armada') {
+        openNewArmadaModal();
       } else {
         openNewContractModal();
       }
@@ -1761,6 +1916,7 @@
       localStorage.setItem(STABLE_STORAGE_KEY_KONTRAK, JSON.stringify(masterKontrak));
       localStorage.setItem(STABLE_STORAGE_KEY_DAILY, JSON.stringify(dailyRentals));
       localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
+      localStorage.setItem(STABLE_STORAGE_KEY_ARMADA, JSON.stringify(masterArmada));
 
       // Also mirror to legacy keys for maximum safety
       localStorage.setItem('mt_master_kontrak_v6', JSON.stringify(masterKontrak));
@@ -1773,6 +1929,7 @@
       renderMatrix();
       renderDaily();
       renderCashTable();
+      renderArmadaTable();
       if (currentDrilldown) showDrilldown(currentDrilldown);
     }
 
@@ -1783,6 +1940,10 @@
         downloadCsv(rows, `REKAP_SEWA_HARIAN_MENDADAK.csv`);
       } else if (currentTab === 'tab-kas') {
         exportCashCsv();
+      } else if (currentTab === 'tab-armada') {
+        let rows = [['No.', 'Nama Mobil / Model', 'Plat Nomor', 'Jenis', 'Status', 'Catatan / Pemilik']];
+        masterArmada.forEach((a, i) => rows.push([i + 1, a.model, a.plate, a.type, a.status, a.notes]));
+        downloadCsv(rows, `MASTER_LIST_ARMADA_MOBIL_MENDADAK.csv`);
       } else {
         const list = masterKontrak || [];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -1853,12 +2014,151 @@
       } else if (id === 'tab-harian') {
         document.getElementById('tab-btn-harian').classList.add('active');
         document.getElementById('btn-top-add').textContent = '➕ Buat Sewa Harian';
-      } else {
+      } else if (id === 'tab-kas') {
         document.getElementById('tab-btn-kas').classList.add('active');
         document.getElementById('btn-top-add').textContent = '🔴 Catat Pengeluaran';
+      } else {
+        document.getElementById('tab-btn-armada').classList.add('active');
+        document.getElementById('btn-top-add').textContent = '🚘 Tambah Mobil Baru';
       }
 
       document.getElementById(id).classList.add('active');
+    }
+
+    // ── RENDER & MANAGEMENT MASTER ARMADA (LIST MOBIL & PLAT) ──
+    function renderArmadaTable() {
+      const tbody = document.getElementById('armada-tbody');
+      const search = (document.getElementById('search-armada')?.value || '').toLowerCase().trim();
+      const list = masterArmada || [];
+
+      let countTotal = list.length;
+      let countKontrak = 0;
+      let countReady = 0;
+      let countServis = 0;
+
+      list.forEach(a => {
+        const st = (a.status || 'READY').toUpperCase();
+        if (st === 'KONTRAK') countKontrak++;
+        else if (st === 'READY' || st === 'SEWA_HARIAN') countReady++;
+        else if (st === 'SERVIS') countServis++;
+      });
+
+      if (document.getElementById('stat-armada-total')) document.getElementById('stat-armada-total').textContent = `${countTotal} Unit`;
+      if (document.getElementById('stat-armada-kontrak')) document.getElementById('stat-armada-kontrak').textContent = `${countKontrak} Unit`;
+      if (document.getElementById('stat-armada-ready')) document.getElementById('stat-armada-ready').textContent = `${countReady} Unit`;
+      if (document.getElementById('stat-armada-servis')) document.getElementById('stat-armada-servis').textContent = `${countServis} Unit`;
+
+      const filtered = list.filter(a => {
+        if (!search) return true;
+        return (a.model || '').toLowerCase().includes(search) ||
+               (a.plate || '').toLowerCase().includes(search) ||
+               (a.type || '').toLowerCase().includes(search) ||
+               (a.notes || '').toLowerCase().includes(search);
+      });
+
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-sub);">Daftar unit armada tidak ditemukan. Klik tombol <b>➕ Tambah Mobil / Unit Baru</b> untuk menginput.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        let statusBadge = '';
+        const st = (item.status || 'READY').toUpperCase();
+        if (st === 'KONTRAK') {
+          statusBadge = `<span class="badge" style="background: rgba(43,108,176,0.15); color: #2b6cb0; font-weight: 700;">🔵 KONTRAK</span>`;
+        } else if (st === 'READY') {
+          statusBadge = `<span class="badge badge-paid">🟢 READY</span>`;
+        } else if (st === 'SEWA_HARIAN') {
+          statusBadge = `<span class="badge badge-pending">🟡 SEWA HARIAN</span>`;
+        } else {
+          statusBadge = `<span class="badge" style="background: rgba(229,62,62,0.15); color: #e53e3e; font-weight: 700;">🔴 SERVIS</span>`;
+        }
+
+        const realIdx = masterArmada.findIndex(x => x.id === item.id || (x.plate === item.plate && x.model === item.model));
+
+        return `
+          <tr>
+            <td style="text-align: center; font-weight: 700; color: var(--text-sub);">${idx + 1}</td>
+            <td style="font-weight: 700; color: var(--text-main);">${item.model}</td>
+            <td><span style="display: inline-block; background: #1a202c; color: #fff; padding: 0.25rem 0.6rem; border-radius: 4px; font-family: monospace; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">${item.plate}</span></td>
+            <td><span class="badge" style="background: var(--bg-hover); color: var(--text-main);">${item.type || 'Mobil MPV'}</span></td>
+            <td style="text-align: center;">${statusBadge}</td>
+            <td style="font-size: 0.85rem; color: var(--text-sub);">${item.notes || '-'}</td>
+            <td style="text-align: center;">
+              <button class="btn btn-secondary btn-sm" onclick="openEditArmadaModal(${realIdx})" title="Edit Mobil">✏️ Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteArmada(${realIdx})" title="Hapus Unit">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openNewArmadaModal() {
+      document.getElementById('armada-modal-title').textContent = '🚘 Tambah Unit Mobil / Armada Baru';
+      document.getElementById('armada-idx').value = '';
+      document.getElementById('armada-model').value = '';
+      document.getElementById('armada-plate').value = '';
+      document.getElementById('armada-type').value = 'Mobil MPV';
+      document.getElementById('armada-status').value = 'READY';
+      document.getElementById('armada-notes').value = '';
+      document.getElementById('armada-modal').style.display = 'flex';
+    }
+
+    function openEditArmadaModal(idx) {
+      const item = masterArmada[idx];
+      if (!item) return;
+      document.getElementById('armada-modal-title').textContent = '✏️ Edit Data Unit Armada';
+      document.getElementById('armada-idx').value = idx;
+      document.getElementById('armada-model').value = item.model || '';
+      document.getElementById('armada-plate').value = item.plate || '';
+      document.getElementById('armada-type').value = item.type || 'Mobil MPV';
+      document.getElementById('armada-status').value = item.status || 'READY';
+      document.getElementById('armada-notes').value = item.notes || '';
+      document.getElementById('armada-modal').style.display = 'flex';
+    }
+
+    function closeArmadaModal() {
+      document.getElementById('armada-modal').style.display = 'none';
+    }
+
+    function handleSaveArmada(e) {
+      e.preventDefault();
+      const idx = document.getElementById('armada-idx').value;
+      const model = document.getElementById('armada-model').value.trim();
+      const plate = document.getElementById('armada-plate').value.trim().toUpperCase();
+      const type = document.getElementById('armada-type').value;
+      const status = document.getElementById('armada-status').value;
+      const notes = document.getElementById('armada-notes').value.trim();
+
+      if (!model || !plate) {
+        alert('Nama Mobil/Model dan Plat Nomor wajib diisi!');
+        return;
+      }
+
+      if (idx !== '') {
+        const i = parseInt(idx, 10);
+        masterArmada[i] = { ...masterArmada[i], model, plate, type, status, notes };
+        showToast('✅ Data mobil berhasil diperbarui!');
+      } else {
+        const newId = masterArmada.length > 0 ? Math.max(...masterArmada.map(a => a.id || 0)) + 1 : 1;
+        masterArmada.push({ id: newId, model, plate, type, status, notes });
+        showToast('🚘 Unit mobil baru berhasil ditambahkan!');
+      }
+
+      saveAll();
+      closeArmadaModal();
+    }
+
+    function deleteArmada(idx) {
+      const item = masterArmada[idx];
+      if (!item) return;
+      if (confirm(`Yakin hapus unit ${item.model} (${item.plate}) dari daftar armada?`)) {
+        masterArmada.splice(idx, 1);
+        saveAll();
+        showToast('🗑️ Unit mobil berhasil dihapus.');
+      }
     }
   </script>
 </body>
