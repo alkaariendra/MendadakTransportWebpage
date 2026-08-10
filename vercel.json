@@ -2,6 +2,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/rekap",
+      "destination": "/rekap.html"
+    },
+    {
       "source": "/",
       "has": [
         {
