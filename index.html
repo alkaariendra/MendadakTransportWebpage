@@ -2,6 +2,11 @@
 <html lang="id">
   <head>
     <meta charset="utf-8" />
+    <script>
+      if (window.location.hostname.startsWith('rekap.') && !window.location.pathname.endsWith('rekap.html')) {
+        window.location.replace('/rekap.html');
+      }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
