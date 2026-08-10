@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "rekap.mendadaktransport.my.id"
+        }
+      ],
+      "destination": "/rekap.html"
+    }
+  ]
+}
