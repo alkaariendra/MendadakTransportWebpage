@@ -1,5 +1,6 @@
 {
-  "redirects": [
+  "cleanUrls": true,
+  "rewrites": [
     {
       "source": "/",
       "has": [
@@ -8,8 +9,7 @@
           "value": "rekap.mendadaktransport.my.id"
         }
       ],
-      "destination": "/rekap.html",
-      "permanent": false
+      "destination": "/rekap.html"
     }
   ]
 }

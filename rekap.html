@@ -526,6 +526,11 @@
     let unitShareChart = null;
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Clean address bar so there is no .html in URL
+      if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
+        window.history.replaceState({}, document.title, '/');
+      }
+
       if (sessionStorage.getItem('fleet_auth') === 'true') {
         document.getElementById('lock-screen').style.display = 'none';
       }
