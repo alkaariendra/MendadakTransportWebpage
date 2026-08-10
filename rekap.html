@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Private Rekap Fleet & Kontrak | Mendadak Transport</title>
+  <title>Private Workspace & Pembukuan Rental | Mendadak Transport</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="assets/logo-mendadak-transport.png">
+  <!-- Chart.js for financial and fleet analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg-primary: #0b0f19;
+      --bg-primary: #090d16;
       --bg-secondary: #111827;
       --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-card-hover: rgba(26, 36, 56, 0.95);
       --border-color: rgba(255, 255, 255, 0.08);
       --border-active: rgba(215, 25, 32, 0.5);
       --text-primary: #f9fafb;
@@ -21,6 +24,7 @@
       --text-muted: #6b7280;
       --accent-red: #d71920;
       --accent-red-hover: #b8141a;
+      --accent-red-glow: rgba(215, 25, 32, 0.25);
       --status-ready: #10b981;
       --status-short: #f59e0b;
       --status-long: #3b82f6;
@@ -28,7 +32,7 @@
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 20px;
-      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -54,7 +58,7 @@
       border-radius: var(--radius-lg); padding: 2.5rem 2rem; width: 100%;
       max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
     }
-    .logo-img { height: 48px; width: auto; object-fit: contain; margin-bottom: 0.75rem; }
+    .logo-img { height: 48px; width: auto; object-fit: contain; margin-bottom: 0.75rem; background:#fff; padding: 4px 8px; border-radius: 8px; }
     .pin-input {
       width: 100%; padding: 0.85rem 1rem; background: var(--bg-primary);
       border: 1px solid var(--border-color); color: #fff; font-size: 1.25rem;
@@ -63,6 +67,7 @@
     }
     .pin-input:focus { border-color: var(--accent-red); }
 
+    /* Topbar */
     .topbar {
       display: flex; justify-content: space-between; align-items: center;
       padding: 0.85rem 2rem; background: rgba(11, 15, 25, 0.85);
@@ -70,58 +75,153 @@
       position: sticky; top: 0; z-index: 100;
     }
     .brand-group { display: flex; align-items: center; gap: 12px; }
-    .top-logo { height: 40px; width: auto; object-fit: contain; background: #fff; padding: 2px 8px; border-radius: 6px; }
+    .top-logo { height: 38px; width: auto; object-fit: contain; background: #fff; padding: 2px 8px; border-radius: 6px; }
     .brand-title { font-size: 1.15rem; font-weight: 700; color: #fff; }
     .brand-title span { color: var(--accent-red); }
     .brand-sub { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+    .header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
     .live-badge {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; background: rgba(16, 185, 129, 0.1);
       border: 1px solid rgba(16, 185, 129, 0.3); color: var(--status-ready);
       font-size: 0.8rem; font-weight: 600; border-radius: 9999px;
     }
-    .live-dot { width: 8px; height: 8px; background: var(--status-ready); border-radius: 50%; box-shadow: 0 0 8px var(--status-ready); }
-    .nav-tabs { display: flex; gap: 0.5rem; padding: 0 2rem; background: rgba(17, 24, 39, 0.5); border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+    .live-dot { width: 8px; height: 8px; background: var(--status-ready); border-radius: 50%; box-shadow: 0 0 8px var(--status-ready); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex; gap: 0.5rem; padding: 0 2rem;
+      background: rgba(17, 24, 39, 0.5); border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
     .tab-btn {
-      padding: 1rem 1.25rem; background: transparent; border: none;
+      padding: 0.9rem 1.25rem; background: transparent; border: none;
       color: var(--text-secondary); font-size: 0.9rem; font-weight: 600;
       cursor: pointer; display: flex; align-items: center; gap: 8px;
       border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
     }
+    .tab-btn:hover { color: #fff; }
     .tab-btn.active { color: #fff; border-bottom-color: var(--accent-red); }
-    .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 2rem; flex: 1; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+
+    /* Container */
+    .container { max-width: 1440px; width: 100%; margin: 0 auto; padding: 1.75rem; flex: 1; }
+
+    /* KPI Summary Cards */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem; margin-bottom: 1.75rem;
+    }
     .stat-card {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; position: relative;
+      border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex;
+      flex-direction: column; gap: 0.4rem; position: relative; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
     .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+    .stat-card.rev::before { background: var(--status-ready); }
+    .stat-card.exp::before { background: var(--status-service); }
+    .stat-card.profit::before { background: var(--accent-red); }
     .stat-card.ready::before { background: var(--status-ready); }
-    .stat-card.short::before { background: var(--status-short); }
-    .stat-card.long::before { background: var(--status-long); }
-    .stat-card.rev::before { background: var(--accent-red); }
-    .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
-    .stat-value { font-size: 1.75rem; font-weight: 800; color: #fff; }
-    .section { display: none; }
-    .section.active { display: block; }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.5rem; }
+    .stat-card.busy::before { background: var(--status-short); }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
+    .stat-value { font-size: 1.65rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Grid Layouts for Work Area */
+    .dashboard-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;
+    }
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 1.5rem; display: flex;
+      flex-direction: column; gap: 1rem;
+    }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; }
+    .chart-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+
+    /* Work Form Box (Bisa Ketik Langsung di Web) */
+    .quick-entry-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.75rem;
+    }
+    .entry-form-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem; margin-top: 1rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+    .form-input, .form-select, .form-textarea {
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      color: #fff; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm);
+      font-size: 0.85rem; outline: none; font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--border-active);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 0.65rem 1.25rem; border-radius: var(--radius-sm); font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s ease;
+    }
+    .btn-primary { background: var(--accent-red); color: #fff; }
+    .btn-primary:hover { background: var(--accent-red-hover); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+    .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
+    .btn-success { background: var(--status-ready); color: #fff; }
+    .btn-danger { background: var(--status-service); color: #fff; }
+
+    /* Tables */
+    .table-wrapper {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); overflow-x: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    .custom-table th {
+      background: rgba(0, 0, 0, 0.4); padding: 0.85rem 1rem; color: var(--text-secondary);
+      font-weight: 600; font-size: 0.75rem; border-bottom: 1px solid var(--border-color); text-transform: uppercase;
+    }
+    .custom-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .custom-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
+    .badge-ready { background: rgba(16, 185, 129, 0.12); color: var(--status-ready); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-short { background: rgba(245, 158, 11, 0.12); color: var(--status-short); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-long { background: rgba(59, 130, 246, 0.12); color: var(--status-long); border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-service { background: rgba(239, 68, 68, 0.12); color: var(--status-service); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Fleet Cards Grid */
+    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.25rem; }
     .fleet-card {
       background: var(--bg-card); border: 1px solid var(--border-color);
       border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
     }
-    .fleet-plate { display: inline-block; background: #000; color: #fff; font-weight: 700; font-size: 0.85rem; padding: 2px 8px; border-radius: 4px; border: 1px solid #333; margin-top: 4px; }
-    .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
-    .badge-ready { background: rgba(16, 185, 129, 0.12); color: var(--status-ready); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-short { background: rgba(245, 158, 11, 0.12); color: var(--status-short); border: 1px solid rgba(245, 158, 11, 0.3); }
-    .badge-long { background: rgba(59, 130, 246, 0.12); color: var(--status-long); border: 1px solid rgba(59, 130, 246, 0.3); }
-    .table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow-x: auto; }
-    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-    .custom-table th { background: rgba(0, 0, 0, 0.4); padding: 0.85rem 1rem; color: var(--text-secondary); font-weight: 600; font-size: 0.75rem; border-bottom: 1px solid var(--border-color); }
-    .custom-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); }
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; }
-    .btn-primary { background: var(--accent-red); color: #fff; }
-    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-color); }
+    .fleet-plate { display: inline-block; background: #000; color: #fff; font-weight: 700; font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; border: 1px solid #333; margin-top: 2px; }
+
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
+    .section-title { font-size: 1.3rem; font-weight: 700; color: #fff; }
+
+    /* Toast */
+    .toast-box {
+      position: fixed; bottom: 2rem; right: 2rem; background: #1f2937;
+      border-left: 4px solid var(--status-ready); color: #fff; padding: 1rem 1.5rem;
+      border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 99999;
+      display: none; animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   </style>
 </head>
 <body>
@@ -129,134 +229,670 @@
   <!-- Lock Screen Modal -->
   <div id="lock-screen">
     <div class="lock-box">
-      <img src="assets/logo-mendadak-transport.png" alt="Mendadak Transport Logo" class="logo-img" style="background:#fff; padding: 4px 8px; border-radius: 8px;">
+      <img src="assets/logo-mendadak-transport.png" alt="Mendadak Transport Logo" class="logo-img">
       <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Private Fleet &amp; Auto-Rekap Control</p>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">Interactive Fleet &amp; Cashflow Workspace</p>
       <form id="pin-form" onsubmit="handlePinSubmit(event)">
         <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="6" autofocus required>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Buka Dashboard</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Buka Workspace</button>
       </form>
       <p id="pin-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 0.75rem; display: none;">PIN salah, silakan coba lagi.</p>
     </div>
   </div>
 
+  <!-- Header -->
   <header class="topbar">
     <div class="brand-group">
       <img src="assets/logo-mendadak-transport.png" alt="Logo" class="top-logo">
       <div>
         <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-        <div class="brand-sub">Auto-Rekap &amp; Fleet Management</div>
+        <div class="brand-sub">Workspace Operasional &amp; Pembukuan Kas</div>
       </div>
     </div>
-    <div style="display: flex; gap: 1rem; align-items: center;">
-      <div class="live-badge"><div class="live-dot"></div><span>Sync Telegram Bot (24 Jam)</span></div>
-      <a href="/" class="btn btn-secondary">🌐 Website</a>
-      <button class="btn btn-secondary" onclick="lockOut()">🔒 Kunci</button>
+    <div class="header-actions">
+      <div class="live-badge"><div class="live-dot"></div><span>Sync Telegram Bot</span></div>
+      <button class="btn btn-primary btn-sm" onclick="switchTab('tab-invoices')">➕ Buat Invoice</button>
+      <button class="btn btn-secondary btn-sm" onclick="switchTab('tab-pembukuan')">💵 Catat Kas</button>
+      <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
     </div>
   </header>
 
+  <!-- Navigation Tabs -->
   <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-armada')">🚗 Ketersediaan Armada</button>
-    <button class="tab-btn" onclick="switchTab('tab-dispatches')">📋 Log Masuk-Keluar (Dispatch)</button>
-    <button class="tab-btn" onclick="switchTab('tab-contracts')">📑 Rekap Kontrak &amp; Auto-Invoice</button>
+    <button class="tab-btn active" onclick="switchTab('tab-dashboard')">📊 Dashboard &amp; Grafik Keuangan</button>
+    <button class="tab-btn" onclick="switchTab('tab-pembukuan')">💵 Pembukuan Kas (Inflow &amp; Outflow)</button>
+    <button class="tab-btn" onclick="switchTab('tab-invoices')">📑 Kelola Invoice &amp; Kontrak</button>
+    <button class="tab-btn" onclick="switchTab('tab-armada')">🚗 Status Armada &amp; Dispatch</button>
   </nav>
 
+  <!-- Main Workspace -->
   <main class="container">
-    <div class="stats-grid">
-      <div class="stat-card ready"><span class="stat-label">Siaga / Ready</span><div class="stat-value" id="st-ready">9 Unit</div></div>
-      <div class="stat-card short"><span class="stat-label">Sewa Harian</span><div class="stat-value" id="st-short">0 Unit</div></div>
-      <div class="stat-card long"><span class="stat-label">Kontrak Bulanan</span><div class="stat-value" id="st-long">1 Unit</div></div>
-      <div class="stat-card rev"><span class="stat-label">Total Omset Rekap</span><div class="stat-value" id="st-rev">Rp 15.650.000</div></div>
-      <div class="stat-card ready"><span class="stat-label">Total Unit</span><div class="stat-value" id="st-total">10 Unit</div></div>
-    </div>
 
-    <!-- Tab 1: Armada -->
-    <section id="tab-armada" class="section active">
+    <!-- KPI Summary Row -->
+    <section class="stats-grid">
+      <div class="stat-card rev">
+        <span class="stat-label">Total Omset / Pemasukan</span>
+        <div class="stat-value" id="kpi-inflow">Rp 15.650.000</div>
+        <span class="stat-sub">Dari 5 transaksi invoice</span>
+      </div>
+      <div class="stat-card exp">
+        <span class="stat-label">Total Pengeluaran Kas</span>
+        <div class="stat-value" id="kpi-outflow">Rp 2.450.000</div>
+        <span class="stat-sub">BBM, Cuci, Servis, Komisi</span>
+      </div>
+      <div class="stat-card profit">
+        <span class="stat-label">Laba Bersih (Net Profit)</span>
+        <div class="stat-value" id="kpi-net">Rp 13.200.000</div>
+        <span class="stat-sub">Margin profit bersih rental</span>
+      </div>
+      <div class="stat-card ready">
+        <span class="stat-label">Armada Siaga / Ready</span>
+        <div class="stat-value" id="kpi-ready">9 Unit</div>
+        <span class="stat-sub">Dari total 10 armada</span>
+      </div>
+      <div class="stat-card busy">
+        <span class="stat-label">Sewa &amp; Kontrak Aktif</span>
+        <div class="stat-value" id="kpi-active">1 Unit</div>
+        <span class="stat-sub">Sedang berjalan</span>
+      </div>
+    </section>
+
+    <!-- TAB 1: DASHBOARD & CHARTS -->
+    <section id="tab-dashboard" class="section active">
+      <div class="dashboard-grid">
+        <!-- Chart 1: Arus Kas & Omset -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">📈 Tren Pendapatan &amp; Pengeluaran Rental (2025/2026)</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Real-time chart</span>
+          </div>
+          <div style="height: 280px; position: relative;">
+            <canvas id="cashflowChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Utilitas Armada Terlaris -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">🚘 Unit Paling Sering Disewa</h3>
+          </div>
+          <div style="height: 280px; position: relative;">
+            <canvas id="carUsageChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Table on Dashboard -->
       <div class="section-header">
-        <h2>Status Ketersediaan Armada</h2>
+        <h2 class="section-title">5 Transaksi Invoice Terbaru</h2>
+        <button class="btn btn-secondary btn-sm" onclick="exportCsv('invoices')">📥 Export CSV</button>
       </div>
-      <div class="fleet-grid" id="grid-armada">
-        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">All New Avanza</div><div class="fleet-plate">DR 1001 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 25.100 · BBM: Full</p></div>
-        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Mitsubishi Xpander</div><div class="fleet-plate">DR 1002 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 31.000 · BBM: Full</p></div>
-        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Innova Reborn</div><div class="fleet-plate">DR 1003 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 42.000 · BBM: Full</p></div>
-        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Innova Zenix</div><div class="fleet-plate">DR 1004 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 15.000 · BBM: Full</p></div>
-        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Fortuner GR</div><div class="fleet-plate">DR 1005 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 28.000 · BBM: Full</p></div>
-        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Alphard Transformer</div><div class="fleet-plate">DR 1006 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 18.000 · BBM: Full</p></div>
-      </div>
-    </section>
-
-    <!-- Tab 2: Dispatches -->
-    <section id="tab-dispatches" class="section">
-      <div class="section-header"><h2>Log Riwayat Serah Terima</h2></div>
       <div class="table-wrapper">
         <table class="custom-table">
-          <thead><tr><th>No Log</th><th>Aksi</th><th>Unit Mobil</th><th>Penyewa</th><th>KM</th><th>BBM</th><th>Waktu &amp; Catatan</th></tr></thead>
-          <tbody id="tbl-dispatches">
-            <tr><td>LOG-202512-005</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Reborn (DR 1003 MT)</td><td>Bpk Made Takuya (Selesai)</td><td>25.500 KM</td><td>Full</td><td>Selesai aman [GF-677/BC/XII/2025]</td></tr>
-            <tr><td>LOG-202512-004</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Fortuner VRZ (DR 1005 MT)</td><td>Bpk Anang Irianto (Selesai)</td><td>28.400 KM</td><td>Full</td><td>Selesai aman [GF-676/BC/XII/2025]</td></tr>
-            <tr><td>LOG-202512-003</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Zenix Q (DR 1004 MT)</td><td>Ibu Hairunnisa (Selesai)</td><td>15.350 KM</td><td>Full</td><td>Selesai aman [GF-675/BC/XII/2025]</td></tr>
-            <tr><td>LOG-202512-002</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Reborn (DR 1003 MT)</td><td>Ibu Rizelsa Aura (Selesai)</td><td>42.600 KM</td><td>Full</td><td>Selesai aman [GF-674/BC/XII/2025]</td></tr>
-            <tr><td>LOG-202512-001</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Reborn (DR 1003 MT)</td><td>Ibu Fatimah (Selesai)</td><td>43.100 KM</td><td>Full</td><td>Selesai aman [GF-673/BC/XII/2025]</td></tr>
+          <thead>
+            <tr>
+              <th>No Invoice</th>
+              <th>Customer</th>
+              <th>Unit Mobil</th>
+              <th>Periode Sewa</th>
+              <th>Durasi</th>
+              <th>Total Biaya</th>
+              <th>Status Bayar</th>
+              <th>Aksi Langsung</th>
+            </tr>
+          </thead>
+          <tbody id="dash-invoice-table">
+            <!-- Rendered by JS -->
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- Tab 3: Contracts & Invoices -->
-    <section id="tab-contracts" class="section">
-      <div class="section-header"><h2>Rekap Kontrak Sewa &amp; Auto-Invoice</h2></div>
+    <!-- TAB 2: PEMBUKUAN KAS (BISA INPUT LANGSUNG DI WEB) -->
+    <section id="tab-pembukuan" class="section">
+      <div class="quick-entry-card">
+        <div class="section-header" style="margin-bottom: 0.5rem;">
+          <h3 class="chart-title">💵 Form Catat Kas Masuk / Kas Keluar Langsung</h3>
+          <span style="font-size:0.8rem; color:var(--text-secondary);">Ketik di sini, data langsung tersimpan &amp; menghitung laba otomatis</span>
+        </div>
+        <form id="cash-entry-form" onsubmit="handleCashEntry(event)">
+          <div class="entry-form-grid">
+            <div class="form-group">
+              <label class="form-label">Jenis Kas</label>
+              <select id="cash-type" class="form-select" required>
+                <option value="OUT">🔴 Pengeluaran (BBM / Servis / Cuci / Driver)</option>
+                <option value="IN">🟢 Pemasukan (Pelunasan Sewa / DP / Tambahan)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kategori</label>
+              <select id="cash-cat" class="form-select">
+                <option value="BBM / Bensin">BBM / Bensin</option>
+                <option value="Cuci Mobil">Cuci Mobil</option>
+                <option value="Servis & Oli">Servis &amp; Ganti Oli</option>
+                <option value="Gaji / Fee Driver">Fee / Gaji Driver</option>
+                <option value="Sewa Mobil">Sewa Mobil Pelanggan</option>
+                <option value="Lain-lain">Lain-lain / Operasional</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nominal (Rp)</label>
+              <input type="number" id="cash-amount" class="form-input" placeholder="Contoh: 150000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal</label>
+              <input type="date" id="cash-date" class="form-input" required>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Keterangan / Rincian</label>
+              <input type="text" id="cash-desc" class="form-input" placeholder="Misal: Beli Pertamax Innova DR 1003 MT atau Cuci Mobil Xpander" required>
+            </div>
+          </div>
+          <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary">💾 Simpan Catatan Kas</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabel Buku Kas -->
+      <div class="section-header">
+        <h2 class="section-title">Buku Jurnal Kas Harian</h2>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="exportCsv('cashflow')">📥 Export Buku Kas</button>
+        </div>
+      </div>
       <div class="table-wrapper">
         <table class="custom-table">
-          <thead><tr><th>No Invoice / Kontrak</th><th>Customer / Klien</th><th>Unit Mobil</th><th>Periode</th><th>Durasi</th><th>Total Tarif</th><th>Status</th></tr></thead>
-          <tbody id="tbl-contracts">
-            <tr><td><strong>MT-673/INV/XII/2025</strong></td><td>Ibu Fatimah</td><td>Innova Reborn</td><td>01–05 Des 2025</td><td>5 Hari</td><td><strong>Rp 4.500.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
-            <tr><td><strong>MT-674/INV/XII/2025</strong></td><td>Ibu Rizelsa Aura</td><td>Innova Reborn</td><td>07–11 Des 2025</td><td>4 Hari</td><td><strong>Rp 2.000.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
-            <tr><td><strong>MT-675/INV/XII/2025</strong></td><td>Ibu Hairunnisa</td><td>Innova Zenix Q</td><td>14–16 Des 2025</td><td>3 Hari</td><td><strong>Rp 3.000.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
-            <tr><td><strong>MT-676/INV/XII/2025</strong></td><td>Bpk Anang Irianto</td><td>Fortuner VRZ</td><td>16–19 Des 2025</td><td>4 Hari</td><td><strong>Rp 4.000.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
-            <tr><td><strong>MT-677/INV/XII/2025</strong></td><td>Bpk Made Takuya</td><td>Innova Reborn</td><td>21–25 Des 2025</td><td>4 Hari</td><td><strong>Rp 2.150.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Tipe</th>
+              <th>Kategori</th>
+              <th>Keterangan / Rincian</th>
+              <th>Nominal Masuk</th>
+              <th>Nominal Keluar</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="cash-table-body">
+            <!-- Dynamic Cash Entries -->
           </tbody>
         </table>
       </div>
     </section>
+
+    <!-- TAB 3: MANAJEMEN INVOICE & KONTRAK (BISA KETIK LANGSUNG DI WEB) -->
+    <section id="tab-invoices" class="section">
+      <div class="quick-entry-card">
+        <div class="section-header" style="margin-bottom: 0.5rem;">
+          <h3 class="chart-title">📑 Form Buat Invoice / Kontrak Sewa Langsung di Web</h3>
+          <span style="font-size:0.8rem; color:var(--text-secondary);">Tersimpan otomatis ke database &amp; siap cetak PDF</span>
+        </div>
+        <form id="invoice-entry-form" onsubmit="handleInvoiceEntry(event)">
+          <div class="entry-form-grid">
+            <div class="form-group">
+              <label class="form-label">Nama Customer / Klien</label>
+              <input type="text" id="inv-client" class="form-input" placeholder="Contoh: Ibu Rina / PT Semesta" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pilih Unit Mobil</label>
+              <select id="inv-car" class="form-select" required>
+                <option value="Toyota Innova Reborn">Toyota Innova Reborn</option>
+                <option value="Toyota Innova Zenix Q">Toyota Innova Zenix Q</option>
+                <option value="Toyota Fortuner VRZ">Toyota Fortuner VRZ</option>
+                <option value="All New Avanza">All New Avanza</option>
+                <option value="Mitsubishi Xpander">Mitsubishi Xpander</option>
+                <option value="Toyota Alphard">Toyota Alphard</option>
+                <option value="Toyota Hiace Premio">Toyota Hiace Premio</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Layanan</label>
+              <select id="inv-service" class="form-select">
+                <option value="Sewa Mobil LK">Sewa Mobil LK (Lepas Kunci)</option>
+                <option value="Sewa Mobil Include">Sewa Mobil Include (Driver+BBM)</option>
+                <option value="Kontrak Bulanan">Kontrak Bulanan Perusahaan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Durasi (Hari / Bulan)</label>
+              <input type="number" id="inv-duration" class="form-input" value="3" min="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Mulai Sewa</label>
+              <input type="date" id="inv-start" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tarif Per Hari (Rp)</label>
+              <input type="number" id="inv-rate" class="form-input" placeholder="500000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Biaya Tambahan / Ongkir (Rp)</label>
+              <input type="number" id="inv-extra" class="form-input" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status Bayar</label>
+              <select id="inv-payment" class="form-select">
+                <option value="LUNAS (CASH)">LUNAS (CASH)</option>
+                <option value="LUNAS (TRANSFER)">LUNAS (TRANSFER)</option>
+                <option value="DP (UANG MUKA)">DP (UANG MUKA)</option>
+                <option value="BELUM BAYAR">BELUM BAYAR</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="submit" class="btn btn-primary">💾 Simpan &amp; Tambahkan ke Rekap</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">Daftar Rekap Invoice &amp; Kontrak Aktif</h2>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="exportCsv('invoices')">📥 Export Rekap</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>No Invoice / Kontrak</th>
+              <th>Customer</th>
+              <th>Unit Mobil</th>
+              <th>Layanan</th>
+              <th>Periode Sewa</th>
+              <th>Durasi</th>
+              <th>Total Tarif</th>
+              <th>Status Bayar</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="invoices-full-table">
+            <!-- Dynamic Invoices Table -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 4: STATUS ARMADA & DISPATCH -->
+    <section id="tab-armada" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Status Ketersediaan 10 Armada</h2>
+        <span style="font-size:0.85rem; color:var(--text-secondary);">Klik tombol status untuk ubah langsung</span>
+      </div>
+      <div class="fleet-grid" id="fleet-live-grid">
+        <!-- Rendered by JS with interactive status toggle -->
+      </div>
+    </section>
+
   </main>
+
+  <!-- Toast Box -->
+  <div id="toast" class="toast-box"></div>
 
   <script>
     const DEFAULT_PIN = "1234";
 
+    // ── DATA STORE (State) ──
+    let invoicesData = [
+      { id: 'MT-673/INV/XII/2025', client: 'Ibu Fatimah', car: 'Toyota Innova Reborn', service: 'Sewa Mobil Include', start: '01 Des 2025', end: '05 Des 2025', dur: 5, rate: 900000, extra: 0, total: 4500000, status: 'LUNAS (CASH)' },
+      { id: 'MT-674/INV/XII/2025', client: 'Ibu Rizelsa Aura', car: 'Toyota Innova Reborn', service: 'Sewa Mobil LK', start: '07 Des 2025', end: '11 Des 2025', dur: 4, rate: 500000, extra: 0, total: 2000000, status: 'LUNAS (CASH)' },
+      { id: 'MT-675/INV/XII/2025', client: 'Ibu Hairunnisa', car: 'Toyota Innova Zenix Q', service: 'Sewa Mobil LK', start: '14 Des 2025', end: '16 Des 2025', dur: 3, rate: 1000000, extra: 0, total: 3000000, status: 'LUNAS (CASH)' },
+      { id: 'MT-676/INV/XII/2025', client: 'Bpk Anang Irianto', car: 'Toyota Fortuner VRZ', service: 'Sewa Mobil LK', start: '16 Des 2025', end: '19 Des 2025', dur: 4, rate: 1000000, extra: 0, total: 4000000, status: 'LUNAS (CASH)' },
+      { id: 'MT-677/INV/XII/2025', client: 'Bpk Made Takuya', car: 'Toyota Innova Reborn', service: 'Sewa Mobil LK', start: '21 Des 2025', end: '25 Des 2025', dur: 4, rate: 500000, extra: 150000, total: 2150000, status: 'LUNAS (CASH)' }
+    ];
+
+    let cashEntries = [
+      { id: 1, date: '2025-12-05', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Ibu Fatimah (5 Hari Include)', in: 4500000, out: 0 },
+      { id: 2, date: '2025-12-06', type: 'OUT', cat: 'BBM / Bensin', desc: 'Isi Pertamax Innova Reborn DR 1003 MT', in: 0, out: 400000 },
+      { id: 3, date: '2025-12-06', type: 'OUT', cat: 'Cuci Mobil', desc: 'Cuci poles bersih Innova Reborn', in: 0, out: 50000 },
+      { id: 4, date: '2025-12-08', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Ibu Rizelsa Aura (4 Hari LK)', in: 2000000, out: 0 },
+      { id: 5, date: '2025-12-12', type: 'OUT', cat: 'Servis & Oli', desc: 'Ganti Oli & Filter Innova Reborn DR 1003 MT', in: 0, out: 650000 },
+      { id: 6, date: '2025-12-16', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Ibu Hairunnisa (Zenix 3 Hari)', in: 3000000, out: 0 },
+      { id: 7, date: '2025-12-19', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Sewa Bpk Anang (Fortuner 4 Hari)', in: 4000000, out: 0 },
+      { id: 8, date: '2025-12-20', type: 'OUT', cat: 'Gaji / Fee Driver', desc: 'Fee Driver Luar Kota Mandalika Tour', in: 0, out: 1200000 },
+      { id: 9, date: '2025-12-25', type: 'IN', cat: 'Sewa Mobil', desc: 'Pelunasan Bpk Made Takuya (+ Ongkir PP)', in: 2150000, out: 0 },
+      { id: 10, date: '2025-12-26', type: 'OUT', cat: 'BBM / Bensin', desc: 'Bensin Fortuner VRZ DR 1005 MT', in: 0, out: 150000 }
+    ];
+
+    let armadaList = [
+      { plate: 'DR 1001 MT', model: 'All New Avanza', km: 25100, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1002 MT', model: 'Mitsubishi Xpander', km: 31000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1003 MT', model: 'Toyota Innova Reborn', km: 42000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1004 MT', model: 'Toyota Innova Zenix Q', km: 15000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1005 MT', model: 'Toyota Fortuner VRZ', km: 28000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1006 MT', model: 'Toyota Alphard Transformer', km: 18000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1007 MT', model: 'Toyota Hiace Commuter', km: 55000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1008 MT', model: 'Toyota Hiace Premio', km: 22000, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1009 MT', model: 'Honda Brio RS', km: 19500, fuel: 'Full', status: 'READY' },
+      { plate: 'DR 1010 MT', model: 'Vespa Matic Sprint', km: 8200, fuel: 'Full', status: 'READY' }
+    ];
+
+    let cashflowChart = null;
+    let carUsageChart = null;
+
     document.addEventListener('DOMContentLoaded', () => {
+      // Set default dates
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('cash-date').value = today;
+      document.getElementById('inv-start').value = today;
+
+      // Check session
       if (sessionStorage.getItem('fleet_auth') === 'true') {
         document.getElementById('lock-screen').style.display = 'none';
       }
-      fetchLiveSync();
+
+      // Load saved storage
+      loadStoredData();
+      renderAll();
+      initCharts();
     });
 
-    async function fetchLiveSync() {
-      try {
-        const res = await fetch('http://124.156.199.159:3859/api/fleet/contracts');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.ok && data.contracts && data.contracts.length > 0) {
-          renderLiveContracts(data.contracts);
-        }
-      } catch (e) {
-        // Fallback to static table
+    function loadStoredData() {
+      const storedInv = localStorage.getItem('mt_invoices');
+      if (storedInv) invoicesData = JSON.parse(storedInv);
+
+      const storedCash = localStorage.getItem('mt_cash');
+      if (storedCash) cashEntries = JSON.parse(storedCash);
+
+      const storedArmada = localStorage.getItem('mt_armada');
+      if (storedArmada) armadaList = JSON.parse(storedArmada);
+    }
+
+    function saveAll() {
+      localStorage.setItem('mt_invoices', JSON.stringify(invoicesData));
+      localStorage.setItem('mt_cash', JSON.stringify(cashEntries));
+      localStorage.setItem('mt_armada', JSON.stringify(armadaList));
+      renderAll();
+      updateCharts();
+    }
+
+    function renderAll() {
+      // 1. Calculate Totals
+      const totalIn = cashEntries.reduce((acc, c) => acc + (c.in || 0), 0);
+      const totalOut = cashEntries.reduce((acc, c) => acc + (c.out || 0), 0);
+      const netProfit = totalIn - totalOut;
+
+      const readyCount = armadaList.filter(a => a.status === 'READY').length;
+      const busyCount = armadaList.filter(a => a.status !== 'READY').length;
+
+      document.getElementById('kpi-inflow').textContent = `Rp ${totalIn.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-outflow').textContent = `Rp ${totalOut.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-net').textContent = `Rp ${netProfit.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-ready').textContent = `${readyCount} Unit`;
+      document.getElementById('kpi-active').textContent = `${busyCount} Unit`;
+
+      // 2. Render Dash Invoices
+      const dashTable = document.getElementById('dash-invoice-table');
+      dashTable.innerHTML = invoicesData.slice(0, 5).map(inv => `
+        <tr>
+          <td><strong>${inv.id}</strong></td>
+          <td><strong>${inv.client}</strong></td>
+          <td>${inv.car}</td>
+          <td>${inv.start} s/d ${inv.end}</td>
+          <td>${inv.dur} Hari</td>
+          <td><strong>Rp ${inv.total.toLocaleString('id-ID')}</strong></td>
+          <td><span class="badge badge-ready">${inv.status}</span></td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="printInvoice('${inv.id}')">🖨️ Cetak</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 3. Render Full Invoices
+      const fullTable = document.getElementById('invoices-full-table');
+      fullTable.innerHTML = invoicesData.map((inv, idx) => `
+        <tr>
+          <td><strong>${inv.id}</strong></td>
+          <td><strong>${inv.client}</strong></td>
+          <td>${inv.car}</td>
+          <td><small>${inv.service}</small></td>
+          <td>${inv.start} s/d ${inv.end}</td>
+          <td>${inv.dur} Hari</td>
+          <td><strong>Rp ${inv.total.toLocaleString('id-ID')}</strong></td>
+          <td>
+            <select class="form-select" style="padding: 2px 6px; font-size:0.75rem;" onchange="updatePaymentStatus(${idx}, this.value)">
+              <option value="LUNAS (CASH)" ${inv.status.includes('CASH') ? 'selected' : ''}>LUNAS (CASH)</option>
+              <option value="LUNAS (TRANSFER)" ${inv.status.includes('TRANSFER') ? 'selected' : ''}>LUNAS (TRANSFER)</option>
+              <option value="DP (UANG MUKA)" ${inv.status.includes('DP') ? 'selected' : ''}>DP (UANG MUKA)</option>
+              <option value="BELUM BAYAR" ${inv.status.includes('BELUM') ? 'selected' : ''}>BELUM BAYAR</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="printInvoice('${inv.id}')">🖨️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteInvoice(${idx})">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 4. Render Cash Entries Table
+      const cashTable = document.getElementById('cash-table-body');
+      cashTable.innerHTML = cashEntries.map((c, idx) => `
+        <tr>
+          <td>${c.date}</td>
+          <td><span class="badge ${c.type === 'IN' ? 'badge-ready' : 'badge-service'}">${c.type === 'IN' ? '🟢 MASUK' : '🔴 KELUAR'}</span></td>
+          <td><strong>${c.cat}</strong></td>
+          <td>${c.desc}</td>
+          <td style="color: var(--status-ready); font-weight:700;">${c.in > 0 ? 'Rp ' + c.in.toLocaleString('id-ID') : '-'}</td>
+          <td style="color: var(--status-service); font-weight:700;">${c.out > 0 ? 'Rp ' + c.out.toLocaleString('id-ID') : '-'}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteCashEntry(${idx})">🗑️</button></td>
+        </tr>
+      `).join('');
+
+      // 5. Render Armada List
+      const fleetGrid = document.getElementById('fleet-live-grid');
+      fleetGrid.innerHTML = armadaList.map((car, idx) => {
+        let badge = car.status === 'READY' ? 'badge-ready' : car.status === 'SEWA' ? 'badge-short' : 'badge-service';
+        return `
+          <div class="fleet-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <div style="font-weight:700; font-size:1.1rem; color:#fff;">${car.model}</div>
+                <div class="fleet-plate">${car.plate}</div>
+              </div>
+              <span class="badge ${badge}">${car.status}</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-secondary); background:rgba(0,0,0,0.3); padding:8px; border-radius:6px;">
+              KM Odometer: <strong>${car.km.toLocaleString('id-ID')} KM</strong> · BBM: <strong>${car.fuel}</strong>
+            </div>
+            <div style="display:flex; gap:6px; margin-top:auto;">
+              <button class="btn btn-success btn-sm" style="flex:1;" onclick="setArmadaStatus(${idx}, 'READY')">🟢 Ready</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="setArmadaStatus(${idx}, 'SEWA')">🟡 Disewa</button>
+              <button class="btn btn-danger btn-sm" style="flex:1;" onclick="setArmadaStatus(${idx}, 'SERVIS')">🔴 Servis</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── FORM HANDLERS (MENGETIK LANGSUNG DI WEB) ──
+    function handleCashEntry(e) {
+      e.preventDefault();
+      const type = document.getElementById('cash-type').value;
+      const cat = document.getElementById('cash-cat').value;
+      const amount = Number(document.getElementById('cash-amount').value || 0);
+      const date = document.getElementById('cash-date').value;
+      const desc = document.getElementById('cash-desc').value;
+
+      cashEntries.unshift({
+        id: Date.now(),
+        date,
+        type,
+        cat,
+        desc,
+        in: type === 'IN' ? amount : 0,
+        out: type === 'OUT' ? amount : 0
+      });
+
+      saveAll();
+      showToast('✅ Catatan kas berhasil disimpan!');
+      document.getElementById('cash-amount').value = '';
+      document.getElementById('cash-desc').value = '';
+    }
+
+    function handleInvoiceEntry(e) {
+      e.preventDefault();
+      const client = document.getElementById('inv-client').value;
+      const car = document.getElementById('inv-car').value;
+      const service = document.getElementById('inv-service').value;
+      const duration = Number(document.getElementById('inv-duration').value || 1);
+      const start = document.getElementById('inv-start').value;
+      const rate = Number(document.getElementById('inv-rate').value || 0);
+      const extra = Number(document.getElementById('inv-extra').value || 0);
+      const status = document.getElementById('inv-payment').value;
+
+      const total = (duration * rate) + extra;
+      const randNum = Math.floor(100 + Math.random() * 900);
+      const invoiceNo = `MT-${randNum}/INV/VIII/2026`;
+
+      // End date calculate
+      const startDateObj = new Date(start);
+      const endDateObj = new Date(startDateObj.getTime() + (duration * 86400000));
+      const endStr = `${endDateObj.getDate()} ${endDateObj.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`;
+      const startStr = `${startDateObj.getDate()} ${startDateObj.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`;
+
+      invoicesData.unshift({
+        id: invoiceNo,
+        client,
+        car,
+        service,
+        start: startStr,
+        end: endStr,
+        dur: duration,
+        rate,
+        extra,
+        total,
+        status
+      });
+
+      // Auto record to Cashbook if LUNAS
+      if (status.includes('LUNAS')) {
+        cashEntries.unshift({
+          id: Date.now(),
+          date: start,
+          type: 'IN',
+          cat: 'Sewa Mobil',
+          desc: `Invoice ${invoiceNo} · ${client} (${car} ${duration} hari)`,
+          in: total,
+          out: 0
+        });
+      }
+
+      saveAll();
+      showToast(`✅ Invoice ${invoiceNo} untuk ${client} berhasil dibuat!`);
+      document.getElementById('inv-client').value = '';
+      document.getElementById('inv-rate').value = '';
+      document.getElementById('inv-extra').value = '';
+    }
+
+    function updatePaymentStatus(idx, val) {
+      invoicesData[idx].status = val;
+      saveAll();
+      showToast('✅ Status pembayaran diperbarui!');
+    }
+
+    function deleteInvoice(idx) {
+      if (confirm('Hapus data invoice ini dari rekap?')) {
+        invoicesData.splice(idx, 1);
+        saveAll();
       }
     }
 
-    function renderLiveContracts(list) {
-      const tbody = document.getElementById('tbl-contracts');
-      if (!tbody || list.length === 0) return;
-      tbody.innerHTML = list.map(c => `
-        <tr>
-          <td><strong>${c.contract_no}</strong></td>
-          <td>${c.client_name}</td>
-          <td>${c.model || c.plate_number}</td>
-          <td>${c.start_date} s/d ${c.end_date}</td>
-          <td>-</td>
-          <td><strong>Rp ${Number(c.total_rate || c.monthly_rate || 0).toLocaleString('id-ID')}</strong></td>
-          <td><span class="badge badge-ready">${c.payment_status || 'LUNAS'}</span></td>
-        </tr>
-      `).join('');
+    function deleteCashEntry(idx) {
+      if (confirm('Hapus catatan kas ini?')) {
+        cashEntries.splice(idx, 1);
+        saveAll();
+      }
+    }
+
+    function setArmadaStatus(idx, st) {
+      armadaList[idx].status = st;
+      saveAll();
+      showToast(`🚘 Status ${armadaList[idx].model} diubah menjadi ${st}`);
+    }
+
+    // ── CHARTS INITIALIZATION ──
+    function initCharts() {
+      // 1. Cashflow Bar Chart
+      const ctx1 = document.getElementById('cashflowChart').getContext('2d');
+      cashflowChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: ['Desember 2025', 'Januari 2026', 'Agustus 2026 (Live)'],
+          datasets: [
+            { label: 'Pemasukan (Rp)', data: [15650000, 18500000, 21500000], backgroundColor: '#10b981', borderRadius: 6 },
+            { label: 'Pengeluaran (Rp)', data: [2450000, 3100000, 3800000], backgroundColor: '#ef4444', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#9ca3af' } } },
+          scales: {
+            x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+
+      // 2. Car Usage Doughnut Chart
+      const ctx2 = document.getElementById('carUsageChart').getContext('2d');
+      carUsageChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: ['Innova Reborn', 'Fortuner VRZ', 'Innova Zenix', 'Avanza / Xpander', 'Hiace / Alphard'],
+          datasets: [{
+            data: [45, 20, 15, 12, 8],
+            backgroundColor: ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', boxWidth: 12 } } }
+        }
+      });
+    }
+
+    function updateCharts() {
+      if (cashflowChart) cashflowChart.update();
+      if (carUsageChart) carUsageChart.update();
+    }
+
+    function printInvoice(id) {
+      const inv = invoicesData.find(i => i.id === id);
+      if (!inv) return;
+      alert(`🖨️ Mencetak Invoice: ${inv.id}\nCustomer: ${inv.client}\nUnit: ${inv.car}\nTotal: Rp ${inv.total.toLocaleString('id-ID')}\n\n*Format PDF resmi berlogo Mendadak Transport juga tersedia otomatis di bot Telegram.`);
+    }
+
+    function exportCsv(type) {
+      let rows = [];
+      let filename = `export_mendadak_${type}_${Date.now()}.csv`;
+
+      if (type === 'invoices') {
+        rows.push(['No Invoice', 'Customer', 'Unit Mobil', 'Layanan', 'Mulai', 'Selesai', 'Durasi', 'Total Tarif', 'Status']);
+        invoicesData.forEach(i => rows.push([i.id, i.client, i.car, i.service, i.start, i.end, i.dur, i.total, i.status]));
+      } else {
+        rows.push(['Tanggal', 'Tipe', 'Kategori', 'Keterangan', 'Pemasukan', 'Pengeluaran']);
+        cashEntries.forEach(c => rows.push([c.date, c.type, c.cat, c.desc, c.in, c.out]));
+      }
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.map(x => `"${x || ''}"`).join(',')).join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
     function handlePinSubmit(e) {
