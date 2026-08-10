@@ -633,56 +633,56 @@
     <!-- ==================== TAB 4: LIST MOBIL & PLAT NOMOR (MASTER ARMADA) ==================== -->
     <section id="tab-armada" class="section">
       <!-- Summary Statistics for Armada -->
-      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem;">
+      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 1.25rem;">
         <div class="stat-card total" style="cursor: default;">
           <span class="stat-label">Total Unit Armada</span>
-          <span class="stat-val" id="stat-armada-total">0 Unit</span>
+          <span class="stat-value" id="stat-armada-total">0 Unit</span>
           <span class="stat-sub">Semua Kendaraan</span>
         </div>
-        <div class="stat-card" style="border-left: 4px solid var(--accent); cursor: default;">
+        <div class="stat-card feeyear" style="cursor: default;">
           <span class="stat-label">Dalam Kontrak</span>
-          <span class="stat-val" id="stat-armada-kontrak" style="color: var(--accent);">0 Unit</span>
+          <span class="stat-value" id="stat-armada-kontrak" style="color: #60a5fa;">0 Unit</span>
           <span class="stat-sub">Sewa Bulan/Tahun</span>
         </div>
         <div class="stat-card paid" style="cursor: default;">
           <span class="stat-label">Ready / Siaga</span>
-          <span class="stat-val" id="stat-armada-ready" style="color: var(--success);">0 Unit</span>
+          <span class="stat-value" id="stat-armada-ready" style="color: var(--color-lunas);">0 Unit</span>
           <span class="stat-sub">Siap Sewa Harian</span>
         </div>
-        <div class="stat-card fee" style="cursor: default;">
+        <div class="stat-card pending" style="cursor: default;">
           <span class="stat-label">Dalam Perbaikan</span>
-          <span class="stat-val" id="stat-armada-servis" style="color: var(--danger);">0 Unit</span>
+          <span class="stat-value" id="stat-armada-servis" style="color: var(--color-belum);">0 Unit</span>
           <span class="stat-sub">Servis / Maintenance</span>
         </div>
       </div>
 
       <!-- Header Action Bar for Armada -->
-      <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.25rem;">
+      <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
         <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
           <div>
-            <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem 0;">🚘 Master List Mobil &amp; Plat Nomor Armada</h2>
-            <p style="font-size: 0.825rem; color: var(--text-sub); margin: 0;">Kelola daftar seluruh kendaraan armada Mendadak Transport (Mobil &amp; Motor)</p>
+            <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 8px;">🚘 Master List Mobil &amp; Plat Nomor Armada</h2>
+            <p style="font-size: 0.825rem; color: var(--text-secondary); margin: 0;">Kelola daftar seluruh kendaraan armada Mendadak Transport (Mobil &amp; Motor)</p>
           </div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-            <input type="text" id="search-armada" class="form-input" placeholder="🔍 Cari mobil / plat..." oninput="renderArmadaTable()" style="width: 220px; padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="search-armada" class="form-input" placeholder="🔍 Cari mobil / plat..." oninput="renderArmadaTable()" style="width: 240px; padding: 0.5rem 0.85rem; font-size: 0.85rem; background: rgba(0,0,0,0.4);">
             <button class="btn btn-primary" onclick="openNewArmadaModal()">➕ Tambah Mobil / Unit Baru</button>
           </div>
         </div>
       </div>
 
       <!-- Armada Data Table -->
-      <div class="matrix-card">
-        <div class="table-container">
-          <table class="rekap-table" id="armada-table">
+      <div class="matrix-wrapper" style="margin-bottom: 1.5rem;">
+        <div class="table-container" style="overflow-x: auto;">
+          <table class="data-table armada-table" id="armada-table">
             <thead>
               <tr>
-                <th style="width: 45px; text-align: center;">No.</th>
-                <th>Nama Mobil / Model</th>
-                <th>Plat Nomor</th>
-                <th>Jenis / Kategori</th>
-                <th style="text-align: center;">Status Armada</th>
-                <th>Catatan / Pemilik</th>
-                <th style="text-align: center; width: 110px;">Aksi</th>
+                <th style="width: 60px; text-align: center;">No.</th>
+                <th style="min-width: 180px; text-align: left;">Nama Mobil / Model</th>
+                <th style="width: 140px; text-align: center;">Plat Nomor</th>
+                <th style="width: 150px; text-align: center;">Jenis / Kategori</th>
+                <th style="width: 150px; text-align: center;">Status Armada</th>
+                <th style="min-width: 200px; text-align: left;">Catatan / Pemilik</th>
+                <th style="width: 130px; text-align: center;">Aksi</th>
               </tr>
             </thead>
             <tbody id="armada-tbody">
@@ -2067,28 +2067,34 @@
         let statusBadge = '';
         const st = (item.status || 'READY').toUpperCase();
         if (st === 'KONTRAK') {
-          statusBadge = `<span class="badge" style="background: rgba(43,108,176,0.15); color: #2b6cb0; font-weight: 700;">🔵 KONTRAK</span>`;
+          statusBadge = `<span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); padding: 4px 10px; font-weight: 700;">🔵 KONTRAK</span>`;
         } else if (st === 'READY') {
-          statusBadge = `<span class="badge badge-paid">🟢 READY</span>`;
+          statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 10px; font-weight: 700;">🟢 READY</span>`;
         } else if (st === 'SEWA_HARIAN') {
-          statusBadge = `<span class="badge badge-pending">🟡 SEWA HARIAN</span>`;
+          statusBadge = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 10px; font-weight: 700;">🟡 SEWA HARIAN</span>`;
         } else {
-          statusBadge = `<span class="badge" style="background: rgba(229,62,62,0.15); color: #e53e3e; font-weight: 700;">🔴 SERVIS</span>`;
+          statusBadge = `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 10px; font-weight: 700;">🔴 SERVIS</span>`;
         }
 
         const realIdx = masterArmada.findIndex(x => x.id === item.id || (x.plate === item.plate && x.model === item.model));
 
         return `
           <tr>
-            <td style="text-align: center; font-weight: 700; color: var(--text-sub);">${idx + 1}</td>
-            <td style="font-weight: 700; color: var(--text-main);">${item.model}</td>
-            <td><span style="display: inline-block; background: #1a202c; color: #fff; padding: 0.25rem 0.6rem; border-radius: 4px; font-family: monospace; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">${item.plate}</span></td>
-            <td><span class="badge" style="background: var(--bg-hover); color: var(--text-main);">${item.type || 'Mobil MPV'}</span></td>
-            <td style="text-align: center;">${statusBadge}</td>
-            <td style="font-size: 0.85rem; color: var(--text-sub);">${item.notes || '-'}</td>
-            <td style="text-align: center;">
-              <button class="btn btn-secondary btn-sm" onclick="openEditArmadaModal(${realIdx})" title="Edit Mobil">✏️ Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteArmada(${realIdx})" title="Hapus Unit">🗑️</button>
+            <td style="text-align: center; font-weight: 700; color: var(--text-secondary); padding: 0.85rem 0.5rem;">${idx + 1}</td>
+            <td style="font-weight: 700; color: #fff; padding: 0.85rem; font-size: 0.9rem;">${item.model}</td>
+            <td style="text-align: center; padding: 0.85rem 0.5rem;">
+              <span style="display: inline-block; background: #090d16; color: #f8fafc; padding: 0.35rem 0.75rem; border-radius: 6px; font-family: 'Outfit', monospace; font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.4);">${item.plate}</span>
+            </td>
+            <td style="text-align: center; padding: 0.85rem 0.5rem;">
+              <span class="badge" style="background: rgba(255, 255, 255, 0.06); color: var(--text-secondary); border: 1px solid var(--border-color); padding: 4px 8px; font-size: 0.75rem;">${item.type || 'Mobil MPV'}</span>
+            </td>
+            <td style="text-align: center; padding: 0.85rem 0.5rem;">${statusBadge}</td>
+            <td style="font-size: 0.825rem; color: var(--text-secondary); padding: 0.85rem; line-height: 1.4;">${item.notes || '-'}</td>
+            <td style="text-align: center; padding: 0.85rem 0.5rem;">
+              <div style="display: inline-flex; gap: 0.4rem; justify-content: center; align-items: center;">
+                <button class="btn btn-edit btn-sm" onclick="openEditArmadaModal(${realIdx})" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Edit Mobil">✏️ Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteArmada(${realIdx})" style="padding: 0.35rem 0.55rem; font-size: 0.75rem;" title="Hapus Unit">🗑️</button>
+              </div>
             </td>
           </tr>
         `;
