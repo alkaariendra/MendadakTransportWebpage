@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Workspace Rekap Rental &amp; Kontrak | Mendadak Transport</title>
+  <title>Workspace Rekap Rental &amp; Pembukuan Kas | Mendadak Transport</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -154,6 +154,7 @@
     .stat-card.pending::before { background: var(--color-belum); }
     .stat-card.feemonth::before { background: var(--color-dp); }
     .stat-card.feeyear::before { background: #3b82f6; }
+    .stat-card.cashbalance::before { background: #8b5cf6; }
     
     .card-top-row { display: flex; justify-content: space-between; align-items: center; }
     .stat-label { font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; }
@@ -232,14 +233,14 @@
     .col-k-feethn { width: 4.8%; }
     .col-k-aksi { width: 4.1%; }
 
-    /* Daily Rentals Table */
-    .daily-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
-    .daily-table th {
+    /* Daily & Cashflow Table */
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
+    .data-table th {
       background: rgba(0, 0, 0, 0.6); padding: 0.65rem 0.85rem; color: var(--text-secondary);
       font-weight: 700; font-size: 0.72rem; border-bottom: 1px solid var(--border-color); text-transform: uppercase;
     }
-    .daily-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-    .daily-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    .data-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .data-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
 
     /* Month Cell Statuses */
     .cell-status {
@@ -257,6 +258,14 @@
       display: inline-block; background: #000; color: #fff; font-weight: 700;
       font-size: 0.67rem; padding: 2px 4px; border-radius: 3px; border: 1px solid #333;
     }
+
+    .source-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.72rem;
+    }
+    .source-bca { background: rgba(0, 90, 187, 0.2); color: #60a5fa; border: 1px solid rgba(0, 90, 187, 0.4); }
+    .source-mandiri { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .source-bri { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .source-cash { background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); }
 
     .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
     .badge-ready { background: rgba(16, 185, 129, 0.12); color: var(--color-lunas); border: 1px solid var(--color-lunas-border); }
@@ -347,11 +356,11 @@
       <img src="assets/logo-mendadak-transport.png" alt="Logo" class="top-logo">
       <div>
         <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
-        <div class="brand-sub">Workspace Operasional Rental &amp; Kontrak Unit</div>
+        <div class="brand-sub">Workspace Operasional Rental, Kontrak &amp; Pembukuan Kas</div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Interactive Drill-Down</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span>Sync Kas &amp; Armada</span></div>
       <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
@@ -363,6 +372,7 @@
     <div class="tab-group">
       <button class="tab-btn active" id="tab-btn-kontrak" onclick="switchTab('tab-kontrak')">📑 Rekap Kontrak Bulanan / Tahunan</button>
       <button class="tab-btn" id="tab-btn-harian" onclick="switchTab('tab-harian')">🚗 Rekap Sewa Keluar Harian &amp; Invoice</button>
+      <button class="tab-btn" id="tab-btn-kas" onclick="switchTab('tab-kas')">💵 Rekap Uang Keluar Masuk (Buku Kas &amp; Sumber Dana)</button>
     </div>
     <div class="year-switch" id="year-switch-box">
       <button class="year-btn active" id="btn-2026" onclick="setYear(2026)">Tahun 2026</button>
@@ -536,7 +546,7 @@
       </div>
 
       <div class="matrix-wrapper">
-        <table class="daily-table">
+        <table class="data-table">
           <thead>
             <tr>
               <th style="width: 140px;">No Invoice</th>
@@ -553,6 +563,79 @@
             </tr>
           </thead>
           <tbody id="daily-tbody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: REKAP UANG KELUAR MASUK (BUKU KAS & SUMBER DANA) ==================== -->
+    <section id="tab-kas" class="section">
+      <!-- 5 Summary Cards for Cashflow -->
+      <div class="stats-grid">
+        <div class="stat-card paid">
+          <span class="stat-label">Total Uang Masuk (Inflow)</span>
+          <div class="stat-value" id="kpi-kas-in" style="color: var(--color-lunas);">Rp 25.650.000</div>
+          <span class="stat-sub">Dari pelunasan sewa &amp; kontrak</span>
+        </div>
+        <div class="stat-card pending">
+          <span class="stat-label">Total Uang Keluar (Outflow)</span>
+          <div class="stat-value" id="kpi-kas-out" style="color: var(--color-belum);">Rp 6.850.000</div>
+          <span class="stat-sub">BBM, servis, fee mitra, operasional</span>
+        </div>
+        <div class="stat-card cashbalance">
+          <span class="stat-label">Sisa Saldo Kas Bersih</span>
+          <div class="stat-value" id="kpi-kas-balance" style="color: #c084fc;">Rp 18.800.000</div>
+          <span class="stat-sub">Total saldo kas saat ini</span>
+        </div>
+        <div class="stat-card feemonth">
+          <span class="stat-label">Saldo Bank BCA</span>
+          <div class="stat-value" id="kpi-kas-bca" style="color: #60a5fa;">Rp 12.400.000</div>
+          <span class="stat-sub">Rekening Utama</span>
+        </div>
+        <div class="stat-card feeyear">
+          <span class="stat-label">Saldo Kas Tunai (Cash)</span>
+          <div class="stat-value" id="kpi-kas-cash" style="color: var(--color-dp);">Rp 6.400.000</div>
+          <span class="stat-sub">Kas Petikemas / Admin</span>
+        </div>
+      </div>
+
+      <!-- Action Bar & Filter for Cashflow -->
+      <div class="table-top-actions">
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          <button class="btn btn-danger btn-sm" onclick="openNewCashModal('OUT')">🔴 Catat Uang Keluar</button>
+          <button class="btn btn-primary btn-sm" onclick="openNewCashModal('IN')">🟢 Catat Uang Masuk</button>
+          <span style="font-size:0.75rem; color:var(--text-secondary); margin-left:0.5rem;">Filter Sumber Dana:</span>
+          <select id="filter-source" class="form-select" style="padding:4px 8px; font-size:0.75rem; width:auto;" onchange="renderCashTable()">
+            <option value="ALL">Semua Sumber Dana</option>
+            <option value="Bank BCA">Bank BCA</option>
+            <option value="Bank Mandiri">Bank Mandiri</option>
+            <option value="Bank BRI">Bank BRI</option>
+            <option value="Kas Tunai (Cash)">Kas Tunai (Cash)</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="exportCashCsv()">📥 Export Buku Kas</button>
+        </div>
+      </div>
+
+      <!-- Table Buku Kas Harian -->
+      <div class="matrix-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 95px;">Tanggal</th>
+              <th style="width: 100px;">Jenis</th>
+              <th style="width: 140px;">Sumber Dana</th>
+              <th style="width: 140px;">Kategori</th>
+              <th style="width: 130px;">Unit Terkait</th>
+              <th>Keterangan / Rincian</th>
+              <th style="text-align:right; width:120px;">Uang Masuk</th>
+              <th style="text-align:right; width:120px;">Uang Keluar</th>
+              <th style="width: 80px; text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="cash-tbody">
             <!-- Rendered by JS -->
           </tbody>
         </table>
@@ -701,6 +784,91 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL 3: INPUT UANG KELUAR / MASUK & SUMBER DANA ==================== -->
+  <div id="cash-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="cash-modal-title">🔴 Catat Uang Keluar (Pengeluaran)</h3>
+        <button class="close-btn" onclick="closeCashModal()">&times;</button>
+      </div>
+
+      <form id="cash-form" onsubmit="handleSaveCash(event)">
+        <input type="hidden" id="cash-edit-idx">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Jenis Transaksi</label>
+            <select id="cash-type" class="form-select" onchange="handleCashTypeChange(this.value)" required>
+              <option value="OUT">🔴 Uang Keluar (Pengeluaran Operasional)</option>
+              <option value="IN">🟢 Uang Masuk (Pemasukan Sewa / DP)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Sumber Dana (Wajib Dipilih)</label>
+            <select id="cash-source" class="form-select" required>
+              <option value="Bank BCA">💳 Bank BCA (Rekening Utama)</option>
+              <option value="Bank Mandiri">💳 Bank Mandiri</option>
+              <option value="Bank BRI">💳 Bank BRI</option>
+              <option value="Kas Tunai (Cash)">💵 Kas Tunai (Cash / Admin)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Kategori Transaksi</label>
+            <select id="cash-cat" class="form-select" required>
+              <option value="BBM / Bensin">⛽ BBM / Bensin</option>
+              <option value="Servis & Ganti Oli">🔧 Servis &amp; Ganti Oli</option>
+              <option value="Cuci Mobil / Salon">🧼 Cuci Mobil / Salon</option>
+              <option value="Fee Driver / Gaji">👨‍✈️ Fee Driver / Gaji</option>
+              <option value="Fee Pemilik / Mitra">🤝 Fee Pemilik / Mitra Unit</option>
+              <option value="Sparepart & Ban">⚙️ Sparepart &amp; Ban</option>
+              <option value="Operasional Kantor">🏢 Operasional &amp; Konsumsi</option>
+              <option value="Pemasukan Sewa">💰 Pemasukan Sewa Unit</option>
+              <option value="Lain-lain">📝 Lain-lain</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Terkait Unit Mobil/Motor (Opsional)</label>
+            <select id="cash-car" class="form-select">
+              <option value="Umum / Operasional">Umum / Semua Unit</option>
+              <option value="B 1861 VZN (Brio)">B 1861 VZN (Honda Brio)</option>
+              <option value="D 1229 VDM (Avanza)">D 1229 VDM (Avanza All New)</option>
+              <option value="W 1248 DJ (Avanza)">W 1248 DJ (Avanza All New)</option>
+              <option value="DR 1223 CJ (Avanza)">DR 1223 CJ (Avanza All New)</option>
+              <option value="DR 1003 MT (Innova Reborn)">DR 1003 MT (Innova Reborn)</option>
+              <option value="DR 1004 MT (Innova Zenix)">DR 1004 MT (Innova Zenix Q)</option>
+              <option value="DR 1005 MT (Fortuner VRZ)">DR 1005 MT (Fortuner VRZ)</option>
+              <option value="DR 5229 CV (Vario 155)">DR 5229 CV (Honda Vario)</option>
+              <option value="DR 3416 EP (Fazzio)">DR 3416 EP (Yamaha Fazzio)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nominal Uang (Rp)</label>
+            <input type="number" id="cash-amount" class="form-input" placeholder="Contoh: 250000" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tanggal Transaksi</label>
+            <input type="date" id="cash-date" class="form-input" required>
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Keterangan / Rincian / Catatan Nota</label>
+            <input type="text" id="cash-desc" class="form-input" placeholder="Misal: Beli Pertamax Innova DR 1003 MT atau Bayar Ganti Oli" required>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeCashModal()">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-cash">💾 Simpan Catatan Kas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast" class="toast-box"></div>
 
   <script>
@@ -711,7 +879,7 @@
     let drilldownChart = null;
     const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    // ── MASTER DATA KONTRAK (DENGAN START & END DATE) ──
+    // ── MASTER DATA KONTRAK ──
     const defaultMasterKontrak = {
       2026: [
         {
@@ -788,8 +956,23 @@
       { id: 'MT-677/INV/XII/2025', client: 'Bpk Made Takuya', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-21', end: '2025-12-25', dur: 4, rate: 500000, extra: 150000, total: 2150000, status: 'LUNAS (CASH)' }
     ];
 
+    // ── DATA BUKU KAS & PENGELUARAN ──
+    const defaultCashTransactions = [
+      { id: 1, date: '2026-08-01', type: 'IN', source: 'Bank BCA', cat: 'Pemasukan Sewa', car: 'B 1861 VZN (Brio)', desc: 'Pelunasan Sewa Kontrak Ayah Ratu (Bulan Juli/Ags)', in: 5500000, out: 0 },
+      { id: 2, date: '2026-08-02', type: 'OUT', source: 'Bank BCA', cat: 'Fee Pemilik / Mitra', car: 'B 1861 VZN (Brio)', desc: 'Transfer Fee Bulanan Pemilik Unit Brio', in: 0, out: 1850000 },
+      { id: 3, date: '2026-08-03', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'BBM / Bensin', car: 'DR 1003 MT (Innova Reborn)', desc: 'Isi Pertamax Full Tank Innova Reborn', in: 0, out: 400000 },
+      { id: 4, date: '2026-08-04', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'Cuci Mobil / Salon', car: 'DR 1003 MT (Innova Reborn)', desc: 'Cuci poles bersih siap jalan', in: 0, out: 50000 },
+      { id: 5, date: '2026-08-05', type: 'IN', source: 'Bank Mandiri', cat: 'Pemasukan Sewa', car: 'DR 1005 MT (Fortuner VRZ)', desc: 'Pelunasan Sewa Fortuner 4 Hari Bpk Anang', in: 4000000, out: 0 },
+      { id: 6, date: '2026-08-06', type: 'OUT', source: 'Bank BCA', cat: 'Servis & Ganti Oli', car: 'DR 1003 MT (Innova Reborn)', desc: 'Ganti Oli Mesin TMO + Filter Oli di Bengkel Resmi', in: 0, out: 650000 },
+      { id: 7, date: '2026-08-07', type: 'OUT', source: 'Bank BCA', cat: 'Fee Driver / Gaji', car: 'DR 1003 MT (Innova Reborn)', desc: 'Fee Driver Perjalanan Tour Kuta Mandalika (3 Hari)', in: 0, out: 900000 },
+      { id: 8, date: '2026-08-08', type: 'IN', source: 'Bank BCA', cat: 'Pemasukan Sewa', car: 'W 1248 DJ (Avanza)', desc: 'Pelunasan Sewa Kontrak Mama Dina', in: 6000000, out: 0 },
+      { id: 9, date: '2026-08-09', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'Operasional Kantor', car: 'Umum / Operasional', desc: 'Beli ATK nota, kwitansi, dan konsumsi admin', in: 0, out: 150000 },
+      { id: 10, date: '2026-08-10', type: 'OUT', source: 'Bank BCA', cat: 'Fee Pemilik / Mitra', car: 'W 1248 DJ (Avanza)', desc: 'Transfer Fee Mitra Pemilik Unit Mama Dina', in: 0, out: 500000 }
+    ];
+
     let masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
     let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
+    let cashTransactions = JSON.parse(JSON.stringify(defaultCashTransactions));
 
     document.addEventListener('DOMContentLoaded', () => {
       if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
@@ -800,14 +983,18 @@
         document.getElementById('lock-screen').style.display = 'none';
       }
 
-      const savedK = localStorage.getItem('mt_master_kontrak_v5');
+      const savedK = localStorage.getItem('mt_master_kontrak_v6');
       if (savedK) { try { masterKontrak = JSON.parse(savedK); } catch(e) {} }
 
-      const savedD = localStorage.getItem('mt_daily_rentals_v5');
+      const savedD = localStorage.getItem('mt_daily_rentals_v6');
       if (savedD) { try { dailyRentals = JSON.parse(savedD); } catch(e) {} }
+
+      const savedC = localStorage.getItem('mt_cash_trans_v6');
+      if (savedC) { try { cashTransactions = JSON.parse(savedC); } catch(e) {} }
 
       renderMatrix();
       renderDaily();
+      renderCashTable();
     });
 
     function setYear(yr) {
@@ -815,9 +1002,7 @@
       document.getElementById('btn-2026').classList.toggle('active', yr === 2026);
       document.getElementById('btn-2027').classList.toggle('active', yr === 2027);
       renderMatrix();
-      if (currentDrilldown) {
-        showDrilldown(currentDrilldown);
-      }
+      if (currentDrilldown) showDrilldown(currentDrilldown);
     }
 
     // ── RENDER MATRIX KONTRAK ──
@@ -1141,6 +1326,71 @@
       document.getElementById('kpi-daily-pending').textContent = `Rp ${totalPending.toLocaleString('id-ID')}`;
     }
 
+    // ── RENDER CASHFLOW / BUKU KAS DENGAN PILIHAN SUMBER DANA ──
+    function renderCashTable() {
+      const tbody = document.getElementById('cash-tbody');
+      const filter = document.getElementById('filter-source')?.value || 'ALL';
+
+      let totalIn = 0;
+      let totalOut = 0;
+      let totalBca = 0;
+      let totalCash = 0;
+
+      // Calculate totals from all items
+      cashTransactions.forEach(c => {
+        totalIn += (c.in || 0);
+        totalOut += (c.out || 0);
+
+        const diff = (c.in || 0) - (c.out || 0);
+        if (c.source === 'Bank BCA') totalBca += diff;
+        if (c.source === 'Kas Tunai (Cash)') totalCash += diff;
+      });
+
+      const balance = totalIn - totalOut;
+
+      document.getElementById('kpi-kas-in').textContent = `Rp ${totalIn.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-kas-out').textContent = `Rp ${totalOut.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-kas-balance').textContent = `Rp ${balance.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-kas-bca').textContent = `Rp ${totalBca.toLocaleString('id-ID')}`;
+      document.getElementById('kpi-kas-cash').textContent = `Rp ${totalCash.toLocaleString('id-ID')}`;
+
+      // Filter rows
+      const filtered = filter === 'ALL' ? cashTransactions : cashTransactions.filter(c => c.source === filter);
+
+      tbody.innerHTML = filtered.map((c, idx) => {
+        let badgeSource = 'source-bca';
+        if (c.source.includes('Mandiri')) badgeSource = 'source-mandiri';
+        else if (c.source.includes('BRI')) badgeSource = 'source-bri';
+        else if (c.source.includes('Cash') || c.source.includes('Tunai')) badgeSource = 'source-cash';
+
+        const originalIdx = cashTransactions.indexOf(c);
+
+        return `
+          <tr>
+            <td>${formatDateDisplay(c.date)}</td>
+            <td>
+              <span class="badge ${c.type === 'IN' ? 'badge-ready' : 'badge-belum'}">
+                ${c.type === 'IN' ? '🟢 MASUK' : '🔴 KELUAR'}
+              </span>
+            </td>
+            <td><span class="source-badge ${badgeSource}">🏦 ${c.source}</span></td>
+            <td><strong>${c.cat}</strong></td>
+            <td><small style="color:var(--text-secondary);">${c.car || '-'}</small></td>
+            <td>${c.desc}</td>
+            <td style="text-align:right; font-weight:700; color:var(--color-lunas);">
+              ${c.in > 0 ? '+ Rp ' + Number(c.in).toLocaleString('id-ID') : '-'}
+            </td>
+            <td style="text-align:right; font-weight:700; color:var(--color-belum);">
+              ${c.out > 0 ? '- Rp ' + Number(c.out).toLocaleString('id-ID') : '-'}
+            </td>
+            <td style="text-align:center;">
+              <button class="btn btn-danger btn-icon" title="Hapus" onclick="deleteCash(${originalIdx})">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     // ── MODAL KONTRAK LOGIC ──
     function openEditModal(rowIdx) {
       const item = masterKontrak[activeYear][rowIdx];
@@ -1317,6 +1567,21 @@
         dailyRentals.unshift({
           id: newId, client, car, plate, service, start, end, dur, rate, extra, total, status
         });
+
+        // Auto catat kas masuk jika Lunas
+        if (status.includes('LUNAS')) {
+          cashTransactions.unshift({
+            id: Date.now(),
+            date: start,
+            type: 'IN',
+            source: status.includes('TRANSFER') ? 'Bank BCA' : 'Kas Tunai (Cash)',
+            cat: 'Pemasukan Sewa',
+            car: `${plate} (${car})`,
+            desc: `Pelunasan Sewa Harian ${client} (${newId})`,
+            in: total,
+            out: 0
+          });
+        }
         showToast(`✅ Sewa harian ${client} (${newId}) berhasil ditambahkan!`);
       }
 
@@ -1336,9 +1601,71 @@
       document.getElementById('daily-modal').style.display = 'none';
     }
 
+    // ── MODAL UANG KELUAR / MASUK LOGIC ──
+    function openNewCashModal(type = 'OUT') {
+      document.getElementById('cash-modal-title').textContent = type === 'OUT' ? '🔴 Catat Uang Keluar (Pengeluaran)' : '🟢 Catat Uang Masuk (Pemasukan)';
+      document.getElementById('cash-type').value = type;
+      document.getElementById('cash-source').value = type === 'OUT' ? 'Kas Tunai (Cash)' : 'Bank BCA';
+      document.getElementById('cash-amount').value = '';
+      document.getElementById('cash-date').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('cash-desc').value = '';
+      document.getElementById('cash-modal').style.display = 'flex';
+      handleCashTypeChange(type);
+    }
+
+    function handleCashTypeChange(type) {
+      const catSelect = document.getElementById('cash-cat');
+      if (type === 'IN') {
+        catSelect.value = 'Pemasukan Sewa';
+      } else {
+        catSelect.value = 'BBM / Bensin';
+      }
+    }
+
+    function handleSaveCash(e) {
+      e.preventDefault();
+      const type = document.getElementById('cash-type').value;
+      const source = document.getElementById('cash-source').value;
+      const cat = document.getElementById('cash-cat').value;
+      const car = document.getElementById('cash-car').value;
+      const amount = Number(document.getElementById('cash-amount').value || 0);
+      const date = document.getElementById('cash-date').value;
+      const desc = document.getElementById('cash-desc').value;
+
+      cashTransactions.unshift({
+        id: Date.now(),
+        date,
+        type,
+        source,
+        cat,
+        car,
+        desc,
+        in: type === 'IN' ? amount : 0,
+        out: type === 'OUT' ? amount : 0
+      });
+
+      saveAll();
+      closeCashModal();
+      showToast(type === 'OUT' ? `🔴 Pengeluaran Rp ${amount.toLocaleString('id-ID')} (${source}) tercatat!` : `🟢 Kas Masuk Rp ${amount.toLocaleString('id-ID')} (${source}) tercatat!`);
+    }
+
+    function deleteCash(idx) {
+      if (confirm('Hapus transaksi kas ini dari buku jurnal?')) {
+        cashTransactions.splice(idx, 1);
+        saveAll();
+        showToast('🗑️ Catatan kas dihapus.');
+      }
+    }
+
+    function closeCashModal() {
+      document.getElementById('cash-modal').style.display = 'none';
+    }
+
     function handleTopAdd() {
       if (currentTab === 'tab-harian') {
         openNewDailyModal();
+      } else if (currentTab === 'tab-kas') {
+        openNewCashModal('OUT');
       } else {
         openNewContractModal();
       }
@@ -1353,10 +1680,12 @@
     }
 
     function saveAll() {
-      localStorage.setItem('mt_master_kontrak_v5', JSON.stringify(masterKontrak));
-      localStorage.setItem('mt_daily_rentals_v5', JSON.stringify(dailyRentals));
+      localStorage.setItem('mt_master_kontrak_v6', JSON.stringify(masterKontrak));
+      localStorage.setItem('mt_daily_rentals_v6', JSON.stringify(dailyRentals));
+      localStorage.setItem('mt_cash_trans_v6', JSON.stringify(cashTransactions));
       renderMatrix();
       renderDaily();
+      renderCashTable();
       if (currentDrilldown) showDrilldown(currentDrilldown);
     }
 
@@ -1365,6 +1694,8 @@
         let rows = [['No Invoice', 'Penyewa', 'Unit Mobil', 'Plat', 'Mulai', 'Selesai', 'Durasi', 'Layanan', 'Tarif', 'Total', 'Status']];
         dailyRentals.forEach(d => rows.push([d.id, d.client, d.car, d.plate, d.start, d.end, `${d.dur} Hari`, d.service, d.rate, d.total, d.status]));
         downloadCsv(rows, `REKAP_SEWA_HARIAN_MENDADAK.csv`);
+      } else if (currentTab === 'tab-kas') {
+        exportCashCsv();
       } else {
         const list = masterKontrak[activeYear] || [];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -1379,6 +1710,14 @@
         });
         downloadCsv(rows, `REKAP_KONTRAK_${activeYear}_MENDADAK.csv`);
       }
+    }
+
+    function exportCashCsv() {
+      let rows = [['Tanggal', 'Jenis', 'Sumber Dana', 'Kategori', 'Unit', 'Keterangan', 'Uang Masuk', 'Uang Keluar']];
+      cashTransactions.forEach(c => {
+        rows.push([c.date, c.type === 'IN' ? 'MASUK' : 'KELUAR', c.source, c.cat, c.car, c.desc, c.in, c.out]);
+      });
+      downloadCsv(rows, `BUKU_KAS_MENDADAK_TRANSPORT.csv`);
     }
 
     function downloadCsv(rows, filename) {
@@ -1425,10 +1764,14 @@
         document.getElementById('tab-btn-kontrak').classList.add('active');
         document.getElementById('year-switch-box').style.display = 'flex';
         document.getElementById('btn-top-add').textContent = '➕ Tambah Kontrak';
-      } else {
+      } else if (id === 'tab-harian') {
         document.getElementById('tab-btn-harian').classList.add('active');
         document.getElementById('year-switch-box').style.display = 'none';
         document.getElementById('btn-top-add').textContent = '➕ Buat Sewa Harian';
+      } else {
+        document.getElementById('tab-btn-kas').classList.add('active');
+        document.getElementById('year-switch-box').style.display = 'none';
+        document.getElementById('btn-top-add').textContent = '🔴 Catat Pengeluaran';
       }
 
       document.getElementById(id).classList.add('active');
