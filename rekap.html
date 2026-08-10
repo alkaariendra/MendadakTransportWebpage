@@ -1548,6 +1548,178 @@
       showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah & tersimpan!`);
     }
 
+    // ── INTERACTIVE DRILL-DOWN EXPLANATION FOR TOP CARDS ──
+    function toggleDrilldown(type) {
+      if (currentDrilldown === type) {
+        closeDrilldown();
+      } else {
+        showDrilldown(type);
+      }
+    }
+
+    function closeDrilldown() {
+      currentDrilldown = null;
+      document.querySelectorAll('#tab-kontrak .stat-card').forEach(c => c.classList.remove('active-card'));
+      document.getElementById('drilldown-box').style.display = 'none';
+      if (drilldownChart) { drilldownChart.destroy(); drilldownChart = null; }
+    }
+
+    function showDrilldown(type) {
+      currentDrilldown = type;
+      document.querySelectorAll('#tab-kontrak .stat-card').forEach(c => c.classList.remove('active-card'));
+      const activeCard = document.getElementById(`card-${type}`);
+      if (activeCard) activeCard.classList.add('active-card');
+
+      const box = document.getElementById('drilldown-box');
+      box.style.display = 'block';
+
+      const list = masterKontrak || [];
+      let listHtml = '';
+      let title = '';
+      let chartLabels = [];
+      let chartData = [];
+      let chartColors = ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'];
+
+      if (type === 'total') {
+        title = `📊 Rincian Sumber Nilai: Total Omset Kontrak (1 Thn)`;
+        document.getElementById('drilldown-list-title').textContent = 'Kontribusi Omset per Pengontrak & Unit:';
+        document.getElementById('drilldown-chart-title').textContent = 'Persentase Omset Kontrak:';
+
+        list.forEach((u, i) => {
+          const uTotal = u.months.reduce((a, b) => a + b.amt, 0);
+          chartLabels.push(`${u.renter} (${u.model})`);
+          chartData.push(uTotal);
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter}</div>
+                <div class="breakdown-meta">${u.model} · ${u.plate} (12 Bulan)</div>
+              </div>
+              <div class="breakdown-val" style="color:#fff;">Rp ${uTotal.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      } else if (type === 'paid') {
+        title = `🟢 Rincian Pembayaran Sewa Kontrak yang Sudah Lunas`;
+        document.getElementById('drilldown-list-title').textContent = 'Jumlah Uang Sewa yang Sudah Diterima per Unit:';
+        document.getElementById('drilldown-chart-title').textContent = 'Porsi Pembayaran Lunas:';
+
+        list.forEach((u, i) => {
+          const paidMonths = u.months.filter(m => m.st === 'SUDAH_BAYAR');
+          const uPaid = paidMonths.reduce((a, b) => a + b.amt, 0);
+          chartLabels.push(`${u.renter}`);
+          chartData.push(uPaid);
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter}</div>
+                <div class="breakdown-meta">${u.model} · <span style="color:var(--color-lunas); font-weight:700;">${paidMonths.length}/12 Bulan Lunas</span></div>
+              </div>
+              <div class="breakdown-val" style="color:var(--color-lunas);">Rp ${uPaid.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      } else if (type === 'pending') {
+        title = `🔴 Rincian Piutang / Belum Bayar`;
+        document.getElementById('drilldown-list-title').textContent = 'Sisa Tagihan yang Belum Dibayar per Unit:';
+        document.getElementById('drilldown-chart-title').textContent = 'Porsi Piutang Berjalan:';
+
+        list.forEach((u, i) => {
+          const unPaidMonths = u.months.filter(m => m.st !== 'SUDAH_BAYAR');
+          const uPending = unPaidMonths.reduce((a, b) => a + b.amt, 0);
+          if (uPending > 0) {
+            chartLabels.push(`${u.renter}`);
+            chartData.push(uPending);
+          }
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter}</div>
+                <div class="breakdown-meta">${u.model} · <span style="color:var(--color-belum); font-weight:700;">${unPaidMonths.length} Bulan Belum Lunas</span></div>
+              </div>
+              <div class="breakdown-val" style="color:var(--color-belum);">Rp ${uPending.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      } else if (type === 'feemonth') {
+        title = `🟠 Rincian Fee Bulanan Pemilik Unit`;
+        document.getElementById('drilldown-list-title').textContent = 'Fee Rutin yang Dibayarkan ke Pemilik Setiap Bulan:';
+        document.getElementById('drilldown-chart-title').textContent = 'Distribusi Fee Bulanan:';
+
+        list.forEach((u, i) => {
+          const feeNum = parseInt(String(u.fee).replace(/[^0-9]/g, '')) || 0;
+          if (feeNum > 0) {
+            chartLabels.push(`${u.renter} (${u.model})`);
+            chartData.push(feeNum);
+          }
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter} (${u.model})</div>
+                <div class="breakdown-meta">Plat: ${u.plate}</div>
+              </div>
+              <div class="breakdown-val" style="color:var(--color-dp);">${u.fee} / bln</div>
+            </div>
+          `;
+        });
+      } else if (type === 'feeyear') {
+        title = `🔵 Rincian Total Fee Tahunan Pemilik Unit`;
+        document.getElementById('drilldown-list-title').textContent = 'Akumulasi Fee Pemilik Selama 1 Tahun:';
+        document.getElementById('drilldown-chart-title').textContent = 'Porsi Fee Tahunan:';
+
+        list.forEach((u, i) => {
+          const feeMonthNum = parseInt(String(u.fee).replace(/[^0-9]/g, '')) || 0;
+          let feeYearNum = u.fee_year ? (parseInt(String(u.fee_year).replace(/[^0-9]/g, '')) || 0) : feeMonthNum * 12;
+          if (feeYearNum > 0) {
+            chartLabels.push(`${u.renter}`);
+            chartData.push(feeYearNum);
+          }
+          listHtml += `
+            <div class="breakdown-item">
+              <div>
+                <div class="breakdown-name">${i+1}. ${u.renter} (${u.model})</div>
+                <div class="breakdown-meta">Fee Bulanan: ${u.fee}</div>
+              </div>
+              <div class="breakdown-val" style="color:#60a5fa;">Rp ${feeYearNum.toLocaleString('id-ID')}</div>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('drilldown-title-text').innerHTML = `<span>${title}</span>`;
+      document.getElementById('drilldown-list-container').innerHTML = listHtml;
+
+      renderDrilldownChart(chartLabels, chartData, chartColors);
+    }
+
+    function renderDrilldownChart(labels, data, colors) {
+      const ctx = document.getElementById('drilldownChartCanvas')?.getContext('2d');
+      if (!ctx) return;
+      if (drilldownChart) drilldownChart.destroy();
+
+      drilldownChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#9ca3af', font: { size: 9 }, boxWidth: 8 }
+            }
+          }
+        }
+      });
+    }
+
     // ── AUTOMATIC CONTRACT CASHFLOW LEDGER SYNC ──
     function syncContractCashflowToLedger(showToastNotice = false) {
       if (!masterKontrak || masterKontrak.length === 0) return;
