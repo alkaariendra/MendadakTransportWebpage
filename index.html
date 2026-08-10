@@ -882,5 +882,63 @@
     </footer>
 
     <script src="script.js?v=ai-wa-cta-20260530"></script>
+    <script>
+      async function syncArmadaStatus() {
+        try {
+          const res = await fetch('/api/sync');
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.armada)) {
+            document.querySelectorAll('.price-card').forEach(card => {
+              const titleElem = card.querySelector('h3');
+              if (!titleElem) return;
+              const carName = titleElem.textContent.trim().toLowerCase();
+              
+              const matched = data.armada.find(a => {
+                const mName = (a.model || '').toLowerCase();
+                return carName.includes(mName) || mName.includes(carName.split(' ')[0]);
+              });
+
+              let badgeElem = card.querySelector('.live-status-badge');
+              if (!badgeElem) {
+                badgeElem = document.createElement('span');
+                badgeElem.className = 'live-status-badge';
+                badgeElem.style.cssText = 'display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; margin: 4px 0 0 6px; vertical-align: middle;';
+                const typeElem = card.querySelector('.vehicle-type');
+                if (typeElem) typeElem.after(badgeElem);
+              }
+
+              if (matched) {
+                const st = (matched.status || 'READY').toUpperCase();
+                if (st === 'READY') {
+                  badgeElem.textContent = '🟢 Ready Siaga';
+                  badgeElem.style.background = 'rgba(16, 185, 129, 0.15)';
+                  badgeElem.style.color = '#10b981';
+                  badgeElem.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+                } else if (st === 'KONTRAK' || st === 'SEWA_HARIAN') {
+                  badgeElem.textContent = '🟡 Sedang Tersewa';
+                  badgeElem.style.background = 'rgba(245, 158, 11, 0.15)';
+                  badgeElem.style.color = '#f59e0b';
+                  badgeElem.style.border = '1px solid rgba(245, 158, 11, 0.4)';
+                } else {
+                  badgeElem.textContent = '🔴 Servis Bengkel';
+                  badgeElem.style.background = 'rgba(239, 68, 68, 0.15)';
+                  badgeElem.style.color = '#ef4444';
+                  badgeElem.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+                }
+              } else {
+                badgeElem.textContent = '🟢 Ready Siaga';
+                badgeElem.style.background = 'rgba(16, 185, 129, 0.15)';
+                badgeElem.style.color = '#10b981';
+                badgeElem.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+              }
+            });
+          }
+        } catch(e) {
+          console.warn('[LiveSync] Gagal sync status armada:', e);
+        }
+      }
+      document.addEventListener('DOMContentLoaded', syncArmadaStatus);
+    </script>
   </body>
 </html>
