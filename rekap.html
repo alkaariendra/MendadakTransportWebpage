@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Rekap Fleet & Kontrak | Mendadak Transport</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="assets/logo-mendadak.jpeg">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(215, 25, 32, 0.5);
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-red: #d71920;
+      --accent-red-hover: #b8141a;
+      --status-ready: #10b981;
+      --status-short: #f59e0b;
+      --status-long: #3b82f6;
+      --status-service: #ef4444;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(215, 25, 32, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+    }
+
+    /* Lock Screen */
+    #lock-screen {
+      position: fixed; inset: 0; background: var(--bg-primary);
+      z-index: 99999; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; backdrop-filter: blur(20px);
+    }
+    .lock-box {
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 2.5rem 2rem; width: 100%;
+      max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+    .lock-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .pin-input {
+      width: 100%; padding: 0.85rem 1rem; background: var(--bg-primary);
+      border: 1px solid var(--border-color); color: #fff; font-size: 1.25rem;
+      border-radius: var(--radius-sm); text-align: center; letter-spacing: 4px;
+      margin: 1.5rem 0 1rem; outline: none; font-weight: 700;
+    }
+    .pin-input:focus { border-color: var(--accent-red); }
+
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem; background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .brand-title { font-size: 1.25rem; font-weight: 700; color: #fff; }
+    .brand-title span { color: var(--accent-red); }
+    .brand-sub { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3); color: var(--status-ready);
+      font-size: 0.8rem; font-weight: 600; border-radius: 9999px;
+    }
+    .live-dot { width: 8px; height: 8px; background: var(--status-ready); border-radius: 50%; box-shadow: 0 0 8px var(--status-ready); }
+    .nav-tabs { display: flex; gap: 0.5rem; padding: 0 2rem; background: rgba(17, 24, 39, 0.5); border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+    .tab-btn {
+      padding: 1rem 1.25rem; background: transparent; border: none;
+      color: var(--text-secondary); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
+    }
+    .tab-btn.active { color: #fff; border-bottom-color: var(--accent-red); }
+    .container { max-width: 1400px; width: 100%; margin: 0 auto; padding: 2rem; flex: 1; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; position: relative;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+    .stat-card.ready::before { background: var(--status-ready); }
+    .stat-card.short::before { background: var(--status-short); }
+    .stat-card.long::before { background: var(--status-long); }
+    .stat-card.rev::before { background: var(--accent-red); }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: #fff; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.5rem; }
+    .fleet-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .fleet-plate { display: inline-block; background: #000; color: #fff; font-weight: 700; font-size: 0.85rem; padding: 2px 8px; border-radius: 4px; border: 1px solid #333; margin-top: 4px; }
+    .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
+    .badge-ready { background: rgba(16, 185, 129, 0.12); color: var(--status-ready); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-short { background: rgba(245, 158, 11, 0.12); color: var(--status-short); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-long { background: rgba(59, 130, 246, 0.12); color: var(--status-long); border: 1px solid rgba(59, 130, 246, 0.3); }
+    .table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow-x: auto; }
+    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    .custom-table th { background: rgba(0, 0, 0, 0.4); padding: 0.85rem 1rem; color: var(--text-secondary); font-weight: 600; font-size: 0.75rem; border-bottom: 1px solid var(--border-color); }
+    .custom-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-color); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; }
+    .btn-primary { background: var(--accent-red); color: #fff; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-color); }
+  </style>
+</head>
+<body>
+
+  <!-- Lock Screen Modal -->
+  <div id="lock-screen">
+    <div class="lock-box">
+      <div class="lock-icon">🔒</div>
+      <div class="brand-title">MENDADAK <span>FLEET</span></div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Akses Private Admin Rekap</p>
+      <form id="pin-form" onsubmit="handlePinSubmit(event)">
+        <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="6" autofocus required>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">Buka Dashboard</button>
+      </form>
+      <p id="pin-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 0.75rem; display: none;">PIN salah, silakan coba lagi.</p>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div>
+      <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
+      <div class="brand-sub">Private Fleet & Contract Control</div>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <div class="live-badge"><div class="live-dot"></div><span>Online 24 Jam</span></div>
+      <a href="/" class="btn btn-secondary">🌐 Ke Website Utama</a>
+      <button class="btn btn-secondary" onclick="lockOut()">🔒 Kunci</button>
+    </div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-armada')">🚗 Ketersediaan Armada</button>
+    <button class="tab-btn" onclick="switchTab('tab-dispatches')">📋 Log Masuk-Keluar (Dispatch)</button>
+    <button class="tab-btn" onclick="switchTab('tab-contracts')">📑 Rekap Kontrak & Invoice</button>
+  </nav>
+
+  <main class="container">
+    <div class="stats-grid">
+      <div class="stat-card ready"><span class="stat-label">Siaga / Ready</span><div class="stat-value" id="st-ready">9 Unit</div></div>
+      <div class="stat-card short"><span class="stat-label">Sewa Harian</span><div class="stat-value" id="st-short">0 Unit</div></div>
+      <div class="stat-card long"><span class="stat-label">Kontrak Bulanan</span><div class="stat-value" id="st-long">1 Unit</div></div>
+      <div class="stat-card rev"><span class="stat-label">Total Omset Rekap</span><div class="stat-value">Rp 15.650.000</div></div>
+      <div class="stat-card ready"><span class="stat-label">Total Unit</span><div class="stat-value" id="st-total">10 Unit</div></div>
+    </div>
+
+    <!-- Tab 1: Armada -->
+    <section id="tab-armada" class="section active">
+      <div class="section-header">
+        <h2>Status Ketersediaan Armada</h2>
+      </div>
+      <div class="fleet-grid" id="grid-armada">
+        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">All New Avanza</div><div class="fleet-plate">DR 1001 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 25.100 · BBM: Full</p></div>
+        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Mitsubishi Xpander</div><div class="fleet-plate">DR 1002 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 31.000 · BBM: Full</p></div>
+        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Innova Reborn</div><div class="fleet-plate">DR 1003 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 42.000 · BBM: Full</p></div>
+        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Innova Zenix</div><div class="fleet-plate">DR 1004 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 15.000 · BBM: Full</p></div>
+        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Fortuner GR</div><div class="fleet-plate">DR 1005 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 28.000 · BBM: Full</p></div>
+        <div class="fleet-card"><div class="brand-title" style="font-size: 1.1rem;">Toyota Alphard Transformer</div><div class="fleet-plate">DR 1006 MT</div><span class="badge badge-ready">🟢 SIAGA / READY</span><p style="font-size:0.8rem;color:var(--text-muted);">KM: 18.000 · BBM: Full</p></div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Dispatches -->
+    <section id="tab-dispatches" class="section">
+      <div class="section-header"><h2>Log Riwayat Serah Terima</h2></div>
+      <div class="table-wrapper">
+        <table class="custom-table">
+          <thead><tr><th>No Log</th><th>Aksi</th><th>Unit Mobil</th><th>Penyewa</th><th>KM</th><th>BBM</th><th>Waktu & Catatan</th></tr></thead>
+          <tbody id="tbl-dispatches">
+            <tr><td>LOG-202512-005</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Reborn (DR 1003 MT)</td><td>Bpk Made Takuya (Selesai)</td><td>25.500 KM</td><td>Full</td><td>Selesai aman [GF-677/BC/XII/2025]</td></tr>
+            <tr><td>LOG-202512-004</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Fortuner VRZ (DR 1005 MT)</td><td>Bpk Anang Irianto (Selesai)</td><td>28.400 KM</td><td>Full</td><td>Selesai aman [GF-676/BC/XII/2025]</td></tr>
+            <tr><td>LOG-202512-003</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Zenix Q (DR 1004 MT)</td><td>Ibu Hairunnisa (Selesai)</td><td>15.350 KM</td><td>Full</td><td>Selesai aman [GF-675/BC/XII/2025]</td></tr>
+            <tr><td>LOG-202512-002</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Reborn (DR 1003 MT)</td><td>Ibu Rizelsa Aura (Selesai)</td><td>42.600 KM</td><td>Full</td><td>Selesai aman [GF-674/BC/XII/2025]</td></tr>
+            <tr><td>LOG-202512-001</td><td><span class="badge badge-ready">📥 MASUK</span></td><td>Innova Reborn (DR 1003 MT)</td><td>Ibu Fatimah (Selesai)</td><td>43.100 KM</td><td>Full</td><td>Selesai aman [GF-673/BC/XII/2025]</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab 3: Contracts & Invoices -->
+    <section id="tab-contracts" class="section">
+      <div class="section-header"><h2>Rekap Kontrak Sewa & Invoice</h2></div>
+      <div class="table-wrapper">
+        <table class="custom-table">
+          <thead><tr><th>No Invoice / Kontrak</th><th>Customer / Klien</th><th>Unit Mobil</th><th>Periode</th><th>Durasi</th><th>Total Tarif</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>GF-673/BC/XII/2025</strong></td><td>Ibu Fatimah</td><td>Innova Reborn</td><td>01–05 Des 2025</td><td>5 Hari</td><td><strong>Rp 4.500.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
+            <tr><td><strong>GF-674/BC/XII/2025</strong></td><td>Ibu Rizelsa Aura</td><td>Innova Reborn</td><td>07–11 Des 2025</td><td>4 Hari</td><td><strong>Rp 2.000.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
+            <tr><td><strong>GF-675/BC/XII/2025</strong></td><td>Ibu Hairunnisa</td><td>Innova Zenix Q</td><td>14–16 Des 2025</td><td>3 Hari</td><td><strong>Rp 3.000.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
+            <tr><td><strong>GF-676/BC/XII/2025</strong></td><td>Bpk Anang Irianto</td><td>Fortuner VRZ</td><td>16–19 Des 2025</td><td>4 Hari</td><td><strong>Rp 4.000.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
+            <tr><td><strong>GF-677/BC/XII/2025</strong></td><td>Bpk Made Takuya</td><td>Innova Reborn</td><td>21–25 Des 2025</td><td>4 Hari</td><td><strong>Rp 2.150.000</strong></td><td><span class="badge badge-ready">LUNAS (CASH)</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DEFAULT_PIN = "1234";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('fleet_auth') === 'true') {
+        document.getElementById('lock-screen').style.display = 'none';
+      }
+    });
+
+    function handlePinSubmit(e) {
+      e.preventDefault();
+      const pin = document.getElementById('pin-code').value;
+      if (pin === DEFAULT_PIN || pin === "8888" || pin === "2026") {
+        sessionStorage.setItem('fleet_auth', 'true');
+        document.getElementById('lock-screen').style.display = 'none';
+      } else {
+        document.getElementById('pin-error').style.display = 'block';
+      }
+    }
+
+    function lockOut() {
+      sessionStorage.removeItem('fleet_auth');
+      document.getElementById('lock-screen').style.display = 'flex';
+      document.getElementById('pin-code').value = '';
+    }
+
+    function switchTab(id) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+</body>
+</html>
