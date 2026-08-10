@@ -622,6 +622,7 @@
           </select>
         </div>
         <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="syncContractCashflowToLedger(true); renderCashTable();" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4);" title="Otomatis masukkan pencatatan uang masuk & angsuran leasing dari kontrak yang sudah lunas">🔄 Sync Kas dari Kontrak</button>
           <button class="btn btn-secondary btn-sm" onclick="exportCashCsv()">📥 Export Buku Kas</button>
         </div>
       </div>
@@ -1549,180 +1550,83 @@
       else if (m.st === 'BAYAR_SETENGAH') m.st = 'MULAI_KONTRAK';
       else m.st = 'SUDAH_BAYAR';
 
+      syncContractCashflowToLedger();
       saveAll();
+      renderCashTable();
       showToast(`✅ Status ${monthsList[mIdx]} (${item.renter}) diubah & tersimpan!`);
     }
 
-    // ── INTERACTIVE DRILL-DOWN EXPLANATION FOR TOP CARDS ──
-    function toggleDrilldown(type) {
-      if (currentDrilldown === type) {
-        closeDrilldown();
-      } else {
-        showDrilldown(type);
-      }
-    }
+    // ── AUTOMATIC CONTRACT CASHFLOW LEDGER SYNC ──
+    function syncContractCashflowToLedger(showToastNotice = false) {
+      if (!masterKontrak || masterKontrak.length === 0) return;
 
-    function closeDrilldown() {
-      currentDrilldown = null;
-      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-card'));
-      document.getElementById('drilldown-box').style.display = 'none';
-      if (drilldownChart) { drilldownChart.destroy(); drilldownChart = null; }
-    }
+      let addedCount = 0;
+      masterKontrak.forEach((item, rIdx) => {
+        const renter = item.renter || 'Penyewa';
+        const model = item.model || 'Armada';
+        const plate = item.plate || '';
+        const feeMonthNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
+        const startDate = item.start_date || '2026-01-01';
+        
+        let startDay = '01';
+        try {
+          const parts = startDate.split('-');
+          if (parts.length === 3) startDay = parts[2].padStart(2, '0');
+        } catch(e) {}
 
-    function showDrilldown(type) {
-      currentDrilldown = type;
-      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-card'));
-      const activeCard = document.getElementById(`card-${type}`);
-      if (activeCard) activeCard.classList.add('active-card');
+        item.months.forEach((m, mIdx) => {
+          if (m.st === 'SUDAH_BAYAR' && m.amt > 0) {
+            const monthName = monthsList[mIdx];
+            const mNumStr = (mIdx + 1).toString().padStart(2, '0');
+            const transDate = `2026-${mNumStr}-${startDay}`;
 
-      const list = masterKontrak || [];
-      const container = document.getElementById('drilldown-list-container');
-      const box = document.getElementById('drilldown-box');
-      box.style.display = 'block';
+            const tagIn = `CONTRACT_IN_${rIdx}_${mIdx}`;
+            const tagOut = `CONTRACT_OUT_LEASING_${rIdx}_${mIdx}`;
 
-      let title = '';
-      let listHtml = '';
-      let chartLabels = [];
-      let chartData = [];
-      let chartColors = ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'];
+            const existsIn = cashTransactions.some(c => c.tag === tagIn || (c.desc && c.desc.includes(`Pelunasan Sewa Kontrak ${renter} (${model}) - Bulan ${monthName}`)));
+            
+            if (!existsIn) {
+              // 1. Inflow: Total rental payment from customer (e.g. Rp 5.500.000)
+              cashTransactions.unshift({
+                id: Date.now() + Math.random(),
+                tag: tagIn,
+                date: transDate,
+                type: 'IN',
+                source: 'Bank BCA',
+                cat: 'Pelunasan Sewa Kontrak',
+                car: `${plate} (${model})`,
+                desc: `Pelunasan Sewa Kontrak ${renter} (${model}) - Bulan ${monthName} '26`,
+                in: m.amt,
+                out: 0
+              });
 
-      if (type === 'total') {
-        title = `📊 Rincian Sumber Nilai: Total Omset Kontrak`;
-        document.getElementById('drilldown-list-title').textContent = 'Kontribusi Omset per Pengontrak & Unit:';
-        document.getElementById('drilldown-chart-title').textContent = 'Persentase Omset Kontrak:';
+              // 2. Outflow: Leasing installment to Mandiri Finance (Rental Amount minus Owner Fee, e.g. Rp 3.650.000)
+              const leasingOutflow = m.amt - feeMonthNum;
+              if (leasingOutflow > 0) {
+                cashTransactions.unshift({
+                  id: Date.now() + Math.random() + 1,
+                  tag: tagOut,
+                  date: transDate,
+                  type: 'OUT',
+                  source: 'Bank BCA',
+                  cat: 'Angsuran Leasing / Mandiri Finance',
+                  car: `${plate} (${model})`,
+                  desc: `Setoran Angsuran Leasing Mandiri Finance ${model} (${plate}) - Bulan ${monthName} '26`,
+                  in: 0,
+                  out: leasingOutflow
+                });
+              }
 
-        list.forEach((u, i) => {
-          const uTotal = u.months.reduce((a, b) => a + b.amt, 0);
-          chartLabels.push(`${u.renter} (${u.model})`);
-          chartData.push(uTotal);
-          listHtml += `
-            <div class="breakdown-item">
-              <div>
-                <div class="breakdown-name">${i+1}. ${u.renter}</div>
-                <div class="breakdown-meta">${u.model} · ${u.plate} (12 Bulan)</div>
-              </div>
-              <div class="breakdown-val" style="color:#fff;">Rp ${uTotal.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        });
-      } else if (type === 'paid') {
-        title = `🟢 Rincian Pembayaran Masuk (Sudah Lunas)`;
-        document.getElementById('drilldown-list-title').textContent = 'Jumlah Uang Sewa yang Sudah Diterima per Unit:';
-        document.getElementById('drilldown-chart-title').textContent = 'Porsi Pembayaran Lunas:';
-
-        list.forEach((u, i) => {
-          const paidMonths = u.months.filter(m => m.st === 'SUDAH_BAYAR');
-          const uPaid = paidMonths.reduce((a, b) => a + b.amt, 0);
-          chartLabels.push(`${u.renter}`);
-          chartData.push(uPaid);
-          listHtml += `
-            <div class="breakdown-item">
-              <div>
-                <div class="breakdown-name">${i+1}. ${u.renter}</div>
-                <div class="breakdown-meta">${u.model} · <span style="color:var(--color-lunas); font-weight:700;">${paidMonths.length}/12 Bulan Lunas</span></div>
-              </div>
-              <div class="breakdown-val" style="color:var(--color-lunas);">Rp ${uPaid.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        });
-      } else if (type === 'pending') {
-        title = `🔴 Rincian Piutang / Belum Bayar`;
-        document.getElementById('drilldown-list-title').textContent = 'Sisa Tagihan yang Belum Dibayar per Unit:';
-        document.getElementById('drilldown-chart-title').textContent = 'Porsi Piutang Berjalan:';
-
-        list.forEach((u, i) => {
-          const unPaidMonths = u.months.filter(m => m.st !== 'SUDAH_BAYAR');
-          const uPending = unPaidMonths.reduce((a, b) => a + b.amt, 0);
-          if (uPending > 0) {
-            chartLabels.push(`${u.renter}`);
-            chartData.push(uPending);
-          }
-          listHtml += `
-            <div class="breakdown-item">
-              <div>
-                <div class="breakdown-name">${i+1}. ${u.renter}</div>
-                <div class="breakdown-meta">${u.model} · <span style="color:var(--color-belum); font-weight:700;">${unPaidMonths.length} Bulan Belum Lunas</span></div>
-              </div>
-              <div class="breakdown-val" style="color:var(--color-belum);">Rp ${uPending.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        });
-      } else if (type === 'feemonth') {
-        title = `🟠 Rincian Fee Bulanan Mitra Pemilik Unit`;
-        document.getElementById('drilldown-list-title').textContent = 'Fee Rutin yang Dibayarkan ke Pemilik Setiap Bulan:';
-        document.getElementById('drilldown-chart-title').textContent = 'Distribusi Fee Bulanan:';
-
-        list.forEach((u, i) => {
-          const feeNum = parseInt(String(u.fee).replace(/[^0-9]/g, '')) || 0;
-          if (feeNum > 0) {
-            chartLabels.push(`${u.renter} (${u.model})`);
-            chartData.push(feeNum);
-          }
-          listHtml += `
-            <div class="breakdown-item">
-              <div>
-                <div class="breakdown-name">${i+1}. ${u.renter} (${u.model})</div>
-                <div class="breakdown-meta">Plat: ${u.plate}</div>
-              </div>
-              <div class="breakdown-val" style="color:var(--color-dp);">${u.fee} / bln</div>
-            </div>
-          `;
-        });
-      } else if (type === 'feeyear') {
-        title = `🔵 Rincian Total Fee Tahunan Mitra Pemilik Unit`;
-        document.getElementById('drilldown-list-title').textContent = 'Akumulasi Fee Pemilik Selama 1 Tahun:';
-        document.getElementById('drilldown-chart-title').textContent = 'Porsi Fee Tahunan:';
-
-        list.forEach((u, i) => {
-          const feeMonthNum = parseInt(String(u.fee).replace(/[^0-9]/g, '')) || 0;
-          let feeYearNum = u.fee_year ? (parseInt(String(u.fee_year).replace(/[^0-9]/g, '')) || 0) : feeMonthNum * 12;
-          if (feeYearNum > 0) {
-            chartLabels.push(`${u.renter}`);
-            chartData.push(feeYearNum);
-          }
-          listHtml += `
-            <div class="breakdown-item">
-              <div>
-                <div class="breakdown-name">${i+1}. ${u.renter} (${u.model})</div>
-                <div class="breakdown-meta">Fee Bulanan: ${u.fee}</div>
-              </div>
-              <div class="breakdown-val" style="color:#60a5fa;">Rp ${feeYearNum.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        });
-      }
-
-      document.getElementById('drilldown-title-text').innerHTML = `<span>${title}</span>`;
-      container.innerHTML = listHtml;
-
-      renderDrilldownChart(chartLabels, chartData, chartColors);
-    }
-
-    function renderDrilldownChart(labels, data, colors) {
-      const ctx = document.getElementById('drilldownChartCanvas').getContext('2d');
-      if (drilldownChart) drilldownChart.destroy();
-
-      drilldownChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: colors.slice(0, labels.length),
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { color: '#9ca3af', font: { size: 9 }, boxWidth: 8 }
+              addedCount++;
             }
           }
-        }
+        });
       });
+
+      if (addedCount > 0) {
+        saveAll();
+        if (showToastNotice) showToast(`✅ ${addedCount} transaksi rekap kontrak otomatis disinkronkan ke Buku Kas!`);
+      }
     }
 
     // ── RENDER DAILY RENTALS ──
