@@ -126,7 +126,7 @@
     .year-btn.active { background: var(--accent-red); color: #fff; }
 
     /* Container */
-    .container { max-width: 1560px; width: 100%; margin: 0 auto; padding: 1.75rem; flex: 1; }
+    .container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 1.75rem; flex: 1; }
 
     /* KPI Summary Cards */
     .stats-grid {
@@ -148,14 +148,17 @@
     .stat-value { font-size: 1.65rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     .stat-sub { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* Legend Bar */
+    /* Action & Legend Bar */
+    .table-top-actions {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;
+    }
     .legend-bar {
       display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
-      background: rgba(17, 24, 39, 0.7); padding: 0.75rem 1.25rem;
-      border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 1.25rem;
+      background: rgba(17, 24, 39, 0.7); padding: 0.65rem 1.15rem;
+      border: 1px solid var(--border-color); border-radius: var(--radius-md);
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); }
-    .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); }
+    .legend-box { width: 10px; height: 10px; border-radius: 2px; }
 
     /* Matrix Table (Jan - Des) */
     .matrix-wrapper {
@@ -164,18 +167,18 @@
     }
     .matrix-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.8rem; }
     .matrix-table th {
-      background: rgba(0, 0, 0, 0.5); padding: 0.75rem 0.6rem; color: var(--text-secondary);
+      background: rgba(0, 0, 0, 0.5); padding: 0.75rem 0.5rem; color: var(--text-secondary);
       font-weight: 700; font-size: 0.75rem; border: 1px solid var(--border-color); text-transform: uppercase;
     }
     .matrix-table td {
-      padding: 0.65rem 0.5rem; border: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap;
+      padding: 0.65rem 0.4rem; border: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap;
     }
     .matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
 
     /* Month Cell Statuses */
     .cell-status {
       display: inline-block; width: 100%; padding: 4px 6px; border-radius: 4px;
-      font-weight: 700; font-size: 0.75rem; cursor: pointer; transition: all 0.15s ease;
+      font-weight: 700; font-size: 0.72rem; cursor: pointer; transition: all 0.15s ease;
     }
     .cell-status:hover { transform: scale(1.05); }
     .cell-lunas { background: var(--color-lunas-bg); color: var(--color-lunas); border: 1px solid var(--color-lunas-border); }
@@ -191,23 +194,35 @@
     /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 0.6rem 1.15rem; border-radius: var(--radius-sm); font-size: 0.85rem;
+      padding: 0.55rem 1.1rem; border-radius: var(--radius-sm); font-size: 0.85rem;
       font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s ease;
     }
     .btn-primary { background: var(--accent-red); color: #fff; }
     .btn-primary:hover { background: var(--accent-red-hover); transform: translateY(-1px); }
     .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-color); }
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
-    .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.75rem; }
+    .btn-edit { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .btn-edit:hover { background: rgba(59, 130, 246, 0.35); color: #fff; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.35); color: #fff; }
+    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.72rem; }
 
-    /* Form Card */
-    .form-card {
-      background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.75rem;
+    /* Edit Modal */
+    #edit-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999;
+      display: none; align-items: center; justify-content: center; padding: 1.5rem; backdrop-filter: blur(10px);
     }
-    .form-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;
+    .edit-modal-box {
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 780px;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.8);
     }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-title { font-size: 1.25rem; font-weight: 700; color: #fff; }
+    .close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+
+    /* Form Grid */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
     .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
     .form-input, .form-select {
@@ -216,6 +231,14 @@
       font-size: 0.85rem; outline: none; font-family: inherit;
     }
     .form-input:focus, .form-select:focus { border-color: var(--border-active); }
+
+    /* Months Status Grid inside Edit Modal */
+    .months-edit-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem;
+      background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.5rem;
+    }
+    .month-edit-item { display: flex; flex-direction: column; gap: 0.25rem; text-align: center; }
+    .month-edit-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); }
 
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.2s ease; }
@@ -256,8 +279,9 @@
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Data Utama Aktif</span></div>
-      <button class="btn btn-secondary btn-sm" onclick="exportExcelCsv()">📥 Export CSV / Excel</button>
+      <div class="live-badge"><div class="live-dot"></div><span>Editable Workspace</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openNewContractModal()">➕ Tambah Unit Baru</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportExcelCsv()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
     </div>
   </header>
@@ -267,7 +291,6 @@
     <div class="tab-group">
       <button class="tab-btn active" onclick="switchTab('tab-matrix')">📑 Tabel Matriks Kontrak (Jan - Des)</button>
       <button class="tab-btn" onclick="switchTab('tab-analytics')">📊 Grafik &amp; Analisis Fee</button>
-      <button class="tab-btn" onclick="switchTab('tab-add')">➕ Tambah Kontrak Baru</button>
     </div>
     <div class="year-switch">
       <button class="year-btn active" id="btn-2026" onclick="setYear(2026)">Tahun 2026</button>
@@ -302,25 +325,29 @@
       </div>
     </section>
 
-    <!-- Legend Keterangan Warna Sesuai Excel Master -->
-    <div class="legend-bar">
-      <span style="font-weight: 700; font-size: 0.8rem; color:#fff;">KETERANGAN STATUS:</span>
-      <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span><strong>HIJAU:</strong> SUDAH BAYAR (LUNAS)</span></div>
-      <div class="legend-item"><div class="legend-box" style="background: var(--color-belum);"></div><span><strong>MERAH:</strong> BELUM BAYAR</span></div>
-      <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span><strong>ABU-ABU:</strong> MULAI KONTRAK</span></div>
-      <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span><strong>ORANGE:</strong> BAYAR SETENGAH (DP)</span></div>
-      <span style="margin-left: auto; font-size:0.75rem; color:var(--text-muted);">*Klik kotak bulan untuk ubah status pembayaran</span>
+    <!-- Top Action Bar & Legend -->
+    <div class="table-top-actions">
+      <div class="legend-bar">
+        <span style="font-weight: 700; font-size: 0.75rem; color:#fff;">KETERANGAN:</span>
+        <div class="legend-item"><div class="legend-box" style="background: var(--color-lunas);"></div><span>🟢 SUDAH BAYAR</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: var(--color-belum);"></div><span>🔴 BELUM BAYAR</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: var(--color-dp);"></div><span>🟠 BAYAR SETENGAH (DP)</span></div>
+        <div class="legend-item"><div class="legend-box" style="background: var(--color-mulai);"></div><span>⚪ MULAI KONTRAK</span></div>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn btn-secondary btn-sm" onclick="resetToExcelDefault()">🔄 Reset ke Default Excel</button>
+      </div>
     </div>
 
-    <!-- TAB 1: MATRIX TABEL KONTRAK (JAN - DES) -->
+    <!-- TAB 1: MATRIX TABEL KONTRAK (JAN - DES) DENGAN TOMBOL EDIT -->
     <section id="tab-matrix" class="section active">
       <div class="matrix-wrapper">
         <table class="matrix-table">
           <thead>
             <tr>
               <th style="width: 35px;">No.</th>
-              <th style="text-align: left; min-width: 190px;">Nama Unit &amp; Pengontrak</th>
-              <th style="min-width: 100px;">PLAT</th>
+              <th style="text-align: left; min-width: 180px;">Nama Unit &amp; Pengontrak</th>
+              <th style="min-width: 95px;">PLAT</th>
               <th>Jan</th>
               <th>Feb</th>
               <th>Mar</th>
@@ -333,12 +360,13 @@
               <th>Okt</th>
               <th>Nov</th>
               <th>Des</th>
-              <th style="min-width: 110px;">FEE/BULAN</th>
-              <th style="min-width: 110px;">TOTAL</th>
+              <th style="min-width: 105px;">FEE/BULAN</th>
+              <th style="min-width: 105px;">TOTAL</th>
+              <th style="min-width: 100px;">AKSI</th>
             </tr>
           </thead>
           <tbody id="matrix-tbody">
-            <!-- Rendered by JS based on selected Year -->
+            <!-- Rendered by JS -->
           </tbody>
         </table>
       </div>
@@ -362,61 +390,74 @@
       </div>
     </section>
 
-    <!-- TAB 3: FORM TAMBAH KONTRAK BARU -->
-    <section id="tab-add" class="section">
-      <div class="form-card">
-        <h3 style="font-size: 1.1rem; color:#fff; margin-bottom: 0.5rem;">➕ Form Tambah Unit Kontrak Baru</h3>
-        <p style="font-size: 0.8rem; color: var(--text-secondary);">Tambahkan unit mobil/motor baru ke dalam tabel matriks kontrak</p>
-        <form id="add-contract-form" onsubmit="handleAddContract(event)">
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label">Nama Pengontrak</label>
-              <input type="text" id="add-renter" class="form-input" placeholder="Misal: Ayah Ratu / PT Nusa" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nama Unit / Model</label>
-              <input type="text" id="add-model" class="form-input" placeholder="Misal: Avanza All New / Brio" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Plat Nomor</label>
-              <input type="text" id="add-plate" class="form-input" placeholder="DR 1234 XY" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tarif Sewa Per Bulan (Rp)</label>
-              <input type="number" id="add-rate" class="form-input" placeholder="5500000" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Fee Pemilik Per Bulan (Rp)</label>
-              <input type="text" id="add-fee" class="form-input" placeholder="Rp. 1.850.000 / NO FEE" value="NO FEE">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tahun Kontrak</label>
-              <select id="add-year" class="form-select">
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-top: 1.25rem; display:flex; justify-content:flex-end;">
-            <button type="submit" class="btn btn-primary">💾 Simpan ke Master Rekap</button>
-          </div>
-        </form>
-      </div>
-    </section>
-
   </main>
+
+  <!-- EDIT / NEW MODAL DIALOG (BISA KERJA & EDIT LANGSUNG DI WEB) -->
+  <div id="edit-modal">
+    <div class="edit-modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title-text">✏️ Edit Data Kontrak Unit</h3>
+        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+
+      <form id="edit-contract-form" onsubmit="handleSaveContract(event)">
+        <input type="hidden" id="edit-row-idx">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nama Pengontrak</label>
+            <input type="text" id="edit-renter" class="form-input" placeholder="Ayah Ratu" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama Unit / Model</label>
+            <input type="text" id="edit-model" class="form-input" placeholder="Brio / Avanza Allnew" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plat Nomor</label>
+            <input type="text" id="edit-plate" class="form-input" placeholder="B 1861 VZN" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fee Pemilik / Bulan</label>
+            <input type="text" id="edit-fee" class="form-input" placeholder="Rp. 1.850.000 / NO FEE" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tarif Bulanan Default (Rp)</label>
+            <input type="number" id="edit-rate-default" class="form-input" placeholder="5500000" oninput="applyDefaultRateToAll(this.value)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tahun Kontrak</label>
+            <select id="edit-year-select" class="form-select">
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+
+        <h4 style="font-size: 0.9rem; color: #fff; margin-bottom: 0.65rem;">📅 Status &amp; Nominal Pembayaran Tiap Bulan (Januari - Desember):</h4>
+        <div class="months-edit-grid" id="months-edit-container">
+          <!-- Dynamic 12 months editors -->
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">💾 Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div id="toast" class="toast-box"></div>
 
   <script>
     const DEFAULT_PIN = "1234";
     let activeYear = 2026;
+    const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    // ── MASTER DATA FROM REKAP KONTRAK.XLSX ──
-    const masterData = {
+    // ── MASTER DATA DEFAULTS ──
+    const defaultMaster = {
       2026: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', total: 'Rp. 66.000.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000',
           months: [
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
             { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
@@ -425,7 +466,7 @@
           ]
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', total: 'Rp. 60.000.000',
+          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE',
           months: [
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
             { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' },
@@ -434,7 +475,7 @@
           ]
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', total: 'Rp. 72.000.000',
+          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000',
           months: [
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
             { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' },
@@ -443,7 +484,7 @@
           ]
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', total: 'Rp. 74.400.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000',
           months: [
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
             { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'SUDAH_BAYAR' },
@@ -452,34 +493,35 @@
           ]
         },
         {
-          no: 5, renter: 'Rachmad Satriowibowo', model: 'Vario 155', plate: 'DR 5229 CV', fee: 'Rp. 2.000.000', total: 'Rp. 24.000.000',
+          no: 5, renter: 'Rachmad Satriowibowo', model: 'Vario 155', plate: 'DR 5229 CV', fee: 'Rp. 2.000.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         },
         {
-          no: 6, renter: 'Rachmad Satriowibowo', model: 'Fazzio', plate: 'DR 3416 EP', fee: 'Rp. 500.000', total: 'Rp. 24.000.000',
+          no: 6, renter: 'Rachmad Satriowibowo', model: 'Fazzio', plate: 'DR 3416 EP', fee: 'Rp. 500.000',
           months: Array(12).fill(0).map(() => ({ amt: 2000000, st: 'SUDAH_BAYAR' }))
         }
       ],
       2027: [
         {
-          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000', total: 'Rp. 66.000.000',
+          no: 1, renter: 'Ayah Ratu', model: 'Brio', plate: 'B 1861 VZN', fee: 'Rp. 1.850.000',
           months: Array(12).fill(0).map(() => ({ amt: 5500000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE', total: 'Rp. 60.000.000',
+          no: 2, renter: 'Ayah Elok', model: 'Avanza Allnew', plate: 'D 1229 VDM', fee: 'NO FEE',
           months: Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000', total: 'Rp. 72.000.000',
+          no: 3, renter: 'Mama Dina', model: 'Avanza Allnew', plate: 'W 1248 DJ', fee: 'Rp. 500.000',
           months: Array(12).fill(0).map(() => ({ amt: 6000000, st: 'BELUM_BAYAR' }))
         },
         {
-          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000', total: 'Rp. 74.400.000',
+          no: 4, renter: 'Ayah Ratu', model: 'Avanza Allnew', plate: 'DR 1223 CJ', fee: 'Rp. 700.000',
           months: Array(12).fill(0).map(() => ({ amt: 6200000, st: 'BELUM_BAYAR' }))
         }
       ]
     };
 
+    let masterData = JSON.parse(JSON.stringify(defaultMaster));
     let monthlyChart = null;
     let unitShareChart = null;
 
@@ -491,7 +533,7 @@
       // Load stored custom edits if any
       const saved = localStorage.getItem('mt_master_rekap');
       if (saved) {
-        try { Object.assign(masterData, JSON.parse(saved)); } catch(e) {}
+        try { masterData = JSON.parse(saved); } catch(e) {}
       }
 
       renderMatrix();
@@ -533,7 +575,7 @@
 
           return `
             <td>
-              <span class="cell-status ${cls}" title="Klik untuk ubah status" onclick="toggleMonthStatus(${rowIdx}, ${mIdx})">
+              <span class="cell-status ${cls}" title="Klik cepat ubah status / klik tombol Edit untuk ubah nominal" onclick="toggleMonthStatus(${rowIdx}, ${mIdx})">
                 ${txt}
               </span>
             </td>
@@ -544,13 +586,12 @@
         totalPaid += rowPaid;
         totalPending += (rowSum - rowPaid);
 
-        // Parse fee
         const feeNum = parseInt(String(item.fee).replace(/[^0-9]/g, '')) || 0;
         totalFee += feeNum;
 
         return `
           <tr>
-            <td><strong>${item.no}</strong></td>
+            <td><strong>${item.no || (rowIdx + 1)}</strong></td>
             <td style="text-align: left;">
               <strong>${item.renter}</strong> / <span style="color:var(--text-secondary);">${item.model}</span>
             </td>
@@ -558,6 +599,10 @@
             ${monthsHtml}
             <td style="color: var(--color-dp); font-weight:700;">${item.fee}</td>
             <td style="font-weight:800; color:#fff;">Rp ${rowSum.toLocaleString('id-ID')}</td>
+            <td>
+              <button class="btn btn-edit btn-sm" onclick="openEditModal(${rowIdx})">✏️ Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteContract(${rowIdx})">🗑️</button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -574,46 +619,138 @@
       const item = masterData[activeYear][rowIdx];
       const m = item.months[mIdx];
 
-      // Cycle: SUDAH_BAYAR -> BELUM_BAYAR -> BAYAR_SETENGAH -> MULAI_KONTRAK
       if (m.st === 'SUDAH_BAYAR') m.st = 'BELUM_BAYAR';
       else if (m.st === 'BELUM_BAYAR') m.st = 'BAYAR_SETENGAH';
       else if (m.st === 'BAYAR_SETENGAH') m.st = 'MULAI_KONTRAK';
       else m.st = 'SUDAH_BAYAR';
 
+      saveAll();
+      showToast(`✅ Status ${monthsList[mIdx]} untuk ${item.renter} diubah!`);
+    }
+
+    // ── EDIT MODAL LOGIC ──
+    function openEditModal(rowIdx) {
+      const item = masterData[activeYear][rowIdx];
+      if (!item) return;
+
+      document.getElementById('modal-title-text').textContent = `✏️ Edit Kontrak: ${item.renter} (${item.model})`;
+      document.getElementById('edit-row-idx').value = rowIdx;
+      document.getElementById('edit-renter').value = item.renter;
+      document.getElementById('edit-model').value = item.model;
+      document.getElementById('edit-plate').value = item.plate;
+      document.getElementById('edit-fee').value = item.fee;
+      document.getElementById('edit-rate-default').value = item.months[0]?.amt || 5000000;
+      document.getElementById('edit-year-select').value = activeYear;
+
+      renderMonthsInModal(item.months);
+      document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function openNewContractModal() {
+      document.getElementById('modal-title-text').textContent = '➕ Tambah Unit Kontrak Baru';
+      document.getElementById('edit-row-idx').value = '-1';
+      document.getElementById('edit-renter').value = '';
+      document.getElementById('edit-model').value = '';
+      document.getElementById('edit-plate').value = '';
+      document.getElementById('edit-fee').value = 'NO FEE';
+      document.getElementById('edit-rate-default').value = 5000000;
+      document.getElementById('edit-year-select').value = activeYear;
+
+      const newMonths = Array(12).fill(0).map(() => ({ amt: 5000000, st: 'BELUM_BAYAR' }));
+      renderMonthsInModal(newMonths);
+      document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function renderMonthsInModal(monthsArray) {
+      const container = document.getElementById('months-edit-container');
+      container.innerHTML = monthsArray.map((m, idx) => `
+        <div class="month-edit-item">
+          <span class="month-edit-label">${monthsList[idx]}</span>
+          <select id="m-st-${idx}" class="form-select" style="padding: 4px; font-size:0.75rem;">
+            <option value="SUDAH_BAYAR" ${m.st === 'SUDAH_BAYAR' ? 'selected' : ''}>🟢 LUNAS</option>
+            <option value="BELUM_BAYAR" ${m.st === 'BELUM_BAYAR' ? 'selected' : ''}>🔴 BELUM</option>
+            <option value="BAYAR_SETENGAH" ${m.st === 'BAYAR_SETENGAH' ? 'selected' : ''}>🟠 DP / 1/2</option>
+            <option value="MULAI_KONTRAK" ${m.st === 'MULAI_KONTRAK' ? 'selected' : ''}>⚪ MULAI</option>
+          </select>
+          <input type="number" id="m-amt-${idx}" class="form-input" style="padding: 4px; font-size:0.75rem;" value="${m.amt}">
+        </div>
+      `).join('');
+    }
+
+    function applyDefaultRateToAll(val) {
+      const amt = Number(val || 0);
+      for (let i = 0; i < 12; i++) {
+        const inp = document.getElementById(`m-amt-${i}`);
+        if (inp) inp.value = amt;
+      }
+    }
+
+    function handleSaveContract(e) {
+      e.preventDefault();
+      const rowIdx = parseInt(document.getElementById('edit-row-idx').value);
+      const renter = document.getElementById('edit-renter').value;
+      const model = document.getElementById('edit-model').value;
+      const plate = document.getElementById('edit-plate').value;
+      const fee = document.getElementById('edit-fee').value;
+      const yr = Number(document.getElementById('edit-year-select').value);
+
+      const months = [];
+      for (let i = 0; i < 12; i++) {
+        const st = document.getElementById(`m-st-${i}`).value;
+        const amt = Number(document.getElementById(`m-amt-${i}`).value || 0);
+        months.push({ amt, st });
+      }
+
+      if (rowIdx >= 0) {
+        // Update existing
+        masterData[activeYear][rowIdx] = {
+          ...masterData[activeYear][rowIdx],
+          renter, model, plate, fee, months
+        };
+        showToast(`✅ Data kontrak ${renter} berhasil diperbarui!`);
+      } else {
+        // Add new
+        const newNo = (masterData[yr].length + 1);
+        masterData[yr].push({
+          no: newNo,
+          renter, model, plate, fee, months
+        });
+        setYear(yr);
+        showToast(`✅ Unit baru ${renter} (${model}) berhasil ditambahkan!`);
+      }
+
+      saveAll();
+      closeEditModal();
+    }
+
+    function deleteContract(rowIdx) {
+      const item = masterData[activeYear][rowIdx];
+      if (confirm(`Apakah Anda yakin ingin menghapus data kontrak ${item.renter} (${item.model})?`)) {
+        masterData[activeYear].splice(rowIdx, 1);
+        saveAll();
+        showToast('🗑️ Data kontrak berhasil dihapus.');
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    function resetToExcelDefault() {
+      if (confirm('Reset seluruh data ke format awal file Excel REKAP KONTRAK.xlsx?')) {
+        masterData = JSON.parse(JSON.stringify(defaultMaster));
+        saveAll();
+        showToast('🔄 Data berhasil di-reset ke default Excel!');
+      }
+    }
+
+    function saveAll() {
       localStorage.setItem('mt_master_rekap', JSON.stringify(masterData));
       renderMatrix();
       updateCharts();
-      showToast(`✅ Status pembayaran ${item.renter} (${item.model}) diperbarui!`);
     }
 
-    function handleAddContract(e) {
-      e.preventDefault();
-      const renter = document.getElementById('add-renter').value;
-      const model = document.getElementById('add-model').value;
-      const plate = document.getElementById('add-plate').value;
-      const rate = Number(document.getElementById('add-rate').value || 0);
-      const fee = document.getElementById('add-fee').value;
-      const yr = Number(document.getElementById('add-year').value);
-
-      const newRow = {
-        no: (masterData[yr].length + 1),
-        renter,
-        model,
-        plate,
-        fee,
-        total: `Rp ${(rate * 12).toLocaleString('id-ID')}`,
-        months: Array(12).fill(0).map(() => ({ amt: rate, st: 'BELUM_BAYAR' }))
-      };
-
-      masterData[yr].push(newRow);
-      localStorage.setItem('mt_master_rekap', JSON.stringify(masterData));
-      
-      setYear(yr);
-      switchTab('tab-matrix');
-      showToast(`✅ Unit baru ${renter} (${model}) berhasil ditambahkan!`);
-      document.getElementById('add-contract-form').reset();
-    }
-
+    // ── CHARTS INITIALIZATION ──
     function initCharts() {
       const ctx1 = document.getElementById('monthlyChart').getContext('2d');
       monthlyChart = new Chart(ctx1, {
@@ -643,7 +780,6 @@
     }
 
     function getChartData() {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
       const paidByMonth = Array(12).fill(0);
       const pendingByMonth = Array(12).fill(0);
 
@@ -655,7 +791,7 @@
       });
 
       return {
-        labels: months,
+        labels: monthsList,
         datasets: [
           { label: 'Sudah Terbayar (Lunas)', data: paidByMonth, backgroundColor: '#10b981', borderRadius: 4 },
           { label: 'Belum Terbayar (Piutang)', data: pendingByMonth, backgroundColor: '#ef4444', borderRadius: 4 }
@@ -669,7 +805,7 @@
         labels: list.map(u => `${u.renter} (${u.model})`),
         datasets: [{
           data: list.map(u => u.months.reduce((a, b) => a + b.amt, 0)),
-          backgroundColor: ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
+          backgroundColor: ['#d71920', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'],
           borderWidth: 0
         }]
       };
@@ -688,11 +824,11 @@
 
     function exportExcelCsv() {
       const list = masterData[activeYear] || [];
-      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       let rows = [];
 
       rows.push([`REKAP KONTRAK MOBIL ${activeYear}`]);
-      rows.push(['No.', 'Nama Unit & Pengontrak', 'PLAT', ...months, 'FEE/BULAN', 'TOTAL']);
+      rows.push(['No.', 'Nama Unit & Pengontrak', 'PLAT', ...fullMonths, 'FEE/BULAN', 'TOTAL']);
 
       list.forEach(item => {
         const mCols = item.months.map(m => `Rp ${m.amt.toLocaleString('id-ID')} [${m.st}]`);
