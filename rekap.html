@@ -856,6 +856,7 @@
     const STABLE_STORAGE_KEY_KONTRAK = "MENDADAK_KONTRAK_PERMANENT_V1";
     const STABLE_STORAGE_KEY_DAILY   = "MENDADAK_DAILY_PERMANENT_V1";
     const STABLE_STORAGE_KEY_CASH    = "MENDADAK_CASH_PERMANENT_V1";
+    const CLOUD_SYNC_URL = 'http://124.156.199.159:3859/api/rekap/sync';
 
     let currentTab = 'tab-kontrak';
     let currentDrilldown = null;
@@ -938,19 +939,57 @@
     let cashTransactions = JSON.parse(JSON.stringify(defaultCashTransactions));
 
     // ── ROBUST LOCALSTORAGE LOADER WITH AUTO-MIGRATION ──
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
-        window.history.replaceState({}, document.title, '/');
+    // ── CLOUD SYNC HELPERS ──
+    async function loadFromCloud() {
+      try {
+        const resp = await fetch(CLOUD_SYNC_URL, { signal: AbortSignal.timeout(5000) });
+        if (!resp.ok) return false;
+        const data = await resp.json();
+        if (!data.ok) return false;
+        let changed = false;
+        if (data.kontrak && Array.isArray(data.kontrak) && data.kontrak.length > 0) {
+          masterKontrak = data.kontrak;
+          localStorage.setItem(STABLE_STORAGE_KEY_KONTRAK, JSON.stringify(masterKontrak));
+          changed = true;
+        }
+        if (data.daily && Array.isArray(data.daily)) {
+          dailyRentals = data.daily;
+          localStorage.setItem(STABLE_STORAGE_KEY_DAILY, JSON.stringify(dailyRentals));
+          changed = true;
+        }
+        if (data.cash && Array.isArray(data.cash)) {
+          cashTransactions = data.cash;
+          localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
+          changed = true;
+        }
+        return changed;
+      } catch (e) {
+        console.warn('[CloudSync] Load gagal, pakai localStorage:', e.message);
+        return false;
       }
+    }
 
-      if (sessionStorage.getItem('fleet_auth') === 'true') {
-        document.getElementById('lock-screen').style.display = 'none';
+    async function pushToCloud() {
+      try {
+        await fetch(CLOUD_SYNC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            kontrak: masterKontrak,
+            daily: dailyRentals,
+            cash: cashTransactions
+          }),
+          signal: AbortSignal.timeout(5000)
+        });
+      } catch (e) {
+        console.warn('[CloudSync] Push gagal:', e.message);
       }
+    }
 
+    function loadFromLocalStorage() {
       // 1. Load Kontrak Data (with migration from all old keys)
       let loadedK = localStorage.getItem(STABLE_STORAGE_KEY_KONTRAK);
       if (!loadedK) {
-        // Search old keys
         const oldKeys = ['mt_master_kontrak_v6', 'mt_master_kontrak_v5', 'mt_master_kontrak_v4', 'mt_master_kontrak_v3', 'mt_master_kontrak'];
         for (const k of oldKeys) {
           const val = localStorage.getItem(k);
@@ -1011,10 +1050,43 @@
       } else {
         try { cashTransactions = JSON.parse(loadedC); } catch(e) {}
       }
+    }
 
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
+        window.history.replaceState({}, document.title, '/');
+      }
+
+      if (sessionStorage.getItem('fleet_auth') === 'true') {
+        document.getElementById('lock-screen').style.display = 'none';
+      }
+
+      // Try cloud first, fallback to localStorage
+      loadFromLocalStorage();
       renderMatrix();
       renderDaily();
       renderCashTable();
+
+      const cloudLoaded = await loadFromCloud();
+      if (cloudLoaded) {
+        renderMatrix();
+        renderDaily();
+        renderCashTable();
+        showToast('☁️ Data cloud tersinkronisasi!');
+      } else {
+        // If cloud has no data yet, push local data up
+        pushToCloud();
+      }
+    });
+
+    // Auto-sync when user switches back to this tab/window
+    window.addEventListener('focus', async () => {
+      const cloudLoaded = await loadFromCloud();
+      if (cloudLoaded) {
+        renderMatrix();
+        renderDaily();
+        renderCashTable();
+      }
     });
 
     // ── RENDER MATRIX KONTRAK ──
@@ -1694,6 +1766,9 @@
       localStorage.setItem('mt_master_kontrak_v6', JSON.stringify(masterKontrak));
       localStorage.setItem('mt_daily_rentals_v6', JSON.stringify(dailyRentals));
       localStorage.setItem('mt_cash_trans_v6', JSON.stringify(cashTransactions));
+
+      // ☁️ CLOUD SYNC — push to VPS for multi-device access
+      pushToCloud();
 
       renderMatrix();
       renderDaily();
