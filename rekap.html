@@ -1294,7 +1294,7 @@
           localStorage.setItem(STABLE_STORAGE_KEY_DAILY, JSON.stringify(dailyRentals));
           changed = true;
         }
-        if (data.cash && Array.isArray(data.cash)) {
+        if (data.cash && Array.isArray(data.cash) && data.cash.length > 0) {
           cashTransactions = data.cash;
           localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
           changed = true;
@@ -1726,6 +1726,9 @@
 
     // ── RENDER CASHFLOW / BUKU KAS DENGAN PILIHAN SUMBER DANA ──
     function renderCashTable() {
+      // Auto-sync contract cashflow into ledger if empty or new paid months exist
+      syncContractCashflowToLedger();
+
       const tbody = document.getElementById('cash-tbody');
       const filter = document.getElementById('filter-source')?.value || 'ALL';
 
@@ -1752,6 +1755,13 @@
       document.getElementById('kpi-kas-cash').textContent = `Rp ${totalCash.toLocaleString('id-ID')}`;
 
       const filtered = filter === 'ALL' ? cashTransactions : cashTransactions.filter(c => c.source === filter);
+
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Belum ada transaksi pencatatan kas. Klik <b>🟢 Catat Uang Masuk</b>, <b>🔴 Catat Uang Keluar</b>, atau <b>🔄 Sync Kas dari Kontrak</b> untuk merekap.</td></tr>`;
+        return;
+      }
 
       tbody.innerHTML = filtered.map((c, idx) => {
         let badgeSource = 'source-bca';
