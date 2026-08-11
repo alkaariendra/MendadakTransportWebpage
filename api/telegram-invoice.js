@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL || 'https://peaceful-gnat-190124.upstash.io',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || 'gQAAAAAAAuasAQIgcDEwNjcwN2FhYTUzMTI0MTA3YjA0ZjMwYjY3NjJkNTllMg',
 });
 
 const monthsList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
