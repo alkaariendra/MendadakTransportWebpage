@@ -30,7 +30,7 @@
 Seluruh data transaksi dan rekap disinkronkan secara real-time ke Cloud Database Upstash Redis:
 
 - **REST API URL**: `https://peaceful-gnat-190124.upstash.io`
-- **REST API Token**: `gQAAAAAAAuasAQIgcDEwNjcwN2FhYTUzMTI0MTA3YjA0ZjMwYjY3NjJkNTllMg`
+- **REST API Token**: `<UPSTASH_REST_API_TOKEN>`
 - **Vercel API Endpoint Sync**: `https://rekap.mendadaktransport.my.id/api/sync`
 - **Daftar Kunci Database (Redis Keys)**:
   - `rekap:kontrak` — Master Data Rekap Kontrak Bulanan & Tahunan (6 Unit)
