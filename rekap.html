@@ -372,6 +372,7 @@
     <div class="header-actions">
       <div class="live-badge"><div class="live-dot"></div><span>Autosave Aktif</span></div>
       <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
+      <button class="btn btn-secondary btn-sm" onclick="openQuickInvoiceModal()" title="Buat invoice PDF langsung">📄 Invoice PDF</button>
       <button class="btn btn-secondary btn-sm" onclick="downloadFullBackupJSON()" title="Download Cadangan Data Lengkap (JSON)">💾 Backup Data</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
@@ -1941,6 +1942,12 @@
       document.getElementById('invoice-modal').style.display = 'flex';
     }
 
+    function openQuickInvoiceModal() {
+      switchTab('tab-harian');
+      openNewDailyModal();
+      showToast('Isi data sewa harian, simpan, lalu invoice PDF akan terbuka otomatis.');
+    }
+
     function closeInvoiceModal() {
       document.getElementById('invoice-modal').style.display = 'none';
     }
@@ -2181,6 +2188,7 @@
       const endD = new Date(startD.getTime() + (dur * 86400000));
       const end = endD.toISOString().slice(0, 10);
 
+      let invoiceIdx = editIdx;
       if (editIdx >= 0) {
         dailyRentals[editIdx] = {
           ...dailyRentals[editIdx],
@@ -2193,6 +2201,7 @@
         dailyRentals.unshift({
           id: newId, client, phone, car, plate, service, start, end, dur, rate, extra, total, status
         });
+        invoiceIdx = 0;
 
         if (status.includes('LUNAS')) {
           cashTransactions.unshift({
@@ -2212,6 +2221,7 @@
 
       saveAll();
       closeDailyModal();
+      if (invoiceIdx >= 0) openInvoiceModal(invoiceIdx);
     }
 
     function deleteDaily(idx) {
