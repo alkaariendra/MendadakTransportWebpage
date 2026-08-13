@@ -1006,7 +1006,7 @@
       <div class="modal-header no-print" style="padding: 1.15rem 1.5rem; background: #1e293b; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
         <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">📄 Invoice Resmi Mendadak Transport</h3>
         <div style="display: flex; gap: 0.6rem; align-items: center;">
-          <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak / Download PDF</button>
+          <button class="btn btn-primary" onclick="downloadCurrentInvoicePdf()">📄 Download PDF</button>
           <button class="close-btn" onclick="closeInvoiceModal()">&times;</button>
         </div>
       </div>
@@ -1219,6 +1219,7 @@
     let currentTab = 'tab-kontrak';
     let currentDrilldown = null;
     let drilldownChart = null;
+    let currentInvoiceData = null;
     const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
     // ── MASTER DATA KONTRAK (UTAMA) ──
@@ -1911,6 +1912,22 @@
       const item = dailyRentals[idx];
       if (!item) return;
 
+      currentInvoiceData = {
+        invoice_no: item.id || `MT-${idx + 1}/INV/${new Date().getMonth() + 1}/${new Date().getFullYear()}`,
+        invoice_date: formatDateDisplay(item.start || new Date().toISOString().slice(0, 10)),
+        customer_name: item.client || 'Pelanggan',
+        customer_phone: item.phone || '-',
+        customer_address: item.address || 'Lombok',
+        car_model: item.car || 'ARMADA',
+        service_type: item.service || 'Sewa Mobil LK',
+        rental_dates: `${formatDateDisplay(item.start)} - ${formatDateDisplay(item.end)}`,
+        duration: Number(item.dur || 1),
+        price_per_day: Number(item.rate || 0),
+        additional_item_name: item.extra > 0 ? 'Biaya Extra / Overtime / Ongkir' : '',
+        additional_item_price: Number(item.extra || 0),
+        payment_method: item.status || 'TRANSFER PAYMENT'
+      };
+
       document.getElementById('inv-out-client').textContent = item.client || 'Pelanggan';
       document.getElementById('inv-out-phone').textContent = item.phone || '-';
       document.getElementById('inv-out-address').textContent = item.address || 'Lombok';
@@ -1950,6 +1967,38 @@
 
     function closeInvoiceModal() {
       document.getElementById('invoice-modal').style.display = 'none';
+    }
+
+    async function downloadCurrentInvoicePdf() {
+      if (!currentInvoiceData) {
+        showToast('Pilih invoice terlebih dahulu.');
+        return;
+      }
+
+      const button = document.querySelector('#invoice-modal .modal-header .btn-primary');
+      if (button) { button.disabled = true; button.textContent = '⏳ Menyiapkan PDF...'; }
+      try {
+        const response = await fetch('/api/invoice-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentInvoiceData)
+        });
+        if (!response.ok) throw new Error((await response.text()) || `HTTP ${response.status}`);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Invoice_${String(currentInvoiceData.customer_name || 'customer').replace(/[^a-z0-9]+/gi, '_')}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        showToast('✅ Invoice PDF berhasil di-download.');
+      } catch (error) {
+        showToast(`❌ Gagal download PDF: ${error.message}`);
+      } finally {
+        if (button) { button.disabled = false; button.textContent = '📄 Download PDF'; }
+      }
     }
 
     // ── RENDER CASHFLOW / BUKU KAS DENGAN PILIHAN SUMBER DANA ──

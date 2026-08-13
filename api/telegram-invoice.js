@@ -2,6 +2,7 @@ import { Redis } from '@upstash/redis';
 import PDFDocument from 'pdfkit';
 import fs from 'node:fs';
 import path from 'node:path';
+import { generateInvoicePdf as generateSharedInvoicePdf } from './invoice-template.js';
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || 'https://peaceful-gnat-190124.upstash.io',
@@ -216,14 +217,27 @@ https://rekap.mendadaktransport.my.id/rekap
 
 _Pesan otomatis sistem Mendadak Transport Workspace_`;
 
-        const pdfBuffer = await generateContractInvoicePdf({
-          item,
-          amount: due.currentMonthData.amt,
-          invoiceNo: invNumber,
-          dueDay: due.startDayNum,
-          monthName: currentMonthName,
-          year: currentYear,
-          status: due.currentMonthData.st,
+        const pdfBuffer = await generateSharedInvoicePdf({
+          invoice_no: invNumber,
+          customer_name: renter,
+          customer_address: item.address || 'Lombok',
+          customer_phone: item.phone || '-',
+          car_model: model,
+          service_type: 'Tagihan Sewa Kontrak',
+          rental_dates: `Jatuh tempo ${due.startDayNum} ${currentMonthName} ${currentYear}`,
+          duration: 1,
+          price_per_day: due.currentMonthData.amt,
+          payment_method: `STATUS: ${String(due.currentMonthData.st || 'BELUM_BAYAR').replace(/_/g, ' ')}`,
+          items: [{
+            no: 1,
+            name: 'SEWA KONTRAK MOBIL',
+            subname: `${model} - ${plate}`,
+            date: `Jatuh tempo ${due.startDayNum} ${currentMonthName} ${currentYear}`,
+            duration: 1,
+            qty: 1,
+            price: due.currentMonthData.amt,
+            amount: due.currentMonthData.amt,
+          }],
         });
 
         const tgUrl = `https://api.telegram.org/bot${botToken}/sendDocument`;
