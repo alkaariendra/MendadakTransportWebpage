@@ -799,14 +799,8 @@
           </div>
           <div class="form-group">
             <label class="form-label">Unit Mobil</label>
-            <select id="daily-car" class="form-select" required>
-              <option value="Toyota Innova Reborn">Toyota Innova Reborn (DR 1003 MT)</option>
-              <option value="Toyota Innova Zenix Q">Toyota Innova Zenix Q (DR 1004 MT)</option>
-              <option value="Toyota Fortuner VRZ">Toyota Fortuner VRZ (DR 1005 MT)</option>
-              <option value="All New Avanza">All New Avanza (DR 1001 MT)</option>
-              <option value="Mitsubishi Xpander">Mitsubishi Xpander (DR 1002 MT)</option>
-              <option value="Toyota Alphard Transformer">Toyota Alphard Transformer (DR 1006 MT)</option>
-              <option value="Toyota Hiace Premio">Toyota Hiace Premio (DR 1008 MT)</option>
+            <select id="daily-car" class="form-select" required onchange="autoFillPlate()">
+              <!-- Options diisi otomatis dari Master Armada (renderCarSelects) -->
             </select>
           </div>
           <div class="form-group">
@@ -903,16 +897,7 @@
           <div class="form-group">
             <label class="form-label">Terkait Unit Mobil/Motor (Opsional)</label>
             <select id="cash-car" class="form-select">
-              <option value="Umum / Operasional">Umum / Semua Unit</option>
-              <option value="B 1861 VZN (Brio)">B 1861 VZN (Honda Brio)</option>
-              <option value="D 1229 VDM (Avanza)">D 1229 VDM (Avanza All New)</option>
-              <option value="W 1248 DJ (Avanza)">W 1248 DJ (Avanza All New)</option>
-              <option value="DR 1223 CJ (Avanza)">DR 1223 CJ (Avanza All New)</option>
-              <option value="DR 1003 MT (Innova Reborn)">DR 1003 MT (Innova Reborn)</option>
-              <option value="DR 1004 MT (Innova Zenix)">DR 1004 MT (Innova Zenix Q)</option>
-              <option value="DR 1005 MT (Fortuner VRZ)">DR 1005 MT (Fortuner VRZ)</option>
-              <option value="DR 5229 CV (Vario 155)">DR 5229 CV (Honda Vario)</option>
-              <option value="DR 3416 EP (Fazzio)">DR 3416 EP (Yamaha Fazzio)</option>
+              <!-- Options diisi otomatis dari Master Armada (renderCarSelects) -->
             </select>
           </div>
 
@@ -1457,6 +1442,7 @@
       renderDaily();
       renderCashTable();
       renderArmadaTable();
+      renderCarSelects();
 
       const cloudLoaded = await loadFromCloud();
       if (cloudLoaded) {
@@ -1464,6 +1450,7 @@
         renderDaily();
         renderCashTable();
         renderArmadaTable();
+        renderCarSelects();
         showToast('☁️ Data cloud tersinkronisasi!');
       } else {
         // If cloud has no data yet, push local data up
@@ -1479,6 +1466,7 @@
         renderDaily();
         renderCashTable();
         renderArmadaTable();
+        renderCarSelects();
       }
     });
 
@@ -1918,7 +1906,7 @@
         customer_name: item.client || 'Pelanggan',
         customer_phone: item.phone || '-',
         customer_address: item.address || 'Lombok',
-        car_model: item.car || 'ARMADA',
+        car_model: item.plate ? `${item.car} (${item.plate})` : (item.car || 'ARMADA'),
         service_type: item.service || 'Sewa Mobil LK',
         rental_dates: `${formatDateDisplay(item.start)} - ${formatDateDisplay(item.end)}`,
         duration: Number(item.dur || 1),
@@ -1934,8 +1922,8 @@
       document.getElementById('inv-out-number').textContent = item.id || `MT-${idx+1}/INV/VIII/2026`;
       document.getElementById('inv-out-date').textContent = formatDateDisplay(item.start || new Date().toISOString().slice(0, 10));
 
-      const carNameUpper = (item.car || 'ARMADA').toUpperCase();
-      document.getElementById('inv-item-name').textContent = carNameUpper;
+      const carNameUpper = item.plate ? `${item.car} (${item.plate})` : (item.car || 'ARMADA');
+      document.getElementById('inv-item-name').textContent = carNameUpper.toUpperCase();
       document.getElementById('inv-item-service').textContent = item.service || 'Sewa Mobil LK';
       document.getElementById('inv-item-date').textContent = `${formatDateDisplay(item.start)} - ${formatDateDisplay(item.end)}`;
       document.getElementById('inv-item-dur').textContent = item.dur || 1;
@@ -2191,12 +2179,22 @@
       document.getElementById('daily-edit-idx').value = '-1';
       document.getElementById('daily-client').value = '';
       if (document.getElementById('daily-phone')) document.getElementById('daily-phone').value = '';
-      document.getElementById('daily-plate').value = 'DR 1003 MT';
+      document.getElementById('daily-plate').value = '';
       document.getElementById('daily-start-date').value = new Date().toISOString().slice(0, 10);
       document.getElementById('daily-duration').value = '3';
       document.getElementById('daily-rate').value = '500000';
       document.getElementById('daily-extra').value = '0';
+      selectDefaultDailyCar();
       document.getElementById('daily-modal').style.display = 'flex';
+    }
+
+    function selectDefaultDailyCar() {
+      const dailySel = document.getElementById('daily-car');
+      if (!dailySel || dailySel.options.length === 0) return;
+      const readyOpt = Array.from(dailySel.options).find(o => (o.dataset.status || 'READY').toUpperCase() === 'READY') || dailySel.options[0];
+      dailySel.selectedIndex = readyOpt.index;
+      dailySel.value = readyOpt.value;
+      autoFillPlate();
     }
 
     function openEditDailyModal(idx) {
@@ -2207,8 +2205,22 @@
       document.getElementById('daily-edit-idx').value = idx;
       document.getElementById('daily-client').value = d.client;
       if (document.getElementById('daily-phone')) document.getElementById('daily-phone').value = d.phone || '';
-      document.getElementById('daily-car').value = d.car;
-      document.getElementById('daily-plate').value = d.plate || 'DR 1003 MT';
+      const dailySel = document.getElementById('daily-car');
+      if (dailySel) {
+        let optFound = Array.from(dailySel.options).find(o => o.value === d.car && (o.dataset.plate || '') === (d.plate || ''));
+        if (!optFound) optFound = Array.from(dailySel.options).find(o => o.value === d.car);
+        if (optFound) {
+          dailySel.selectedIndex = optFound.index;
+        } else if (d.car) {
+          const opt = document.createElement('option');
+          opt.value = d.car;
+          opt.textContent = `${d.car} (${d.plate || '?'})`;
+          opt.dataset.plate = d.plate || '';
+          dailySel.appendChild(opt);
+          dailySel.value = d.car;
+        }
+      }
+      document.getElementById('daily-plate').value = d.plate || '';
       document.getElementById('daily-service').value = d.service;
       document.getElementById('daily-start-date').value = d.start;
       document.getElementById('daily-duration').value = d.dur;
@@ -2465,6 +2477,7 @@
       renderDaily();
       renderCashTable();
       renderArmadaTable();
+      renderCarSelects();
       if (currentDrilldown) showDrilldown(currentDrilldown);
     }
 
@@ -2554,6 +2567,46 @@
       }
 
       document.getElementById(id).classList.add('active');
+    }
+
+    // ── DYNAMIC CAR SELECTS (DARI MASTER ARMADA) ──
+    function escAttr(v) {
+      return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderCarSelects() {
+      const dailySel = document.getElementById('daily-car');
+      const cashSel = document.getElementById('cash-car');
+      const list = masterArmada || [];
+
+      if (dailySel) {
+        if (list.length === 0) {
+          dailySel.innerHTML = '<option value="Toyota Innova Reborn" data-plate="DR 1003 MT">Toyota Innova Reborn (DR 1003 MT)</option>';
+        } else {
+          dailySel.innerHTML = list.map(a =>
+            `<option value="${escAttr(a.model)}" data-plate="${escAttr(a.plate || '')}" data-status="${escAttr((a.status || 'READY').toUpperCase())}">${escAttr(a.model)} (${escAttr(a.plate || '-')})</option>`
+          ).join('');
+        }
+      }
+
+      if (cashSel) {
+        if (list.length === 0) {
+          cashSel.innerHTML = '<option value="Umum / Operasional">Umum / Semua Unit</option>';
+        } else {
+          const options = list.map(a => `<option value="${escAttr(a.plate)} (${escAttr(a.model)})">${escAttr(a.plate)} (${escAttr(a.model)})</option>`).join('');
+          cashSel.innerHTML = '<option value="Umum / Operasional">Umum / Semua Unit</option>' + options;
+        }
+      }
+    }
+
+    function autoFillPlate() {
+      const dailySel = document.getElementById('daily-car');
+      const plateInput = document.getElementById('daily-plate');
+      if (!dailySel || !plateInput) return;
+      const opt = dailySel.options[dailySel.selectedIndex];
+      if (opt && opt.dataset.plate) {
+        plateInput.value = opt.dataset.plate;
+      }
     }
 
     // ── RENDER & MANAGEMENT MASTER ARMADA (LIST MOBIL & PLAT) ──
