@@ -799,9 +799,8 @@
           </div>
           <div class="form-group">
             <label class="form-label">Unit Mobil</label>
-            <select id="daily-car" class="form-select" required onchange="autoFillPlate()">
-              <!-- Options diisi otomatis dari Master Armada (renderCarSelects) -->
-            </select>
+            <input type="text" id="daily-car" class="form-input" list="daily-car-list" placeholder="Ketik unit mobil atau pilih dari daftar..." required oninput="autoFillPlate()">
+            <datalist id="daily-car-list"></datalist>
           </div>
           <div class="form-group">
             <label class="form-label">Plat Nomor</label>
@@ -896,9 +895,8 @@
 
           <div class="form-group">
             <label class="form-label">Terkait Unit Mobil/Motor (Opsional)</label>
-            <select id="cash-car" class="form-select">
-              <!-- Options diisi otomatis dari Master Armada (renderCarSelects) -->
-            </select>
+            <input type="text" id="cash-car" class="form-input" list="cash-car-list" placeholder="Umum / Operasional atau ketik unit...">
+            <datalist id="cash-car-list"></datalist>
           </div>
 
           <div class="form-group">
@@ -2189,12 +2187,17 @@
     }
 
     function selectDefaultDailyCar() {
-      const dailySel = document.getElementById('daily-car');
-      if (!dailySel || dailySel.options.length === 0) return;
-      const readyOpt = Array.from(dailySel.options).find(o => (o.dataset.status || 'READY').toUpperCase() === 'READY') || dailySel.options[0];
-      dailySel.selectedIndex = readyOpt.index;
-      dailySel.value = readyOpt.value;
-      autoFillPlate();
+      const dailyInput = document.getElementById('daily-car');
+      if (!dailyInput) return;
+      const list = masterArmada || [];
+      let defaultItem = list.find(a => (a.status || 'READY').toUpperCase() === 'READY') || list[0];
+      if (defaultItem) {
+        dailyInput.value = `${defaultItem.model} (${defaultItem.plate || '-'})`;
+        const plateInput = document.getElementById('daily-plate');
+        if (plateInput) plateInput.value = defaultItem.plate || '';
+      } else if (dailyInput) {
+        dailyInput.value = '';
+      }
     }
 
     function openEditDailyModal(idx) {
@@ -2205,19 +2208,19 @@
       document.getElementById('daily-edit-idx').value = idx;
       document.getElementById('daily-client').value = d.client;
       if (document.getElementById('daily-phone')) document.getElementById('daily-phone').value = d.phone || '';
-      const dailySel = document.getElementById('daily-car');
-      if (dailySel) {
-        let optFound = Array.from(dailySel.options).find(o => o.value === d.car && (o.dataset.plate || '') === (d.plate || ''));
-        if (!optFound) optFound = Array.from(dailySel.options).find(o => o.value === d.car);
-        if (optFound) {
-          dailySel.selectedIndex = optFound.index;
-        } else if (d.car) {
-          const opt = document.createElement('option');
-          opt.value = d.car;
-          opt.textContent = `${d.car} (${d.plate || '?'})`;
-          opt.dataset.plate = d.plate || '';
-          dailySel.appendChild(opt);
-          dailySel.value = d.car;
+      const dailyInput = document.getElementById('daily-car');
+      if (dailyInput) {
+        // Unit lama disimpan sebagai model (d.car) + plat (d.plate) terpisah.
+        // Tampilkan gabungan "Model (PLAT)" agar konsisten dengan datalist,
+        // namun biarkan model saja jika datanya hanya model tanpa plat.
+        if (d.car) {
+          if (d.plate && !String(d.car).includes('(')) {
+            dailyInput.value = `${d.car} (${d.plate})`;
+          } else {
+            dailyInput.value = d.car;
+          }
+        } else {
+          dailyInput.value = '';
         }
       }
       document.getElementById('daily-plate').value = d.plate || '';
@@ -2235,8 +2238,13 @@
       const editIdx = parseInt(document.getElementById('daily-edit-idx').value);
       const client = document.getElementById('daily-client').value;
       const phone = document.getElementById('daily-phone')?.value || '';
-      const car = document.getElementById('daily-car').value;
-      const plate = document.getElementById('daily-plate').value;
+      const carInput = document.getElementById('daily-car').value || '';
+      const plateInput = document.getElementById('daily-plate').value || '';
+      // Nilai input bisa berbentuk "Model (PLAT)" dari datalist, atau teks bebas manual.
+      // Pecah kembali agar skema data (car = model, plate = plat) tetap konsisten.
+      const parsed = parseCarInput(carInput, plateInput);
+      const car = parsed.model;
+      const plate = parsed.plate;
       const service = document.getElementById('daily-service').value;
       const start = document.getElementById('daily-start-date').value;
       const dur = Number(document.getElementById('daily-duration').value || 1);
@@ -2305,6 +2313,8 @@
       document.getElementById('cash-amount').value = '';
       document.getElementById('cash-date').value = new Date().toISOString().slice(0, 10);
       document.getElementById('cash-desc').value = '';
+      const cashCarInput = document.getElementById('cash-car');
+      if (cashCarInput) cashCarInput.value = 'Umum / Operasional';
       document.getElementById('cash-modal').style.display = 'flex';
       handleCashTypeChange(type);
     }
@@ -2323,7 +2333,7 @@
       const type = document.getElementById('cash-type').value;
       const source = document.getElementById('cash-source').value;
       const cat = document.getElementById('cash-cat').value;
-      const car = document.getElementById('cash-car').value;
+      const car = (document.getElementById('cash-car').value || '').trim() || 'Umum / Operasional';
       const amount = Number(document.getElementById('cash-amount').value || 0);
       const date = document.getElementById('cash-date').value;
       const desc = document.getElementById('cash-desc').value;
@@ -2575,38 +2585,79 @@
     }
 
     function renderCarSelects() {
-      const dailySel = document.getElementById('daily-car');
-      const cashSel = document.getElementById('cash-car');
+      const dailyList = document.getElementById('daily-car-list');
+      const cashList = document.getElementById('cash-car-list');
       const list = masterArmada || [];
 
-      if (dailySel) {
+      if (dailyList) {
         if (list.length === 0) {
-          dailySel.innerHTML = '<option value="Toyota Innova Reborn" data-plate="DR 1003 MT">Toyota Innova Reborn (DR 1003 MT)</option>';
+          dailyList.innerHTML = '<option value="Toyota Innova Reborn (DR 1003 MT)" data-plate="DR 1003 MT" data-status="READY"></option>';
         } else {
-          dailySel.innerHTML = list.map(a =>
-            `<option value="${escAttr(a.model)}" data-plate="${escAttr(a.plate || '')}" data-status="${escAttr((a.status || 'READY').toUpperCase())}">${escAttr(a.model)} (${escAttr(a.plate || '-')})</option>`
+          dailyList.innerHTML = list.map(a =>
+            `<option value="${escAttr(a.model)} (${escAttr(a.plate || '-')})" data-plate="${escAttr(a.plate || '')}" data-status="${escAttr((a.status || 'READY').toUpperCase())}"></option>`
           ).join('');
         }
       }
 
-      if (cashSel) {
+      if (cashList) {
         if (list.length === 0) {
-          cashSel.innerHTML = '<option value="Umum / Operasional">Umum / Semua Unit</option>';
+          cashList.innerHTML = '<option value="Umum / Operasional"></option>';
         } else {
-          const options = list.map(a => `<option value="${escAttr(a.plate)} (${escAttr(a.model)})">${escAttr(a.plate)} (${escAttr(a.model)})</option>`).join('');
-          cashSel.innerHTML = '<option value="Umum / Operasional">Umum / Semua Unit</option>' + options;
+          const options = list.map(a => `<option value="${escAttr(a.plate)} (${escAttr(a.model)})" data-plate="${escAttr(a.plate)}" data-model="${escAttr(a.model)}"></option>`).join('');
+          cashList.innerHTML = '<option value="Umum / Operasional"></option>' + options;
         }
+      }
+
+      // Jaga agar nilai yang sudah terpilih tetap utuh setelah daftar di-render
+      const carInput = document.getElementById('daily-car');
+      const cashInput = document.getElementById('cash-car');
+      if (carInput && carInput.dataset.preserve) {
+        carInput.value = carInput.dataset.preserve;
+        delete carInput.dataset.preserve;
+      }
+      if (cashInput && cashInput.dataset.preserve) {
+        cashInput.value = cashInput.dataset.preserve;
+        delete cashInput.dataset.preserve;
       }
     }
 
     function autoFillPlate() {
-      const dailySel = document.getElementById('daily-car');
+      const carInput = document.getElementById('daily-car');
       const plateInput = document.getElementById('daily-plate');
-      if (!dailySel || !plateInput) return;
-      const opt = dailySel.options[dailySel.selectedIndex];
-      if (opt && opt.dataset.plate) {
-        plateInput.value = opt.dataset.plate;
+      if (!carInput || !plateInput) return;
+      const typed = (carInput.value || '').trim();
+      if (!typed) return;
+      const list = masterArmada || [];
+      // Cocokkan dengan model ATAU plat yang diketik
+      const match = list.find(a =>
+        (a.model && typed.toLowerCase().includes(String(a.model).toLowerCase())) ||
+        (a.plate && typed.toUpperCase().includes(String(a.plate).toUpperCase()))
+      );
+      if (match && match.plate) {
+        plateInput.value = match.plate;
       }
+    }
+
+    // Pecah input unit mobil ("Model (PLAT)" atau teks bebas) menjadi {model, plate}
+    function parseCarInput(value, plateOverride) {
+      let input = String(value || '').trim();
+      // Prioritas 1: cocok dengan master armada
+      const list = masterArmada || [];
+      const exact = list.find(a => input.toLowerCase() === `${a.model} (${a.plate})`.toLowerCase() ||
+                                    input.toLowerCase() === a.model.toLowerCase() ||
+                                    input.toUpperCase() === a.plate.toUpperCase());
+      if (exact) return { model: exact.model, plate: exact.plate, unitId: exact.id };
+
+      // Prioritas 2: pola "Model (PLAT)" di teks bebas
+      const m = input.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+      if (m) {
+        const model = m[1].trim();
+        const plate = m[2].trim().toUpperCase();
+        return { model: model || '', plate: plate || plateOverride || '' };
+      }
+
+      // Prioritas 3: teks manual murni → model = teks, plate dari kolom plat
+      return { model: input, plate: (plateOverride || '').toUpperCase() };
     }
 
     // ── RENDER & MANAGEMENT MASTER ARMADA (LIST MOBIL & PLAT) ──
