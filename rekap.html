@@ -2628,14 +2628,24 @@
       const typed = (carInput.value || '').trim();
       if (!typed) return;
       const list = masterArmada || [];
-      // Cocokkan dengan model ATAU plat yang diketik
-      const match = list.find(a =>
-        (a.model && typed.toLowerCase().includes(String(a.model).toLowerCase())) ||
-        (a.plate && typed.toUpperCase().includes(String(a.plate).toUpperCase()))
-      );
-      if (match && match.plate) {
-        plateInput.value = match.plate;
+      // 1) Prioritas: cocokkan plat yang tertulis di teks (mis. "Avanza (W 1248 DJ)")
+      const m = typed.match(/\(([^)]+)\)\s*$/);
+      const typedPlate = m ? m[1].trim().toUpperCase() : '';
+      if (typedPlate) {
+        const byPlate = list.find(a => a.plate && a.plate.toUpperCase() === typedPlate);
+        if (byPlate) { plateInput.value = byPlate.plate; return; }
       }
+      // 2) Cocokkan model; bila ada beberapa unit model sama, pilih yang state-nya READY
+      const byModel = list.filter(a => a.model && String(a.model).toLowerCase().includes(typed.toLowerCase()));
+      if (byModel.length === 1) { plateInput.value = byModel[0].plate || ''; return; }
+      if (byModel.length > 1) {
+        const ready = byModel.find(a => (a.status || 'READY').toUpperCase() === 'READY');
+        plateInput.value = (ready || byModel[0]).plate || '';
+        return;
+      }
+      // 3) Cocokkan plat saja
+      const byPlateOnly = list.find(a => a.plate && a.plate.toUpperCase().includes(typed.toUpperCase()));
+      if (byPlateOnly) { plateInput.value = byPlateOnly.plate; return; }
     }
 
     // Pecah input unit mobil ("Model (PLAT)" atau teks bebas) menjadi {model, plate}
