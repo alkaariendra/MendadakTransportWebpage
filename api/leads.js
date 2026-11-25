@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'METHOD_NOT_ALLOWED' });
   }
 
-  if (!requireAdmin(req, res)) return res;
+  if (!requireAdmin(req, res)) return res.status(401).json({ ok: false, error: 'ADMIN_AUTH_REQUIRED' });
 
   const limit = Number(req.query?.limit || 20);
   const days = Number(req.query?.days || 14);
