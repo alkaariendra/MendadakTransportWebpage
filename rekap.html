@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="assets/logo-mendadak-transport.png">
+  <link rel="icon" type="image/png" href="assets/mendadak-icon-actual-192.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -349,30 +349,31 @@
   <!-- Lock Screen Modal -->
   <div id="lock-screen">
     <div class="lock-box">
-      <img src="assets/logo-mendadak-transport.png" alt="Mendadak Transport Logo" class="logo-img">
+      <img src="assets/mendadak-icon-actual-192.png" alt="Mendadak Transport Logo" class="logo-img">
       <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
       <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Workspace Rental Harian &amp; Kontrak</p>
       <form id="pin-form" onsubmit="handlePinSubmit(event)">
-        <input type="password" id="pin-code" class="pin-input" placeholder="••••" maxlength="6" autofocus autocomplete="off">
+        <input type="password" id="pin-code" class="pin-input" placeholder="Token akses admin" aria-label="Token akses admin" autofocus autocomplete="off">
         <button type="button" class="btn btn-primary" onclick="handlePinSubmit(event)" style="width: 100%; justify-content: center; padding: 0.75rem;">Buka Workspace</button>
       </form>
-      <p id="pin-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 0.65rem; display: none;">PIN salah, silakan coba lagi.</p>
+      <p id="pin-error" style="color: #ef4444; font-size: 0.75rem; margin-top: 0.65rem; display: none;">Masukkan token admin yang dikonfigurasi pada server (ADMIN_ACCESS_TOKEN).</p>
     </div>
   </div>
 
   <!-- Header -->
   <header class="topbar">
     <div class="brand-group">
-      <img src="assets/logo-mendadak-transport.png" alt="Logo" class="top-logo">
+      <img src="assets/mendadak-icon-actual-192.png" alt="Logo" class="top-logo">
       <div>
         <div class="brand-title">MENDADAK <span>TRANSPORT</span></div>
         <div class="brand-sub">Workspace Operasional Rental, Kontrak &amp; Pembukuan Kas</div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="live-badge"><div class="live-dot"></div><span>Autosave Aktif</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span id="cloud-sync-status">Autosave lokal • Cloud menunggu login</span></div>
       <button class="btn btn-primary btn-sm" id="btn-top-add" onclick="handleTopAdd()">➕ Tambah Kontrak</button>
       <button class="btn btn-secondary btn-sm" onclick="openQuickInvoiceModal()" title="Buat invoice PDF langsung">📄 Invoice PDF</button>
+      <button class="btn btn-secondary btn-sm" onclick="openCloudBackupModal()" title="Lihat snapshot cloud dan restore eksplisit">🛡 Backup Cloud</button>
       <button class="btn btn-secondary btn-sm" onclick="downloadFullBackupJSON()" title="Download Cadangan Data Lengkap (JSON)">💾 Backup Data</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCurrentData()">📥 Export CSV</button>
       <button class="btn btn-secondary btn-sm" onclick="lockOut()">🔒 Kunci</button>
@@ -838,6 +839,22 @@
               <option value="BELUM BAYAR">🔴 BELUM BAYAR</option>
             </select>
           </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Sumber Lead / Channel (Opsional)</label>
+            <select id="daily-channel" class="form-select">
+              <option value="">— Tidak dicatat —</option>
+              <option value="WEBSITE">🌐 Website</option>
+              <option value="WHATSAPP">💬 WhatsApp Langsung</option>
+              <option value="INSTAGRAM">📸 Instagram</option>
+              <option value="TIKTOK">🎵 TikTok</option>
+              <option value="GOOGLE">🔎 Google / Maps</option>
+              <option value="REFERRAL">🤝 Referral / Rekomendasi</option>
+              <option value="WALK_IN">🚶 Walk-in</option>
+              <option value="REPEAT">🔁 Pelanggan Ulang</option>
+              <option value="LAINNYA">📝 Lainnya</option>
+            </select>
+          </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
@@ -887,6 +904,9 @@
               <option value="Fee Driver / Gaji">👨‍✈️ Fee Driver / Gaji</option>
               <option value="Fee Pemilik / Mitra">🤝 Fee Pemilik / Mitra Unit</option>
               <option value="Sparepart & Ban">⚙️ Sparepart &amp; Ban</option>
+              <option value="Angsuran Leasing / Mandiri Finance">🏦 Angsuran Leasing / Mandiri Finance</option>
+              <option value="Pajak / STNK / KIR">🧾 Pajak / STNK / KIR</option>
+              <option value="Tol / Parkir / Retribusi">🛣️ Tol / Parkir / Retribusi</option>
               <option value="Operasional Kantor">🏢 Operasional &amp; Konsumsi</option>
               <option value="Pemasukan Sewa">💰 Pemasukan Sewa Unit</option>
               <option value="Lain-lain">📝 Lain-lain</option>
@@ -1001,7 +1021,7 @@
           <!-- Header Area -->
           <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.5rem;">
             <div>
-              <img src="assets/logo-mendadak-header.png" alt="Mendadak Transport" style="height: 64px; width: 190px; object-fit: contain; object-position: left center;">
+              <img src="assets/mendadak-logo-original-tight.png" alt="Mendadak Transport" style="height: 64px; width: 190px; object-fit: contain; object-position: left center;">
             </div>
             <div style="text-align: right;">
               <div style="font-size: 1.15rem; font-weight: 900; color: #d71920; letter-spacing: 0.5px;">OFFICIAL INVOICE</div>
@@ -1189,15 +1209,35 @@
     </div>
   </div>
 
+  <div id="cloud-backup-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cloud-backup-title">
+    <div class="modal-box" style="max-width: 760px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="cloud-backup-title">🛡 Backup Cloud Rekap</h3>
+        <button class="close-btn" onclick="closeCloudBackupModal()" aria-label="Tutup backup cloud">&times;</button>
+      </div>
+      <p style="color:var(--text-secondary); font-size:0.82rem; margin-bottom:1rem;">Daftar ini hanya menampilkan metadata snapshot. Restore akan membuat backup pengaman sebelum data aktif diganti.</p>
+      <div id="cloud-backup-list" style="display:grid; gap:0.55rem;"><p style="color:var(--text-secondary);">Buka panel untuk memuat snapshot.</p></div>
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.2rem;">
+        <button class="btn btn-secondary" onclick="closeCloudBackupModal()">Tutup</button>
+        <button class="btn btn-primary" onclick="loadCloudBackups()">↻ Muat ulang</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast-box"></div>
 
   <script>
-    const DEFAULT_PIN = "1234";
+    let adminAccessToken = '';
+    let cloudReady = false;
     const STABLE_STORAGE_KEY_KONTRAK = "MENDADAK_KONTRAK_PERMANENT_V1";
     const STABLE_STORAGE_KEY_DAILY   = "MENDADAK_DAILY_PERMANENT_V1";
     const STABLE_STORAGE_KEY_CASH    = "MENDADAK_CASH_PERMANENT_V1";
     const STABLE_STORAGE_KEY_ARMADA  = "MENDADAK_ARMADA_PERMANENT_V1";
     const CLOUD_SYNC_URL = '/api/sync';
+    const CLOUD_SYNC_DEBOUNCE_MS = 500;
+    let cloudSyncTimer = null;
+    let cloudSyncInFlight = false;
+    let cloudSyncQueued = false;
 
     let currentTab = 'tab-kontrak';
     let currentDrilldown = null;
@@ -1206,98 +1246,16 @@
     const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
     // ── MASTER DATA KONTRAK (UTAMA) ──
-    const defaultMasterKontrak = [
-      {
-        no: 1, renter: 'Ayah Ratu', model: 'Honda Brio', plate: 'B 1861 VZN', start_date: '2026-01-22', end_date: '2027-12-22', fee: 'Rp. 1.850.000', fee_year: 'Rp. 11.100.000',
-        months: [
-          { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
-          { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' }, { amt: 5500000, st: 'SUDAH_BAYAR' },
-          { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' },
-          { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }, { amt: 5500000, st: 'BELUM_BAYAR' }
-        ]
-      },
-      {
-        no: 2, renter: 'Ayah Elok', model: 'Toyota Avanza All New', plate: 'D 1229 VDM', start_date: '2026-07-01', end_date: '2027-01-01', fee: 'NO FEE', fee_year: 'Rp. 0',
-        months: [
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'SUDAH_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' },
-          { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }, { amt: 5000000, st: 'BELUM_BAYAR' }
-        ]
-      },
-      {
-        no: 3, renter: 'Mama Dina', model: 'Toyota Avanza All New', plate: 'W 1248 DJ', start_date: '2026-07-06', end_date: '2027-01-06', fee: 'Rp. 500.000', fee_year: 'Rp. 3.000.000',
-        months: [
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'SUDAH_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' },
-          { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }, { amt: 6000000, st: 'BELUM_BAYAR' }
-        ]
-      },
-      {
-        no: 4, renter: 'Ayah Ratu', model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', start_date: '2026-07-24', end_date: '2027-01-24', fee: 'Rp. 700.000', fee_year: 'Rp. 4.200.000',
-        months: [
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 6200000, st: 'SUDAH_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' },
-          { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }, { amt: 6200000, st: 'BELUM_BAYAR' }
-        ]
-      },
-      {
-        no: 5, renter: 'Rachmad Satriowibowo', model: 'Honda Vario 155', plate: 'DR 5229 CV', start_date: '2026-08-04', end_date: '2026-12-04', fee: 'Rp. 2.000.000', fee_year: 'Rp. 8.000.000',
-        months: [
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' },
-          { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }
-        ]
-      },
-      {
-        no: 6, renter: 'Rachmad Satriowibowo', model: 'Yamaha Fazzio', plate: 'DR 3416 EP', start_date: '2026-08-04', end_date: '2026-12-04', fee: 'Rp. 500.000', fee_year: 'Rp. 2.000.000',
-        months: [
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' },
-          { amt: 0, st: 'BELUM_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' },
-          { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 2000000, st: 'SUDAH_BAYAR' }, { amt: 0, st: 'BELUM_BAYAR' }
-        ]
-      }
-    ];
+    const defaultMasterKontrak = [];
 
     // ── DATA SEWA HARIAN ──
-    const defaultDailyRentals = [
-      { id: 'MT-673/INV/XII/2025', client: 'Ibu Fatimah', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil Include', start: '2025-12-01', end: '2025-12-05', dur: 5, rate: 900000, extra: 0, total: 4500000, status: 'LUNAS (CASH)' },
-      { id: 'MT-674/INV/XII/2025', client: 'Ibu Rizelsa Aura', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-07', end: '2025-12-11', dur: 4, rate: 500000, extra: 0, total: 2000000, status: 'LUNAS (CASH)' },
-      { id: 'MT-675/INV/XII/2025', client: 'Ibu Hairunnisa', car: 'Toyota Innova Zenix Q', plate: 'DR 1004 MT', service: 'Sewa Mobil LK', start: '2025-12-14', end: '2025-12-16', dur: 3, rate: 1000000, extra: 0, total: 3000000, status: 'LUNAS (CASH)' },
-      { id: 'MT-676/INV/XII/2025', client: 'Bpk Anang Irianto', car: 'Toyota Fortuner VRZ', plate: 'DR 1005 MT', service: 'Sewa Mobil LK', start: '2025-12-16', end: '2025-12-19', dur: 4, rate: 1000000, extra: 0, total: 4000000, status: 'LUNAS (CASH)' },
-      { id: 'MT-677/INV/XII/2025', client: 'Bpk Made Takuya', car: 'Toyota Innova Reborn', plate: 'DR 1003 MT', service: 'Sewa Mobil LK', start: '2025-12-21', end: '2025-12-25', dur: 4, rate: 500000, extra: 150000, total: 2150000, status: 'LUNAS (CASH)' }
-    ];
+    const defaultDailyRentals = [];
 
     // ── DATA BUKU KAS ──
-    const defaultCashTransactions = [
-      { id: 1, date: '2026-08-01', type: 'IN', source: 'Bank BCA', cat: 'Pemasukan Sewa', car: 'B 1861 VZN (Brio)', desc: 'Pelunasan Sewa Kontrak Ayah Ratu', in: 5500000, out: 0 },
-      { id: 2, date: '2026-08-02', type: 'OUT', source: 'Bank BCA', cat: 'Fee Pemilik / Mitra', car: 'B 1861 VZN (Brio)', desc: 'Transfer Fee Bulanan Pemilik Unit Brio', in: 0, out: 1850000 },
-      { id: 3, date: '2026-08-03', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'BBM / Bensin', car: 'DR 1003 MT (Innova Reborn)', desc: 'Isi Pertamax Full Tank Innova Reborn', in: 0, out: 400000 },
-      { id: 4, date: '2026-08-04', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'Cuci Mobil / Salon', car: 'DR 1003 MT (Innova Reborn)', desc: 'Cuci poles bersih siap jalan', in: 0, out: 50000 },
-      { id: 5, date: '2026-08-05', type: 'IN', source: 'Bank Mandiri', cat: 'Pemasukan Sewa', car: 'DR 1005 MT (Fortuner VRZ)', desc: 'Pelunasan Sewa Fortuner 4 Hari Bpk Anang', in: 4000000, out: 0 },
-      { id: 6, date: '2026-08-06', type: 'OUT', source: 'Bank BCA', cat: 'Servis & Ganti Oli', car: 'DR 1003 MT (Innova Reborn)', desc: 'Ganti Oli Mesin TMO + Filter Oli di Bengkel Resmi', in: 0, out: 650000 },
-      { id: 7, date: '2026-08-07', type: 'OUT', source: 'Bank BCA', cat: 'Fee Driver / Gaji', car: 'DR 1003 MT (Innova Reborn)', desc: 'Fee Driver Perjalanan Tour Kuta Mandalika (3 Hari)', in: 0, out: 900000 },
-      { id: 8, date: '2026-08-08', type: 'IN', source: 'Bank BCA', cat: 'Pemasukan Sewa', car: 'W 1248 DJ (Avanza)', desc: 'Pelunasan Sewa Kontrak Mama Dina', in: 6000000, out: 0 },
-      { id: 9, date: '2026-08-09', type: 'OUT', source: 'Kas Tunai (Cash)', cat: 'Operasional Kantor', car: 'Umum / Operasional', desc: 'Beli ATK nota, kwitansi, dan konsumsi admin', in: 0, out: 150000 },
-      { id: 10, date: '2026-08-10', type: 'OUT', source: 'Bank BCA', cat: 'Fee Pemilik / Mitra', car: 'W 1248 DJ (Avanza)', desc: 'Transfer Fee Mitra Pemilik Unit Mama Dina', in: 0, out: 500000 }
-    ];
+    const defaultCashTransactions = [];
 
     // ── DATA MASTER ARMADA (LIST MOBIL & PLAT) ──
-    const defaultMasterArmada = [
-      { id: 1, model: 'Honda Brio', plate: 'B 1861 VZN', type: 'City Car', status: 'KONTRAK', notes: 'Kontrak Ayah Ratu (Fee Rp 1.850.000)' },
-      { id: 2, model: 'Toyota Avanza All New', plate: 'D 1229 VDM', type: 'Mobil MPV', status: 'KONTRAK', notes: 'Kontrak Ayah Elok (NO FEE)' },
-      { id: 3, model: 'Toyota Avanza All New', plate: 'W 1248 DJ', type: 'Mobil MPV', status: 'KONTRAK', notes: 'Kontrak Mama Dina (Fee Rp 500.000)' },
-      { id: 4, model: 'Toyota Avanza All New', plate: 'DR 1223 CJ', type: 'Mobil MPV', status: 'KONTRAK', notes: 'Kontrak Ayah Ratu (Fee Rp 700.000)' },
-      { id: 5, model: 'Honda Vario 155', plate: 'DR 5229 CV', type: 'Motor Matic', status: 'KONTRAK', notes: 'Kontrak Rachmad Satriowibowo' },
-      { id: 6, model: 'Yamaha Fazzio', plate: 'DR 3416 EP', type: 'Motor Matic', status: 'KONTRAK', notes: 'Kontrak Rachmad Satriowibowo' },
-      { id: 7, model: 'Toyota Innova Reborn', plate: 'DR 1003 MT', type: 'Mobil MPV Premium', status: 'READY', notes: 'Unit Sewa Harian Siaga' },
-      { id: 8, model: 'Toyota Innova Zenix Q', plate: 'DR 1004 MT', type: 'Mobil MPV Premium', status: 'READY', notes: 'Unit Sewa Harian Siaga' },
-      { id: 9, model: 'Toyota Fortuner VRZ', plate: 'DR 1005 MT', type: 'Mobil SUV', status: 'READY', notes: 'Unit Sewa Harian Siaga' }
-    ];
+    const defaultMasterArmada = [];
 
     let masterKontrak = JSON.parse(JSON.stringify(defaultMasterKontrak));
     let dailyRentals = JSON.parse(JSON.stringify(defaultDailyRentals));
@@ -1308,12 +1266,13 @@
     // ── CLOUD SYNC HELPERS ──
     async function loadFromCloud() {
       try {
-        const resp = await fetch(CLOUD_SYNC_URL, { signal: AbortSignal.timeout(5000) });
-        if (!resp.ok) return false;
+        if (!adminAccessToken) return false;
+        const resp = await adminFetch(CLOUD_SYNC_URL, { signal: AbortSignal.timeout(5000) });
         const data = await resp.json();
         if (!data.ok) return false;
+        if (!cloudReady) loadFromLocalStorage();
         let changed = false;
-        if (data.kontrak && Array.isArray(data.kontrak) && data.kontrak.length > 0) {
+        if (data.kontrak && Array.isArray(data.kontrak)) {
           masterKontrak = data.kontrak;
           localStorage.setItem(STABLE_STORAGE_KEY_KONTRAK, JSON.stringify(masterKontrak));
           changed = true;
@@ -1323,7 +1282,7 @@
           localStorage.setItem(STABLE_STORAGE_KEY_DAILY, JSON.stringify(dailyRentals));
           changed = true;
         }
-        if (data.cash && Array.isArray(data.cash) && data.cash.length > 0) {
+        if (data.cash && Array.isArray(data.cash)) {
           cashTransactions = data.cash;
           localStorage.setItem(STABLE_STORAGE_KEY_CASH, JSON.stringify(cashTransactions));
           changed = true;
@@ -1333,28 +1292,123 @@
           localStorage.setItem(STABLE_STORAGE_KEY_ARMADA, JSON.stringify(masterArmada));
           changed = true;
         }
-        return changed;
+        cloudReady = true;
+        setCloudSyncStatus('Autosave lokal • Cloud tersambung', 'saved');
+        return true;
       } catch (e) {
-        console.warn('[CloudSync] Load gagal, pakai localStorage:', e.message);
+        cloudReady = false;
+        setAccessMessage(e.message);
         return false;
       }
     }
 
+    function setCloudSyncStatus(message, state = 'idle') {
+      const el = document.getElementById('cloud-sync-status');
+      if (!el) return;
+      el.textContent = message;
+      el.dataset.state = state;
+    }
+
+    function queueCloudSync() {
+      if (!adminAccessToken || !cloudReady) {
+        setCloudSyncStatus('Autosave lokal • Cloud menunggu login', 'idle');
+        return;
+      }
+      cloudSyncQueued = true;
+      setCloudSyncStatus('Autosave lokal • Cloud menunggu upload', 'pending');
+      clearTimeout(cloudSyncTimer);
+      cloudSyncTimer = setTimeout(() => { pushToCloud(); }, CLOUD_SYNC_DEBOUNCE_MS);
+    }
+
     async function pushToCloud() {
+      if (!adminAccessToken || !cloudReady) return;
+      if (cloudSyncInFlight) { cloudSyncQueued = true; return; }
+      cloudSyncInFlight = true;
+      cloudSyncQueued = false;
+      setCloudSyncStatus('Autosave lokal • Mengunggah cloud…', 'uploading');
       try {
-        await fetch(CLOUD_SYNC_URL, {
+        const response = await adminFetch(CLOUD_SYNC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            kontrak: masterKontrak,
-            daily: dailyRentals,
-            cash: cashTransactions,
-            armada: masterArmada
-          }),
-          signal: AbortSignal.timeout(5000)
+          body: JSON.stringify({ kontrak: masterKontrak, daily: dailyRentals, cash: cashTransactions, armada: masterArmada }),
+          signal: AbortSignal.timeout(10000)
         });
+        const result = await response.json();
+        setCloudSyncStatus(`Autosave lokal • Cloud tersimpan ${new Date().toLocaleTimeString('id-ID')}`, 'saved');
+        return result;
       } catch (e) {
-        console.warn('[CloudSync] Push gagal:', e.message);
+        setCloudSyncStatus('Autosave lokal • Cloud gagal, coba lagi', 'error');
+        showToast('Gagal menyimpan cloud: ' + e.message);
+        return null;
+      } finally {
+        cloudSyncInFlight = false;
+        if (cloudSyncQueued) pushToCloud();
+      }
+    }
+    async function openCloudBackupModal() {
+      const modal = document.getElementById('cloud-backup-modal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      await loadCloudBackups();
+    }
+
+    function closeCloudBackupModal() {
+      const modal = document.getElementById('cloud-backup-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function formatBackupDate(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? 'Waktu tidak diketahui' : date.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    async function loadCloudBackups() {
+      const container = document.getElementById('cloud-backup-list');
+      if (!container) return;
+      container.innerHTML = '<p style="color:var(--text-secondary);">Memuat metadata snapshot…</p>';
+      try {
+        const response = await adminFetch('/api/backups?limit=50', { signal: AbortSignal.timeout(8000) });
+        const result = await response.json();
+        const backups = Array.isArray(result.backups) ? result.backups : [];
+        if (!backups.length) {
+          container.innerHTML = '<p style="color:var(--text-secondary);">Belum ada snapshot cloud.</p>';
+          return;
+        }
+        container.innerHTML = backups.map((backup) => {
+          const counts = backup.counts || {};
+          const label = `${formatBackupDate(backup.createdAt)} · ${backup.source || 'sync'}`;
+          const summary = `Kontrak ${Number(counts.kontrak || 0)} · Harian ${Number(counts.daily || 0)} · Kas ${Number(counts.cash || 0)} · Armada ${Number(counts.armada || 0)}`;
+          const encodedId = encodeURIComponent(String(backup.id || ''));
+          return `<div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap; padding:0.75rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:rgba(0,0,0,0.25);"><div><strong style="display:block; color:#fff;">${label}</strong><span style="color:var(--text-secondary); font-size:0.75rem;">${summary}</span></div><button class="btn btn-secondary btn-sm" data-backup-id="${encodedId}">Restore</button></div>`;
+        }).join('');
+        container.querySelectorAll('[data-backup-id]').forEach((button) => button.addEventListener('click', () => restoreCloudBackup(decodeURIComponent(button.dataset.backupId || ''))));
+      } catch (error) {
+        container.innerHTML = `<p style="color:#fca5a5;">Gagal memuat backup: ${error.message}</p>`;
+      }
+    }
+
+    async function restoreCloudBackup(id) {
+      if (!id) return;
+      const confirmed = window.prompt('Restore akan mengganti seluruh data aktif. Ketik RESTORE untuk melanjutkan:');
+      if (confirmed !== 'RESTORE') {
+        showToast('Restore dibatalkan.');
+        return;
+      }
+      try {
+        const response = await adminFetch('/api/backups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, confirm: 'RESTORE' }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const result = await response.json();
+        if (!result.ok) throw new Error(result.error || 'Restore gagal.');
+        await loadFromCloud();
+        renderMatrix(); renderDaily(); renderCashTable(); renderArmadaTable(); renderCarSelects();
+        showToast('✅ Backup berhasil dipulihkan. Safety backup telah dibuat.');
+        await loadCloudBackups();
+      } catch (error) {
+        showToast(`❌ Restore gagal: ${error.message}`);
       }
     }
 
@@ -1426,34 +1480,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      if (window.location.pathname.endsWith('.html') || window.location.pathname.endsWith('/rekap.html')) {
-        window.history.replaceState({}, document.title, '/');
-      }
+      sessionStorage.removeItem('fleet_auth');
 
-      if (sessionStorage.getItem('fleet_auth') === 'true') {
-        document.getElementById('lock-screen').style.display = 'none';
-      }
-
-      // Try cloud first, fallback to localStorage
-      loadFromLocalStorage();
-      renderMatrix();
-      renderDaily();
-      renderCashTable();
-      renderArmadaTable();
-      renderCarSelects();
-
-      const cloudLoaded = await loadFromCloud();
-      if (cloudLoaded) {
-        renderMatrix();
-        renderDaily();
-        renderCashTable();
-        renderArmadaTable();
-        renderCarSelects();
-        showToast('☁️ Data cloud tersinkronisasi!');
-      } else {
-        // If cloud has no data yet, push local data up
-        pushToCloud();
-      }
+      setAccessMessage('Masukkan token admin untuk membuka data. Jika server belum dikonfigurasi, hubungi pengelola.');
     });
 
     // Auto-sync when user switches back to this tab/window
@@ -1859,7 +1888,7 @@
             return `
               <tr>
                 <td><strong>${d.id}</strong></td>
-                <td><strong style="color:#fff;">${d.client}</strong></td>
+                <td><strong style="color:#fff;">${d.client}</strong>${d.channel ? `<br><small style="color:var(--text-secondary);">📥 ${d.channel}</small>` : ''}</td>
                 <td>${d.car}</td>
                 <td><div class="plate-tag">${d.plate || 'DR 1003 MT'}</div></td>
                 <td>${formatDateDisplay(d.start)} s/d ${formatDateDisplay(d.end)}</td>
@@ -1964,7 +1993,7 @@
       const button = document.querySelector('#invoice-modal .modal-header .btn-primary');
       if (button) { button.disabled = true; button.textContent = '⏳ Menyiapkan PDF...'; }
       try {
-        const response = await fetch('/api/invoice-pdf', {
+        const response = await adminFetch('/api/invoice-pdf', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(currentInvoiceData)
@@ -2182,6 +2211,7 @@
       document.getElementById('daily-duration').value = '3';
       document.getElementById('daily-rate').value = '500000';
       document.getElementById('daily-extra').value = '0';
+      if (document.getElementById('daily-channel')) document.getElementById('daily-channel').value = '';
       selectDefaultDailyCar();
       document.getElementById('daily-modal').style.display = 'flex';
     }
@@ -2230,6 +2260,7 @@
       document.getElementById('daily-rate').value = d.rate;
       document.getElementById('daily-extra').value = d.extra || 0;
       document.getElementById('daily-payment').value = d.status;
+      if (document.getElementById('daily-channel')) document.getElementById('daily-channel').value = d.channel || '';
       document.getElementById('daily-modal').style.display = 'flex';
     }
 
@@ -2251,6 +2282,7 @@
       const rate = Number(document.getElementById('daily-rate').value || 0);
       const extra = Number(document.getElementById('daily-extra').value || 0);
       const status = document.getElementById('daily-payment').value;
+      const channel = document.getElementById('daily-channel')?.value || '';
 
       const total = (dur * rate) + extra;
       const startD = new Date(start);
@@ -2261,14 +2293,14 @@
       if (editIdx >= 0) {
         dailyRentals[editIdx] = {
           ...dailyRentals[editIdx],
-          client, phone, car, plate, service, start, end, dur, rate, extra, total, status
+          client, phone, car, plate, service, start, end, dur, rate, extra, total, status, channel
         };
         showToast(`✅ Data sewa harian ${client} diperbarui!`);
       } else {
         const randNum = Math.floor(100 + Math.random() * 900);
         const newId = `MT-${randNum}/INV/VIII/2026`;
         dailyRentals.unshift({
-          id: newId, client, phone, car, plate, service, start, end, dur, rate, extra, total, status
+          id: newId, client, phone, car, plate, service, start, end, dur, rate, extra, total, status, channel
         });
         invoiceIdx = 0;
 
@@ -2369,8 +2401,10 @@
 
     // ── TELEGRAM BOT INVOICE REMINDER LOGIC ──
     function openTelegramModal() {
-      document.getElementById('tg-bot-token').value = localStorage.getItem('MT_TG_BOT_TOKEN') || '';
-      document.getElementById('tg-chat-id').value = localStorage.getItem('MT_TG_CHAT_ID') || '';
+      document.getElementById('tg-bot-token').disabled = true;
+      document.getElementById('tg-chat-id').disabled = true;
+      document.getElementById('tg-bot-token').placeholder = 'Dikelola di server: TELEGRAM_BOT_TOKEN';
+      document.getElementById('tg-chat-id').placeholder = 'Dikelola di server: TELEGRAM_CHAT_ID';
       document.getElementById('telegram-modal').style.display = 'flex';
     }
 
@@ -2379,32 +2413,20 @@
     }
 
     function saveTelegramSettings() {
-      const token = document.getElementById('tg-bot-token').value.trim();
-      const chatId = document.getElementById('tg-chat-id').value.trim();
-      localStorage.setItem('MT_TG_BOT_TOKEN', token);
-      localStorage.setItem('MT_TG_CHAT_ID', chatId);
-      showToast('✅ Setting Bot Telegram berhasil disimpan!');
+      localStorage.removeItem('MT_TG_BOT_TOKEN');
+      localStorage.removeItem('MT_TG_CHAT_ID');
+      showToast('Konfigurasi Telegram hanya melalui environment server. Hubungi pengelola.');
     }
 
     async function triggerTelegramInvoices(forceAll = false) {
-      const botToken = localStorage.getItem('MT_TG_BOT_TOKEN') || document.getElementById('tg-bot-token')?.value?.trim();
-      const chatId = localStorage.getItem('MT_TG_CHAT_ID') || document.getElementById('tg-chat-id')?.value?.trim();
-
-      if (!botToken || !chatId) {
-        showToast('⚠️ Masukkan Bot Token & Chat ID Telegram terlebih dahulu!');
-        openTelegramModal();
-        return;
-      }
 
       showToast('⏳ Mengecek & mengirim invoice tagihan ke Telegram...');
 
       try {
-        const resp = await fetch('/api/telegram-invoice', {
+        const resp = await adminFetch('/api/telegram-invoice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            botToken,
-            chatId,
             kontrak: masterKontrak,
             force: forceAll
           })
@@ -2480,8 +2502,8 @@
       localStorage.setItem('mt_daily_rentals_v6', JSON.stringify(dailyRentals));
       localStorage.setItem('mt_cash_trans_v6', JSON.stringify(cashTransactions));
 
-      // ☁️ CLOUD SYNC — push to VPS for multi-device access
-      pushToCloud();
+      // ☁️ CLOUD SYNC — queued/debounced upload plus versioned server snapshot
+      queueCloudSync();
 
       renderMatrix();
       renderDaily();
@@ -2544,17 +2566,48 @@
       setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
-    function handlePinSubmit(e) {
+    function setAccessMessage(message) {
+      const el = document.getElementById('pin-error');
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    async function adminFetch(url, options = {}) {
+      if (!adminAccessToken) throw new Error('Akses admin diperlukan.');
+      const response = await fetch(url, { ...options, headers: { ...options.headers, Authorization: 'Bearer ' + adminAccessToken } });
+      if (!response.ok) {
+        let code = '';
+        try { code = (await response.json()).error; } catch {}
+        const message = code === 'ADMIN_AUTH_NOT_CONFIGURED' ? 'Akses diblokir: ADMIN_ACCESS_TOKEN belum dikonfigurasi di server (minimal 32 karakter).'
+          : code === 'STORAGE_NOT_CONFIGURED' ? 'Akses diblokir: konfigurasi penyimpanan cloud belum tersedia. Hubungi pengelola.'
+          : code === 'TELEGRAM_NOT_CONFIGURED' ? 'Telegram belum dikonfigurasi: atur TELEGRAM_BOT_TOKEN dan TELEGRAM_CHAT_ID pada server.'
+          : response.status === 401 ? 'Token admin tidak valid atau telah dirotasi. Silakan masuk kembali.'
+          : 'Layanan cloud tidak tersedia. Data lokal tidak otomatis diunggah; coba lagi.';
+        if (response.status === 401 || code === 'ADMIN_AUTH_NOT_CONFIGURED') lockOut();
+        setAccessMessage(message);
+        throw new Error(message);
+      }
+      return response;
+    }
+
+    async function handlePinSubmit(e) {
       if (e) e.preventDefault();
-      sessionStorage.setItem('fleet_auth', 'true');
-      const lockElem = document.getElementById('lock-screen');
-      if (lockElem) lockElem.style.display = 'none';
+      adminAccessToken = document.getElementById('pin-code').value.trim();
+      cloudReady = false;
+      setAccessMessage('Memeriksa akses admin dan penyimpanan cloud...');
+      if (!await loadFromCloud()) return;
+      document.getElementById('pin-code').value = '';
+      document.getElementById('lock-screen').style.display = 'none';
+      renderMatrix(); renderDaily(); renderCashTable(); renderArmadaTable(); renderCarSelects();
     }
 
     function lockOut() {
+      adminAccessToken = '';
+      cloudReady = false;
       sessionStorage.removeItem('fleet_auth');
       document.getElementById('lock-screen').style.display = 'flex';
       document.getElementById('pin-code').value = '';
+      setAccessMessage('Sesi ditutup. Masukkan token admin untuk masuk kembali.');
     }
 
     function switchTab(id) {

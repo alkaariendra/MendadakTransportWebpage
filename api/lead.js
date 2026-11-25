@@ -1,5 +1,24 @@
-const ADMIN_WHATSAPP_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || "6289697301342";
+import { checkPublicRequest } from './_request-guard.js';
+import { buildLeadRecord, storeLead } from './_lead-store.js';
+
+const ADMIN_WHATSAPP_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || "6285923601619";
 const TELEGRAM_API_URL = "https://api.telegram.org";
+const ATTRIBUTION_FIELDS = [
+  ['campaign_source', ['source', 'campaign_source'], ['google', 'instagram', 'facebook', 'whatsapp', 'google_business']],
+  ['campaign_medium', ['medium', 'campaign_medium'], ['cpc', 'organic', 'social', 'referral', 'email']],
+  ['campaign_name', ['campaign', 'campaign_name'], ['lombok-rental', 'bandara-lombok', 'mataram', 'lepas-kunci-lombok']],
+  ['campaign_content', ['content', 'campaign_content'], ['bio', 'profile', 'post', 'reel', 'story', 'highlight', 'dm', 'comment', 'ad']]
+];
+
+export function normalizeAttribution(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  const normalized = {};
+  ATTRIBUTION_FIELDS.forEach(([field, keys, allowed]) => {
+    const values = keys.filter((key) => Object.prototype.hasOwnProperty.call(input, key)).map((key) => input[key]);
+    if (values.length === 1 && typeof values[0] === 'string' && allowed.includes(values[0])) normalized[field] = values[0];
+  });
+  return normalized;
+}
 
 function sendJson(res, statusCode, payload) {
   res.statusCode = statusCode;
@@ -74,20 +93,31 @@ function pickSummary(messages) {
   return (userSummary || "Pesanan baru dari AI assistant.").slice(0, 900);
 }
 
-function buildLeadText(messages, pageUrl) {
+function buildLeadText(messages, pageUrl, leadId = '', attribution = {}) {
   const summary = pickSummary(messages);
   const userText = pickUserText(messages);
+  const attributionText = [
+    attribution.campaign_source ? `Sumber ${attribution.campaign_source}` : '',
+    attribution.campaign_medium ? `Medium ${attribution.campaign_medium}` : '',
+    attribution.campaign_name ? `Kampanye ${attribution.campaign_name}` : '',
+    attribution.campaign_content ? `Konten ${attribution.campaign_content}` : ''
+  ].filter(Boolean).join(' · ');
 
   return [
     "ORDER BARU WEBSITE",
+    leadId ? `Lead ID: ${leadId}` : "",
     `Waktu: ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Makassar" })} WITA`,
     pageUrl ? `Sumber: ${pageUrl}` : "",
+    attributionText ? `Atribusi: ${attributionText}` : "",
     "",
     userText ? "Pesan pelanggan:" : "",
     userText || "",
     userText ? "" : "",
     "Ringkasan:",
     summary,
+    "",
+    "Status follow-up: NEW",
+    "Tindakan berikutnya: Balas pelanggan melalui WhatsApp",
     "",
     "Catatan katalog:",
     "Lead bisa berasal dari rental mobil, rental motor, paket tour, antar jemput bandara, atau transport acara/kantor.",
@@ -129,7 +159,7 @@ async function sendTelegramLead(text) {
   return { ok: true };
 }
 
-async function sendWebhookLead(body, messages, leadText) {
+async function sendWebhookLead(body, messages, leadText, leadId, attribution) {
   const webhookUrl = String(process.env.LEAD_WEBHOOK_URL || "").trim();
   const webhookSecret = String(process.env.LEAD_WEBHOOK_SECRET || "").trim();
 
@@ -141,19 +171,26 @@ async function sendWebhookLead(body, messages, leadText) {
     };
   }
 
+  const webhookPayload = {
+    source: "mendadaktransport.com",
+    createdAt: new Date().toISOString(),
+    leadId,
+    status: "NEW",
+    followUpStatus: "NEW",
+    nextAction: "REPLY_ON_WHATSAPP",
+    pageUrl: body.pageUrl || "",
+    leadText,
+    messages
+  };
+  if (Object.keys(attribution).length) webhookPayload.attribution = attribution;
+
   const response = await fetch(webhookUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-lead-secret": webhookSecret
     },
-    body: JSON.stringify({
-      source: "mendadaktransport.com",
-      createdAt: new Date().toISOString(),
-      pageUrl: body.pageUrl || "",
-      leadText,
-      messages
-    })
+    body: JSON.stringify(webhookPayload)
   });
 
   const data = await response.json().catch(() => ({}));
@@ -180,6 +217,9 @@ function normalizeChannelResult(result) {
 }
 
 export default async function handler(req, res) {
+  const guard = checkPublicRequest(req, res, { scope: 'lead', limit: 12, windowMs: 60_000 });
+  if (!guard.ok) return sendJson(res, 429, { error: 'Terlalu banyak permintaan. Coba lagi sebentar.', requestId: guard.requestId });
+  const requestId = guard.requestId;
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -187,7 +227,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    return sendJson(res, 405, { error: "Method not allowed" });
+    return sendJson(res, 405, { error: "Method not allowed", requestId });
   }
 
   try {
@@ -195,16 +235,18 @@ export default async function handler(req, res) {
     const messages = normalizeMessages(body.messages);
 
     if (!messages.length) {
-      return sendJson(res, 400, { error: "Ringkasan pesanan masih kosong." });
+      return sendJson(res, 400, { error: "Ringkasan pesanan masih kosong.", requestId });
     }
 
-    const leadText = buildLeadText(messages, body.pageUrl);
+    const leadId = requestId;
+    const attribution = normalizeAttribution(body.attribution);
+    const leadText = buildLeadText(messages, body.pageUrl, leadId, attribution);
     const fallbackUrl = createWhatsAppUrl(ADMIN_WHATSAPP_NUMBER, leadText);
 
     const [telegramResult, webhookResult] = (
       await Promise.allSettled([
         sendTelegramLead(leadText),
-        sendWebhookLead(body, messages, leadText)
+        sendWebhookLead(body, messages, leadText, leadId, attribution)
       ])
     ).map(normalizeChannelResult);
 
@@ -222,9 +264,27 @@ export default async function handler(req, res) {
         console.error("WhatsApp notification failed:", webhookResult.reason);
       }
 
+      const stored = await storeLead(buildLeadRecord({
+        leadId,
+        attribution,
+        pageUrl: body.pageUrl,
+        summary: pickSummary(messages),
+        userText: pickUserText(messages),
+        channel: channels.join("+"),
+        notificationStatus: "SENT"
+      }));
+      if (!stored.ok) {
+        console.error("Lead storage skipped:", stored.reason);
+      }
+
       return sendJson(res, 200, {
         ok: true,
+        leadId,
+        status: 'NEW',
+        followUpStatus: 'NEW',
+        nextAction: 'REPLY_ON_WHATSAPP',
         channel: channels.join("+"),
+        stored: Boolean(stored.ok),
         telegramSent: Boolean(telegramResult.ok),
         whatsappSent: Boolean(webhookResult.ok),
         message: webhookResult.ok
@@ -238,9 +298,27 @@ export default async function handler(req, res) {
       webhook: webhookResult.reason
     });
 
+    const storedFallback = await storeLead(buildLeadRecord({
+      leadId,
+      attribution,
+      pageUrl: body.pageUrl,
+      summary: pickSummary(messages),
+      userText: pickUserText(messages),
+      channel: 'fallback',
+      notificationStatus: "PENDING_NOTIFICATION"
+    }));
+    if (!storedFallback.ok) {
+      console.error("Lead storage skipped:", storedFallback.reason);
+    }
+
     return sendJson(res, 200, {
       ok: false,
+      leadId,
+      status: 'NEW',
+      followUpStatus: 'PENDING_NOTIFICATION',
+      nextAction: 'OPEN_WHATSAPP_FALLBACK',
       fallback: true,
+      stored: Boolean(storedFallback.ok),
       fallbackUrl,
       message: "Notifikasi otomatis belum aktif. Membuka WhatsApp admin sebagai fallback."
     });

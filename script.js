@@ -1,302 +1,108 @@
 // ── WhatsApp config ─────────────────────────────────────────────────
-const whatsappPrimary   = "6289697301342";
-const whatsappSecondary = "62881038004520";
+const whatsappPrimary   = "6285923601619";
+const whatsappSecondary = "6289697301342";
 const defaultMessage    = "Halo Mendadak Transport, saya ingin bertanya ketersediaan transport.";
-const thankYouUrl       = "/terima-kasih.html";
+const thankYouUrl       = "/terima-kasih";
+const pagePath = window.location.pathname.replace(/\.html$/, '') || "/";
+const pageTitle = document.querySelector("h1")?.textContent.trim().replace(/\s+/g, " ") || "";
+
+const getBookingPrompt = () => {
+  if (/bandara|airport/i.test(pagePath + pageTitle)) return "Tanggal, jam penerbangan, jumlah penumpang, dan tujuan akhir:";
+  if (/tour|paket/i.test(pagePath + pageTitle)) return "Tanggal mulai, jumlah peserta, dan paket/rute yang diminati:";
+  if (pagePath !== "/" && pageTitle) return "Tanggal mulai, durasi, dan pilihan lepas kunci atau driver:";
+  return "Tanggal mulai, durasi, layanan, dan area jemput:";
+};
+
+const contextualMessage = `Halo Mendadak Transport, saya ingin cek harga dan ketersediaan ${pageTitle || "layanan transport Lombok"}.\n\n${getBookingPrompt()}`;
 
 const createWhatsAppUrl = (number, message = defaultMessage) =>
   `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 
-const applyWhatsAppLink = (link, number, message) => {
-  link.setAttribute("href", createWhatsAppUrl(number, message));
+const withBookingPrompt = (message) => {
+  const base = String(message || contextualMessage).trim();
+  if (/tanggal|durasi|peserta|penerbangan|area jemput|tujuan akhir/i.test(base)) return base;
+  return `${base}\n\n${getBookingPrompt()}`;
+};
+
+const applyWhatsAppLink = (link, number, message = contextualMessage) => {
+  if (!link) return;
+  link.setAttribute("href", createWhatsAppUrl(number, withBookingPrompt(message)));
   link.setAttribute("target", "_blank");
   link.setAttribute("rel", "noopener");
 };
 
-document.querySelectorAll("[data-whatsapp-link]").forEach((l) => applyWhatsAppLink(l, whatsappPrimary));
-document.querySelectorAll("[data-whatsapp-link-alt]").forEach((l) => applyWhatsAppLink(l, whatsappSecondary));
+document.querySelectorAll("[data-whatsapp-link]").forEach((l) => applyWhatsAppLink(l, whatsappPrimary, contextualMessage));
+document.querySelectorAll("[data-whatsapp-link-alt]").forEach((l) => applyWhatsAppLink(l, whatsappSecondary, contextualMessage));
 document.querySelectorAll("[data-whatsapp-message]").forEach((l) =>
   applyWhatsAppLink(l, whatsappPrimary, l.dataset.whatsappMessage)
 );
-
-// AI booking assistant
-const ASSISTANT_WELCOME_MESSAGE = "Halo, saya asisten Mendadak Transport. Saya bisa bantu rental mobil, rental motor, paket tour Lombok, antar jemput bandara, dan transport acara/kantor. Ceritakan kebutuhan perjalanan Anda, nanti saya bantu cocokkan dengan katalog dan kirim ringkasan ke admin jika datanya cukup.";
-
-const getAssistantWelcomeMessage = () => ({
-  role: "assistant",
-  content: ASSISTANT_WELCOME_MESSAGE
-});
-
-const assistantState = {
-  open: false,
-  busy: false,
-  leadSent: false,
-  messages: [getAssistantWelcomeMessage()]
-};
-
-const assistantQuickReplies = [
-  "Mobil lepas kunci",
-  "Mobil dengan driver",
-  "Rental motor",
-  "Paket tour Lombok"
-];
-
-const assistantShell = document.createElement("div");
-assistantShell.className = "ai-assistant";
-assistantShell.innerHTML = `
-  <div class="ai-assistant-actions" aria-label="Aksi cepat">
-    <a class="ai-assistant-whatsapp-cta" href="#kontak" aria-label="Chat WhatsApp Mendadak Transport">
-      <img src="assets/icon-whatsapp.svg" alt="" />
-      <strong>WhatsApp</strong>
-    </a>
-    <button class="ai-assistant-toggle" type="button" aria-label="Buka AI assistant" aria-expanded="false">
-      <span>AI</span>
-      <strong>Tanya AI</strong>
-    </button>
-  </div>
-  <section class="ai-assistant-panel" aria-label="AI assistant Mendadak Transport">
-    <div class="ai-assistant-header">
-      <div>
-        <strong>AI Booking Assistant</strong>
-        <span>Mendadak Transport</span>
-      </div>
-      <button class="ai-assistant-close" type="button" aria-label="Tutup AI assistant">×</button>
-    </div>
-    <div class="ai-assistant-messages" aria-live="polite"></div>
-    <div class="ai-assistant-quick" aria-label="Pertanyaan cepat"></div>
-    <form class="ai-assistant-form">
-      <textarea rows="1" name="message" placeholder="Tulis nama, nomor HP, atau alamat..." aria-label="Tulis nama, nomor HP, atau alamat"></textarea>
-      <button type="submit">Kirim</button>
-    </form>
-    <button class="ai-assistant-wa" type="button">Kirim Manual ke Admin</button>
-    <span class="ai-assistant-status" aria-live="polite"></span>
-  </section>
+const floatingQuickCheck = document.querySelector("#quickCheckForm") && ["/", "/index"].includes(pagePath) ? document.createElement("a") : null;
+if (floatingQuickCheck) {
+  floatingQuickCheck.className = "floating-quick-check";
+  floatingQuickCheck.href = "#cek-harga";
+  floatingQuickCheck.dataset.trackCta = "quick_check";
+  floatingQuickCheck.textContent = "Cek harga";
+  floatingQuickCheck.setAttribute("aria-label", "Cek harga dan ketersediaan");
+}
+const floatingWhatsappActions = document.createElement("div");
+floatingWhatsappActions.className = "floating-whatsapp-actions";
+floatingWhatsappActions.setAttribute("aria-label", "Aksi WhatsApp");
+floatingWhatsappActions.innerHTML = `
+  <a class="floating-whatsapp-action floating-whatsapp-action-primary" href="#kontak" aria-label="Chat utama Mendadak Transport">
+    <img src="assets/icon-whatsapp.svg" alt="" />
+    <strong>Chat utama</strong>
+  </a>
+  <a class="floating-whatsapp-action floating-whatsapp-action-secondary" href="#kontak" aria-label="Chat alternatif Mendadak Transport">
+    <img src="assets/icon-whatsapp.svg" alt="" />
+    <strong>Chat alternatif</strong>
+  </a>
 `;
-document.body.appendChild(assistantShell);
+document.body.appendChild(floatingWhatsappActions);
+if (floatingQuickCheck) floatingWhatsappActions.prepend(floatingQuickCheck);
+applyWhatsAppLink(floatingWhatsappActions.querySelector(".floating-whatsapp-action-primary"), whatsappPrimary, contextualMessage);
+applyWhatsAppLink(floatingWhatsappActions.querySelector(".floating-whatsapp-action-secondary"), whatsappSecondary, contextualMessage);
 
-const assistantWhatsappCta = assistantShell.querySelector(".ai-assistant-whatsapp-cta");
-const assistantToggle = assistantShell.querySelector(".ai-assistant-toggle");
-const assistantPanel = assistantShell.querySelector(".ai-assistant-panel");
-const assistantClose = assistantShell.querySelector(".ai-assistant-close");
-const assistantMessagesEl = assistantShell.querySelector(".ai-assistant-messages");
-const assistantQuickEl = assistantShell.querySelector(".ai-assistant-quick");
-const assistantForm = assistantShell.querySelector(".ai-assistant-form");
-const assistantInput = assistantForm.querySelector("textarea");
-const assistantSubmit = assistantForm.querySelector("button");
-const assistantWa = assistantShell.querySelector(".ai-assistant-wa");
-const assistantStatus = assistantShell.querySelector(".ai-assistant-status");
+// ── Hero booking utility ────────────────────────────────────────────
+const quickCheckForm = document.querySelector("#quickCheckForm");
+const quickCheckDate = document.querySelector("#qcDate");
 
-applyWhatsAppLink(assistantWhatsappCta, whatsappPrimary);
+if (quickCheckDate) {
+  const today = new Date();
+  const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+  quickCheckDate.min = localToday;
+}
 
-const cleanAssistantText = (text) => String(text || "")
-  .replace(/\*\*(.*?)\*\*/g, "$1")
-  .replace(/__(.*?)__/g, "$1")
-  .replace(/`([^`]+)`/g, "$1")
-  .replace(/[*_]{2,}/g, "")
-  .replace(/^\s*[*]\s+/gm, "- ")
-  .trim();
-
-const escapeAssistantHtml = (text) => cleanAssistantText(text).replace(/[&<>"']/g, (char) => ({
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#039;"
-}[char])).replace(/\n/g, "<br>");
-
-const getCompactAssistantSummary = () => {
-  const latestAssistant = [...assistantState.messages].reverse().find((message) => (
-    message.role === "assistant"
-    && message.content !== ASSISTANT_WELCOME_MESSAGE
-    && !/pesanan sudah dikirim/i.test(message.content)
-  ));
-  const latestUsers = assistantState.messages
-    .filter((message) => message.role === "user")
-    .slice(-4)
-    .map((message) => cleanAssistantText(message.content))
-    .join("\n");
-
-  return cleanAssistantText(latestAssistant?.content || latestUsers || "Pesanan dari AI assistant.")
-    .replace(/klik tombol kirim pesanan ke admin.*$/i, "")
-    .replace(/website akan mengirim notifikasi ke admin otomatis.*$/i, "")
-    .replace(/ketersediaan dan harga final.*$/i, "")
-    .trim()
-    .slice(0, 900);
-};
-
-const updateAssistantWhatsApp = () => {
-  const message = `Halo admin Mendadak Transport, saya ingin meneruskan lead dari AI assistant website.\n\nRingkasan:\n${getCompactAssistantSummary()}`;
-  assistantWa.dataset.fallbackUrl = createWhatsAppUrl(whatsappPrimary, message);
-};
-
-const renderAssistantMessages = () => {
-  assistantMessagesEl.innerHTML = assistantState.messages
-    .map((message) => `<div class="ai-message ${message.role}">${escapeAssistantHtml(message.content)}</div>`)
-    .join("");
-  assistantMessagesEl.scrollTop = assistantMessagesEl.scrollHeight;
-  updateAssistantWhatsApp();
-};
-
-const setAssistantOpen = (open) => {
-  assistantState.open = open;
-  assistantShell.classList.toggle("open", open);
-  assistantToggle.setAttribute("aria-expanded", String(open));
-  if (open) {
-    renderAssistantMessages();
-    setTimeout(() => assistantInput.focus(), 80);
-  }
-};
-
-const setAssistantBusy = (busy) => {
-  assistantState.busy = busy;
-  assistantSubmit.disabled = busy;
-  assistantInput.disabled = busy;
-  assistantWa.disabled = busy || assistantState.leadSent;
-  assistantShell.classList.toggle("loading", busy);
-};
-
-const setAssistantStatus = (message, type = "") => {
-  assistantStatus.textContent = message;
-  assistantStatus.dataset.type = type;
-};
-
-const goToThankYouPage = () => {
-  window.setTimeout(() => {
-    window.location.assign(thankYouUrl);
-  }, 900);
-};
-
-const isAssistantLeadReady = (content) => {
-  const text = cleanAssistantText(content);
-  const hasSummary = /ringkasan\s+pesanan/i.test(text);
-  const hasIdentity = /(whats\s*app|wa|hp|nomor|nama|pesan pelanggan)/i.test(text);
-  const hasServiceDetail = /(layanan|armada|mobil|motor|tour|paket|bandara|driver|lepas\s+kunci|pengantaran|pengambilan|alamat|jemput|antar|lokasi|tanggal|durasi|peserta|rute|tujuan)/i.test(text);
-  const asksToSend = /kirim\s+pesanan\s+ke\s+admin|meneruskan\s+ringkasan|notifikasi\s+ke\s+admin/i.test(text);
-
-  return hasSummary && hasIdentity && (hasServiceDetail || asksToSend);
-};
-
-assistantQuickEl.innerHTML = assistantQuickReplies
-  .map((reply) => `<button type="button">${reply}</button>`)
-  .join("");
-
-assistantQuickEl.querySelectorAll("button").forEach((button) => {
-  button.addEventListener("click", () => {
-    assistantInput.value = button.textContent;
-    assistantForm.requestSubmit();
-  });
+let quickCheckStarted = false;
+quickCheckForm?.addEventListener("focusin", () => {
+  if (quickCheckStarted) return;
+  quickCheckStarted = true;
+  window.mtTrackEvent?.("quick_check_start", { form_name: "quick_check" });
 });
 
-const askAssistant = async (content) => {
-  const cleanContent = content.trim();
-  if (!cleanContent || assistantState.busy) return;
-
-  assistantState.messages.push({ role: "user", content: cleanContent });
-  assistantInput.value = "";
-  renderAssistantMessages();
-  setAssistantBusy(true);
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: assistantState.messages,
-        pageUrl: window.location.href,
-        pageTitle: document.title
-      })
-    });
-    const data = await response.json().catch(() => ({}));
-
-    const assistantReply = response.ok
-      ? cleanAssistantText(data.reply)
-      : (data.error || "Maaf, AI assistant sedang tidak tersedia. Silakan lanjut via WhatsApp.");
-
-    assistantState.messages.push({
-      role: "assistant",
-      content: assistantReply
-    });
-
-    if (response.ok && isAssistantLeadReady(assistantReply)) {
-      setTimeout(() => submitAssistantLead({ automatic: true }), 250);
-    }
-  } catch (error) {
-    assistantState.messages.push({
-      role: "assistant",
-      content: "Maaf, koneksi ke AI assistant sedang bermasalah. Silakan lanjut via WhatsApp agar admin bisa bantu langsung."
-    });
-  } finally {
-    setAssistantBusy(false);
-    assistantInput.style.height = "auto";
-    renderAssistantMessages();
-  }
-};
-
-const submitAssistantLead = async ({ automatic = false } = {}) => {
-  if (assistantState.busy || assistantState.leadSent) return;
-
-  setAssistantBusy(true);
-  setAssistantStatus(
-    automatic ? "Mengirim informasi ke admin..." : "Mengirim pesanan ke admin...",
-    "loading"
-  );
-
-  try {
-    const response = await fetch("/api/lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: assistantState.messages,
-        pageUrl: window.location.href
-      })
-    });
-    const data = await response.json().catch(() => ({}));
-
-    if (response.ok && data.ok) {
-      assistantState.leadSent = true;
-      setAssistantStatus(`${data.message || "Pesanan sudah dikirim ke admin."} Mengalihkan...`, "success");
-      assistantWa.textContent = "Terkirim ke Admin";
-      assistantWa.disabled = true;
-      goToThankYouPage();
-      return;
-    }
-
-    const fallbackUrl = data.fallbackUrl || assistantWa.dataset.fallbackUrl;
-    setAssistantStatus(
-      automatic
-        ? "Notifikasi otomatis belum aktif. Klik Kirim Manual ke Admin sebagai fallback."
-        : (data.message || "Membuka WhatsApp admin sebagai fallback."),
-      "warning"
-    );
-    if (!automatic && fallbackUrl) window.open(fallbackUrl, "_blank", "noopener");
-  } catch (error) {
-    setAssistantStatus(
-      automatic
-        ? "Koneksi notifikasi bermasalah. Klik Kirim Manual ke Admin sebagai fallback."
-        : "Koneksi notifikasi bermasalah. Membuka WhatsApp admin.",
-      "warning"
-    );
-    if (!automatic && assistantWa.dataset.fallbackUrl) {
-      window.open(assistantWa.dataset.fallbackUrl, "_blank", "noopener");
-    }
-  } finally {
-    setAssistantBusy(false);
-  }
-};
-
-assistantToggle.addEventListener("click", () => setAssistantOpen(!assistantState.open));
-assistantClose.addEventListener("click", () => setAssistantOpen(false));
-assistantForm.addEventListener("submit", (event) => {
+quickCheckForm?.addEventListener("submit", (event) => {
   event.preventDefault();
-  askAssistant(assistantInput.value);
-});
-assistantWa.addEventListener("click", submitAssistantLead);
-assistantInput.addEventListener("input", () => {
-  assistantInput.style.height = "auto";
-  assistantInput.style.height = `${Math.min(110, assistantInput.scrollHeight)}px`;
+  const service = document.querySelector("#qcService")?.value;
+  const date = quickCheckDate?.value;
+  const duration = document.querySelector("#qcDuration")?.value;
+  const area = document.querySelector("#qcArea")?.value;
+
+  const english = document.documentElement.lang === 'en';
+  const message = [
+    english ? 'Hello Mendadak Transport, I would like to check the price and availability.' : 'Halo Mendadak Transport, saya ingin cek harga dan ketersediaan.',
+    '',
+    `${english ? 'Service type' : 'Jenis layanan'}: ${service}`,
+    `${english ? 'Start date' : 'Tanggal mulai'}: ${date}`,
+    `${english ? 'Duration' : 'Durasi'}: ${duration}`,
+    `${english ? 'Pick-up area' : 'Area jemput'}: ${area}`
+  ].join("\n");
+
+  window.mtTrackEvent?.("quick_check_complete", { form_name: "quick_check", service_type: service, duration, pickup_area: area });
+  window.open(createWhatsAppUrl(whatsappPrimary, message), "_blank", "noopener,noreferrer");
+  window.mtTrackLeadSubmitted?.("quick_check", { service_type: service, duration, pickup_area: area });
 });
 
-renderAssistantMessages();
 
 const yearEl = document.querySelector("#year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -330,21 +136,99 @@ window.addEventListener("scroll", () => {
   siteHeader?.classList.toggle("scrolled", window.scrollY > 60);
 }, { passive: true });
 
-// ── Fleet category filter ───────────────────────────────────────────
-const filterBtns  = document.querySelectorAll(".filter-btn");
-const priceCards  = document.querySelectorAll(".price-card");
+// ── Fleet discovery search and category filter ───────────────────────
+const filterBtns = document.querySelectorAll(".filter-btn");
+const priceCards = document.querySelectorAll(".price-card");
+const fleetSearch = document.querySelector("[data-fleet-search]");
+const fleetSearchClear = document.querySelector("[data-fleet-search-clear]");
+const fleetResultCount = document.querySelector("[data-fleet-result-count]");
+const fleetGrid = document.querySelector(".price-grid");
+const fleetEmpty = fleetGrid ? document.createElement("p") : null;
+let activeFleetFilter = "all";
+
+// Baris harga sebelumnya membuat pengunjung mengklik area statis (dead click).
+// Sekarang baris harga membuka WhatsApp dengan konteks unit yang sama seperti tombol Pesan.
+priceCards.forEach((card) => {
+  const nameEl = card.querySelector("h3");
+  const waLink = card.querySelector(".whatsapp-action");
+  const priceList = card.querySelector("dl");
+  if (!nameEl || !waLink || !priceList) return;
+
+  const unit = nameEl.textContent.trim();
+  priceList.classList.add("price-list-actionable");
+  priceList.setAttribute("role", "link");
+  priceList.setAttribute("tabindex", "0");
+  priceList.setAttribute("aria-label", `Pesan ${unit} via WhatsApp`);
+
+  const openUnitWhatsApp = (event) => {
+    if (event) event.preventDefault();
+    const message = waLink.dataset.whatsappMessage
+      || `Halo Mendadak Transport, saya ingin cek ketersediaan ${unit}.`;
+    window.mtTrackEvent?.("pricelist_click", { car_model: unit, action: "whatsapp" });
+    window.open(createWhatsAppUrl(whatsappPrimary, message), "_blank", "noopener,noreferrer");
+  };
+
+  priceList.addEventListener("click", openUnitWhatsApp);
+  priceList.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+      openUnitWhatsApp(event);
+    }
+  });
+});
+
+if (fleetEmpty) {
+  fleetEmpty.className = "fleet-empty-state";
+  fleetEmpty.textContent = "Belum ada unit yang cocok. Coba kata kunci atau kategori lain.";
+  fleetEmpty.hidden = true;
+  fleetGrid.insertAdjacentElement("afterend", fleetEmpty);
+}
+
+const updateFleetResults = () => {
+  const query = (fleetSearch?.value || "").trim().toLowerCase();
+  let visibleCount = 0;
+
+  priceCards.forEach((card) => {
+    const searchableText = card.textContent.toLowerCase();
+    const matchesCategory = activeFleetFilter === "all" || card.dataset.category === activeFleetFilter;
+    const matchesQuery = !query || searchableText.includes(query);
+    const visible = matchesCategory && matchesQuery;
+    card.style.display = visible ? "" : "none";
+    card.setAttribute("aria-hidden", String(!visible));
+    if (visible) visibleCount += 1;
+  });
+
+  if (fleetResultCount) {
+    fleetResultCount.textContent = `${visibleCount} unit${visibleCount === 1 ? "" : " tersedia"}`;
+  }
+  if (fleetSearchClear) fleetSearchClear.hidden = !query;
+  if (fleetEmpty) fleetEmpty.hidden = visibleCount > 0;
+};
 
 filterBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     filterBtns.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
-    const filter = btn.dataset.filter;
-    priceCards.forEach((card) => {
-      const show = filter === "all" || card.dataset.category === filter;
-      card.style.display = show ? "" : "none";
-    });
+    activeFleetFilter = btn.dataset.filter;
+    updateFleetResults();
+    window.mtTrackEvent?.("fleet_filter", { filter_name: activeFleetFilter, result_count: priceCards.length });
   });
 });
+
+let fleetSearchTracked = false;
+fleetSearch?.addEventListener("input", () => {
+  updateFleetResults();
+  if (!fleetSearchTracked && fleetSearch.value.trim()) {
+    fleetSearchTracked = true;
+    window.mtTrackEvent?.("fleet_search", { query_present: true });
+  }
+});
+fleetSearchClear?.addEventListener("click", () => {
+  fleetSearch.value = "";
+  fleetSearch.focus();
+  updateFleetResults();
+});
+
+updateFleetResults();
 
 // ── Scroll-triggered animations ─────────────────────────────────────
 // Testimonial slider
