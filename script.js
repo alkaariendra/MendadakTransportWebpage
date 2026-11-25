@@ -1,3 +1,20 @@
+// ── Hero CTA: smooth mobile scroll + focus to quick-check form ────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-scroll-target]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const target = document.getElementById(el.dataset.scrollTarget);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => {
+        const first = target.querySelector('select, input, button');
+        if (first) first.focus({ preventScroll: true });
+      }, 450);
+      window.mtTrackEvent?.('cta_click', { cta_type: 'hero_quick_check', cta_label: 'Cek Harga & Ketersediaan' });
+    });
+  });
+});
+
 // ── WhatsApp config ─────────────────────────────────────────────────
 const whatsappPrimary   = "6285923601619";
 const whatsappSecondary = "6289697301342";
@@ -236,6 +253,17 @@ const testimonialTrack = document.querySelector("[data-testimonial-track]");
 const testimonialCards = testimonialTrack ? Array.from(testimonialTrack.querySelectorAll(".testimonial-card")) : [];
 const testimonialPrev = document.querySelector("[data-testimonial-prev]");
 const testimonialNext = document.querySelector("[data-testimonial-next]");
+
+// Create dots dynamically before binding listeners
+const dotsContainer = document.querySelector("[data-testimonial-dots]");
+if (dotsContainer && testimonialCards.length) {
+  testimonialCards.forEach((_, i) => {
+    const dot = document.createElement("button");
+    dot.dataset.testimonialDot = i;
+    dot.setAttribute("aria-label", `Testimoni ${i + 1}`);
+    dotsContainer.appendChild(dot);
+  });
+}
 const testimonialDots = Array.from(document.querySelectorAll("[data-testimonial-dot]"));
 
 if (testimonialTrack && testimonialCards.length) {
@@ -279,6 +307,7 @@ if (testimonialTrack && testimonialCards.length) {
     });
   });
 
+
   testimonialTrack.addEventListener("scroll", () => {
     if (testimonialTicking) return;
     testimonialTicking = true;
@@ -298,3 +327,53 @@ const observer = new IntersectionObserver(
   { threshold: 0.1 }
 );
 document.querySelectorAll(".animate-on-scroll").forEach((el) => observer.observe(el));
+
+// ── Fleet quick-view overlay (hover desktop) ────────────────────────
+document.querySelectorAll(".price-card").forEach((card) => {
+  if (card.querySelector(".quick-view")) return;
+  const nameEl = card.querySelector("h3");
+  const dl = card.querySelector("dl");
+  const wa = card.querySelector(".whatsapp-action");
+  if (!nameEl || !dl || !wa) return;
+  const unit = nameEl.textContent.trim();
+  const priceText = dl.textContent.replace(/\s+/g, " ").trim();
+  const overlay = document.createElement("div");
+  overlay.className = "quick-view";
+  overlay.innerHTML = `<strong>${unit}</strong><span>${priceText}</span><a href="${wa.getAttribute("href") || "#kontak"}" data-whatsapp-message="${wa.dataset.whatsappMessage || ""}">Pesan via WhatsApp</a>`;
+  card.appendChild(overlay);
+});
+
+// ── WhatsApp flow: pre-fill from URL + progress ─────────────────────
+(function () {
+  const params = new URLSearchParams(location.search);
+  const prefillMap = { qcService: "service", qcDate: "date", qcDuration: "duration", qcArea: "area", name: "name" };
+  let prefilled = false;
+  Object.entries(prefillMap).forEach(([id, key]) => {
+    const val = params.get(key);
+    if (!val) return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.tagName === "SELECT") {
+      const opt = Array.from(el.options).find(o => o.value === val || o.text === val);
+      if (opt) { el.value = opt.value; prefilled = true; }
+    } else {
+      el.value = val;
+      prefilled = true;
+    }
+  });
+  if (prefilled) window.mtTrackEvent?.("quick_check_prefill", { form_name: "quick_check" });
+
+  const form = document.getElementById("quickCheckForm");
+  if (!form) return;
+  const submitBtn = form.querySelector(".qc-submit");
+  if (!submitBtn) return;
+  form.addEventListener("submit", () => {
+    const original = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Mengirim ke WhatsApp...";
+    setTimeout(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = original;
+    }, 2200);
+  });
+})();

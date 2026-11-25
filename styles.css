@@ -4682,3 +4682,42 @@ h2 {
     gap: 22px;
   }
 }
+
+/* ── Fleet quick-view hover overlay ────────────────────────────────── */
+.price-card { position: relative; }
+.price-card .quick-view {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  padding: 14px;
+  background: rgba(22, 22, 22, 0.92);
+  color: #fff;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .18s ease, visibility .18s ease;
+  z-index: 2;
+}
+.price-card:hover .quick-view,
+.price-card:focus-within .quick-view {
+  opacity: 1;
+  visibility: visible;
+}
+.price-card .quick-view strong { font-size: 1rem; }
+.price-card .quick-view span { font-size: .78rem; color: #e8e1d6; }
+.price-card .quick-view a {
+  justify-self: center;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--red, #b85c45);
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: .8rem;
+}
+@media (hover: none) {
+  .price-card .quick-view { display: none; }
+}

@@ -22,7 +22,7 @@ async function load(name) {
   }
   const mod = await moduleFor(path.join(root, 'api', name)); await mod.evaluate(); return mod.namespace;
 }
-function response() { return { code: 200, headers: {}, setHeader(k,v) { this.headers[k]=v; }, status(code) { this.code=code; return this; }, json(body) { this.body=JSON.parse(JSON.stringify(body)); return this; } }; }
+function response() { return { code: 200, headers: {}, setHeader(k,v) { this.headers[k]=v; }, status(code) { this.code=code; return this; }, json(body) { this.body=JSON.parse(JSON.stringify(body)); return this; }, end() { this.ended = true; return this; } }; }
 test('public request guard emits request ID and rate limits synthetic clients', async () => {
   const { checkPublicRequest, resetPublicRequestBuckets } = await load('_request-guard.js');
   resetPublicRequestBuckets();
